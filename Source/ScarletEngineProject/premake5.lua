@@ -20,6 +20,7 @@ project "ScarletEngine"
 
     includedirs
     {
+        "%{prj.name}",
         "%{prj.name}/Src/",
 
         "$(SolutionDir)Source/ScarletCoreProject/",

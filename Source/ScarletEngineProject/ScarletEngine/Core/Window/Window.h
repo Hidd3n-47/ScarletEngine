@@ -5,6 +5,8 @@ struct GLFWwindow;
 namespace Scarlet
 {
 
+class Event;
+
 /**
  * @class WindowProperties
  * A structure to hold the properties of a window.
@@ -27,6 +29,9 @@ struct WindowProperties
     bool   resizable = false;
     /** If the window contains a titlebar.  */
     bool   titleBar  = true;
+
+    /** A function pointer to a callback method used to process events. */
+    std::function<void(Event&)> eventCallback;
 };
 
 /**
@@ -65,6 +70,11 @@ public:
      * @return Properties of the window.
      */
     [[nodiscard]] inline WindowProperties* GetProperties() { return &mWindowProperties; }
+
+    /**
+     * @brief Set the function pointer for event callback.
+     */
+    inline void SetEventCallback(const std::function<void(Event&)>& callback) { mWindowProperties.eventCallback = callback; }
 private:
     GLFWwindow*      mWindowHandle;
     WindowProperties mWindowProperties;

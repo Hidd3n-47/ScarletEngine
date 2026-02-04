@@ -4,7 +4,9 @@
 
 int main(int, char**)
 {
-    Scarlet::Engine::Init();
+    Scarlet::Engine::CreateEngine();
+
+    Scarlet::Engine::Instance().Init();
     Scarlet::Engine::Instance().Run();
-    Scarlet::Engine::Destroy();
+    Scarlet::Engine::Instance().Destroy();
 }

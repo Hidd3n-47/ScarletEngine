@@ -5,6 +5,7 @@
 namespace Scarlet
 {
 
+class Event;
 class Window;
 
 class Engine
@@ -17,8 +18,10 @@ public:
 
     [[nodiscard]] inline static Engine& Instance() { return *mInstance; }
 
-    static void Init();
-    static void Destroy();
+    static void CreateEngine();
+
+    void Init();
+    void Destroy();
 
     void Run() const;
 private:
@@ -30,6 +33,8 @@ private:
     WeakHandle<Window> mMainWindow;
 
     bool mRunning = false;
+
+    void OnEvent(Event& e);
 };
 
 } // Namespace Scarlet.

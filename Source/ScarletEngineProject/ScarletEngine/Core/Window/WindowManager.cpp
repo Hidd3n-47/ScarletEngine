@@ -3,6 +3,10 @@
 
 #include <glfw/glfw3.h>
 
+#include "Core/Events/MouseEvents.h"
+#include "Core/Events/KeyboardEvents.h"
+#include "Core/Events/ApplicationEvents.h"
+
 namespace Scarlet
 {
 
@@ -12,6 +16,20 @@ namespace
 void GlfwErrorCallback(int error, const char* description)
 {
     __debugbreak();
+}
+
+template <typename T, typename ...Args>
+void DispatchEvent(GLFWwindow* win, Args... args)
+{
+    const WindowProperties& data = *static_cast<WindowProperties*>(glfwGetWindowUserPointer(win));
+
+    if (!data.eventCallback)
+    {
+        return;
+    }
+
+    T event{ std::forward<Args>(args)... };
+    data.eventCallback(event);
 }
 
 } // Anonymous namespace.
@@ -40,6 +58,60 @@ WeakHandle<Window> WindowManager::CreateWindowInternal(const char* title, const 
 
     Window* windowHandle = new Window(window, windowProperties);
     glfwSetWindowUserPointer(window, windowHandle->GetProperties());
+
+    glfwSetWindowCloseCallback(window, [](GLFWwindow* win) { DispatchEvent<WindowClosedEvent>(win); });
+
+    glfwSetCursorPosCallback(window, 
+        [](GLFWwindow* win, const double x, const double y) { DispatchEvent<MouseMovedEvent>(win, static_cast<float>(x), static_cast<float>(y)); });
+
+    glfwSetScrollCallback(window, 
+        [](GLFWwindow* win, const double xOffset, const double yOffset) { DispatchEvent<MouseScrollEvent>(win, static_cast<float>(xOffset), static_cast<float>(yOffset)); });
+
+    glfwSetMouseButtonCallback(window, [](GLFWwindow* win, const int button, const int action, const int mods)
+        {
+            switch (action)
+            {
+            case GLFW_PRESS:
+            {
+                DispatchEvent<MouseButtonPressedEvent>(win, static_cast<uint32>(button));
+                break;
+            }
+            case GLFW_RELEASE:
+            {
+                DispatchEvent<MouseButtonReleasedEvent>(win, static_cast<uint32>(button));
+                break;
+            }
+            default:
+                break;
+            }
+        });
+
+    glfwSetKeyCallback(window, [](GLFWwindow* win, const int key, const int scanCode, const int action, const int mods)
+        {
+            switch (action)
+            {
+            case GLFW_PRESS:
+            {
+                DispatchEvent<KeyPressedEvent>(win, static_cast<uint32>(key));
+                break;
+            }
+            case GLFW_RELEASE:
+            {
+                DispatchEvent<KeyReleasedEvent>(win, static_cast<uint32>(key));
+                break;
+            }
+            case GLFW_REPEAT:
+            {
+                DispatchEvent<KeyTypedEvent>(win, static_cast<uint32>(key));
+                break;
+            }
+            default:
+                break;
+            }
+        });
+
+    glfwSetCharCallback(window,
+        [](GLFWwindow* win, const uint32 keycode){ DispatchEvent<KeyTypedEvent>(win, keycode); });
 
     return WeakHandle{ windowHandle };
 }
