@@ -6,8 +6,8 @@ project "Scarlet"
     staticruntime "Off"
     cppdialect "C++20"
 
-    targetdir(outputPath .. "%{prj.name}")
-    objdir(outputIntPath .. "%{prj.name}")
+    targetdir(path.join(outputPath, "%{prj.name}"))
+    objdir(path.join(outputIntPath, "%{prj.name}"))
 
     pchheader "ScarletPch.h"
     pchsource "%{prj.name}/Src/ScarletPch.cpp"
@@ -22,8 +22,8 @@ project "Scarlet"
     {
         "%{prj.name}/Src/",
 
-        "$(SolutionDir)Source/ScarletCore/",
-        "$(SolutionDir)Source/ScarletEngine/",
+        "$(SolutionDir)Source/ScarletCoreProject/",
+        "$(SolutionDir)Source/ScarletEngineProject/",
     }
 
     libdirs

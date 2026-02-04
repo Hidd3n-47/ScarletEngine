@@ -6,8 +6,8 @@ project "ScarletCore"
     staticruntime "Off"
     cppdialect "C++20"
 
-    targetdir(outputPath .. "%{prj.name}")
-    objdir(outputIntPath .. "%{prj.name}")
+    targetdir(path.join(outputPath, "%{prj.name}"))
+    objdir(path.join(outputIntPath, "%{prj.name}"))
 
     files
     {
@@ -30,8 +30,6 @@ project "ScarletCore"
 
     postbuildcommands
     {
-        '{MKDIR} "' .. outputPath .. 'Scarlet"',
-        '{COPYFILE} "%{cfg.buildtarget.abspath}" "' .. outputPath .. 'Scarlet/"'
     }
 
     filter "system:windows"

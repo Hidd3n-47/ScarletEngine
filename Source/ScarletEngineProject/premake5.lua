@@ -6,8 +6,8 @@ project "ScarletEngine"
     staticruntime "Off"
     cppdialect "C++20"
 
-    targetdir(outputPath .. "%{prj.name}")
-    objdir(outputIntPath .. "%{prj.name}")
+    targetdir(path.join(outputPath, "%{prj.name}"))
+    objdir(path.join(outputIntPath, "%{prj.name}"))
 
     pchheader "ScarletEnginePch.h"
     pchsource "%{prj.name}/Src/ScarletEnginePch.cpp"
@@ -21,20 +21,26 @@ project "ScarletEngine"
     includedirs
     {
         "%{prj.name}/Src/",
+
+        "$(SolutionDir)Source/ScarletCoreProject/",
+
+        "$(SolutionDir)Deps/Include/"
     }
 
     libdirs
     {
+        "$(SolutionDir)Deps/Lib/"
     }
 
     links
     {
+        "glfw3_mt.lib"
     }
 
     postbuildcommands
     {
-        '{MKDIR} "' .. outputPath .. 'Scarlet"',
-        '{COPYFILE} "%{cfg.buildtarget.abspath}" "' .. outputPath .. 'Scarlet/"'
+        --'{MKDIR} "' .. outputPath .. '/Scarlet/"',
+        --'{COPYFILE} "%{cfg.buildtarget.abspath}" "' .. outputPath .. '/Scarlet/"'
     }
 
     filter "system:windows"

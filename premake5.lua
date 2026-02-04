@@ -8,8 +8,12 @@ configurations
 }
 
 outputName    = "%{cfg.buildcfg}"
-outputPath    = "%{wks.location}Scratch/Bin/" .. outputName .. "/"
-outputIntPath = "%{wks.location}Scratch/Bin-Int/" .. outputName .. "/"
+outputPath    = path.join(_MAIN_SCRIPT_DIR, "Scratch", "Bin", outputName)
+outputIntPath = path.join(_MAIN_SCRIPT_DIR, "Scratch", "Bin-Int", outputName)
+
+-- Ensure that paths are absolute paths.
+outputPath    = path.getabsolute(outputPath)
+outputIntPath = path.getabsolute(outputIntPath)
 
 include "Source/ScarletProject/"
 include "Source/ScarletCoreProject/"
