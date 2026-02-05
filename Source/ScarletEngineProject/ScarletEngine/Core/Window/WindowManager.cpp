@@ -44,6 +44,11 @@ void WindowManager::InitApi()
     glfwSetErrorCallback(GlfwErrorCallback);
 }
 
+void WindowManager::ApiPoll()
+{
+    glfwPollEvents();
+}
+
 void WindowManager::TerminateApi()
 {
     glfwTerminate();
@@ -55,6 +60,11 @@ WeakHandle<Window> WindowManager::CreateWindowInternal(const char* title, const 
     glfwWindowHint(GLFW_RESIZABLE, windowProperties.resizable);
 
     GLFWwindow* window = glfwCreateWindow(static_cast<int>(windowProperties.width), static_cast<int>(windowProperties.height), title, nullptr, nullptr);
+
+    if (windowProperties.makeGlContext)
+    {
+        glfwMakeContextCurrent(window);
+    }
 
     Window* windowHandle = new Window(window, windowProperties);
     glfwSetWindowUserPointer(window, windowHandle->GetProperties());

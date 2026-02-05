@@ -35,7 +35,9 @@ project "ScarletEngine"
 
     links
     {
-        "glfw3_mt.lib"
+        "glfw3_mt.lib",
+        "glew32s.lib",
+        "opengl32.lib"
     }
 
     postbuildcommands

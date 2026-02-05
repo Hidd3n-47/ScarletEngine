@@ -18,6 +18,8 @@ public:
      */
     static void InitApi();
 
+    static void ApiPoll();
+
     /**
      * @brief Terminate the API used to create windows.
      */

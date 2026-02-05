@@ -15,7 +15,7 @@ Window::Window(GLFWwindow* windowHandle, const WindowProperties& windowPropertie
 
 void Window::Update() const
 {
-    glfwPollEvents();
+    glfwSwapBuffers(mWindowHandle);
 }
 
 } // Namespace Scarlet.
