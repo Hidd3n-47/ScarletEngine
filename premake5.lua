@@ -16,5 +16,6 @@ outputPath    = path.getabsolute(outputPath)
 outputIntPath = path.getabsolute(outputIntPath)
 
 include "Source/ScarletProject/"
+include "Source/ScarlEntProject/"
 include "Source/ScarletCoreProject/"
 include "Source/ScarletEngineProject/"

@@ -18,6 +18,9 @@ public:
      */
     static void InitApi();
 
+    /**
+     * @brief API agnostic interface for engine to poll for input/events.
+     */
     static void ApiPoll();
 
     /**

@@ -1,16 +1,13 @@
--- ---------------------------- ScarletEngine Project.
-project "ScarletEngine"
+-- ---------------------------- ScarlEnt Project.
+project "ScarlEnt"
     location "%{prj.name}"
-    kind "StaticLib"
+    kind "SharedLib"
     language "C++"
     staticruntime "Off"
     cppdialect "C++20"
 
     targetdir(path.join(outputPath, "%{prj.name}"))
     objdir(path.join(outputIntPath, "%{prj.name}"))
-
-    pchheader "ScarletEnginePch.h"
-    pchsource "%{prj.name}/Src/ScarletEnginePch.cpp"
 
     files
     {
@@ -30,21 +27,17 @@ project "ScarletEngine"
 
     libdirs
     {
-        "$(SolutionDir)Deps/Lib/"
     }
 
     links
     {
-        "ScarletCore",
-        "glfw3_mt.lib",
-        "glew32s.lib",
-        "opengl32.lib"
+        "ScarletCore"
     }
 
     postbuildcommands
     {
-        --'{MKDIR} "' .. outputPath .. '/Scarlet/"',
-        --'{COPYFILE} "%{cfg.buildtarget.abspath}" "' .. outputPath .. '/Scarlet/"'
+        '{MKDIR} "' .. outputPath .. '/Scarlet/"',
+        '{COPYFILE} "%{cfg.buildtarget.abspath}" "' .. outputPath .. '/Scarlet/"'
     }
 
     filter "system:windows"
