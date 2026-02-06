@@ -4,8 +4,8 @@ namespace Scarlet
 {
 
 /**
- * @class WeakHandle: A class used to hold a reference to a pointer such that the ownership is not transferred.<br/>
- * Having a \c Handle to a pointer allows you to access the pointer and its methods but not call \c delete on it.
+ * @class WeakHandle: A class used to hold a reference to a pointer such that the ownership is not transferred.\\n
+ * Having a handle to a pointer allows you to access the pointer and its methods but not call \c delete on it.
  * @note A handle could be invalid if the original memory is freed, and therefore should be only used when the lifetime is known to exist.
  * @tparam T: The class of the pointer.
  */

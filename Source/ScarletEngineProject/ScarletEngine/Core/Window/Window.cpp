@@ -6,9 +6,9 @@
 namespace Scarlet
 {
 
-Window::Window(GLFWwindow* windowHandle, const WindowProperties& windowProperties)
+Window::Window(GLFWwindow* windowHandle, WindowProperties&& windowProperties)
     : mWindowHandle(windowHandle)
-    , mWindowProperties(windowProperties)
+    , mWindowProperties(std::move(windowProperties))
 {
     // Empty.
 }

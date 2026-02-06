@@ -4,7 +4,7 @@ namespace Scarlet
 {
 
 /**
- * @brief Enum to represent the type of event.
+ * @enum EventType: An enum to represent the type of event.
  */
 enum class EventType
 {
@@ -22,12 +22,12 @@ enum class EventType
 };
 
 
-#define EVENT_TYPE(type)      [[nodiscard]] static  EventType GetStaticType()               { return EventType::##type; } \
-                              [[nodiscard]] virtual EventType GetEventType() const override { return GetStaticType(); }
+#define EVENT_TYPE(type) [[nodiscard]] static  EventType GetStaticType()                { return EventType::##type; } \
+                         [[nodiscard]] virtual EventType GetEventType () const override { return GetStaticType(); }
 
 /**
 * @class Event: A class that represents an event.
-* @see EventType
+* @ref EventType
 */
 class Event
 {
@@ -42,12 +42,12 @@ public:
     Event& operator=(const Event&) = default;
 
     /**
-     * Get the type of event @see EventType
+     * @brief Get the type of event @ref EventType.
      * @return The type of the event.
      */
     [[nodiscard]] virtual EventType GetEventType() const = 0;
     /**
-     * Get if the event is handled or not.
+     * @brief Get if the event is handled or not.
      * @return \c true if the event is handled, \c false otherwise.
      */
     [[nodiscard]] inline bool IsHandled() const { return mHandled; }
@@ -66,9 +66,9 @@ public:
     { /* Empty*/ }
 
     /**
-     * Dispatch an event class to a respective function callback.
+     * @brief Dispatch an event class to a respective function callback.
      * @tparam T Generic interface of the events where \c T inherits from \c Event.
-     * @see Event
+     * @ref Event
      * @param function The callback function the event is being dispatched to.
      * @return \c true if the event was successfully dispatched to a callback method, \c false otherwise.
      */

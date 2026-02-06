@@ -7,7 +7,7 @@ namespace Scarlet
 
 /**
  * @class Log
- * A class used for logging to the debug console.<br/>
+ * A class used for logging to the debug console.
  * @note Ensure that it is initialised before use.
  */
 class Log

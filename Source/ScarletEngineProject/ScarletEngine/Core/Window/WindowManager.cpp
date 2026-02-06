@@ -38,10 +38,12 @@ bool WindowManager::mInitialized = false;
 
 void WindowManager::InitApi()
 {
-    mInitialized = true;
-
-    (void)glfwInit();
+    const int glfwOkay = glfwInit();
     glfwSetErrorCallback(GlfwErrorCallback);
+
+    SCARLET_ASSERT(glfwOkay == GLFW_TRUE && "Failed to initialise GLFW.");
+
+    mInitialized = true;
 }
 
 void WindowManager::ApiPoll()
@@ -54,19 +56,21 @@ void WindowManager::TerminateApi()
     glfwTerminate();
 }
 
-WeakHandle<Window> WindowManager::CreateWindowInternal(const char* title, const WindowProperties& windowProperties /* = {} */)
+WeakHandle<Window> WindowManager::CreateWindowInternal(const char* title, WindowProperties&& windowProperties /* = {} */)
 {
     glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
     glfwWindowHint(GLFW_RESIZABLE, windowProperties.resizable);
 
     GLFWwindow* window = glfwCreateWindow(static_cast<int>(windowProperties.width), static_cast<int>(windowProperties.height), title, nullptr, nullptr);
 
+    SCARLET_ASSERT(window && "Failed to create GLFW window.");
+
     if (windowProperties.makeGlContext)
     {
         glfwMakeContextCurrent(window);
     }
 
-    Window* windowHandle = new Window(window, windowProperties);
+    Window* windowHandle = new Window(window, std::move(windowProperties));
     glfwSetWindowUserPointer(window, windowHandle->GetProperties());
 
     glfwSetWindowCloseCallback(window, [](GLFWwindow* win) { DispatchEvent<WindowClosedEvent>(win); });
@@ -92,6 +96,7 @@ WeakHandle<Window> WindowManager::CreateWindowInternal(const char* title, const 
                 break;
             }
             default:
+                SCARLET_WARN("Unhandled Mouse Action Event. GLFW action: {}", action);
                 break;
             }
         });
@@ -116,6 +121,7 @@ WeakHandle<Window> WindowManager::CreateWindowInternal(const char* title, const 
                 break;
             }
             default:
+                SCARLET_WARN("Unhandled Key Action Event. GLFW action: {}", action);
                 break;
             }
         });

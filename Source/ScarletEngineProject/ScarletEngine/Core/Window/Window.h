@@ -8,7 +8,7 @@ namespace Scarlet
 class Event;
 
 /**
- * @class WindowProperties
+ * @struct WindowProperties
  * A structure to hold the properties of a window.
  */
 struct WindowProperties
@@ -38,13 +38,13 @@ struct WindowProperties
 
 /**
  * @class Window
- * A class to hold a handle to a window that allows for window interaction that is API agnostic.<br/>
- * Use @see WindowManager to create and destroy a window.
+ * A class to hold a handle to a window that allows for window interaction that is API agnostic.\\n
+ * Use @ref WindowManager to create and destroy a window.
  */
 class Window
 {
 public:
-    Window(GLFWwindow* windowHandle, const WindowProperties& windowProperties);
+    Window(GLFWwindow* windowHandle, WindowProperties&& windowProperties);
 
     /**
      * @brief Update the window.
@@ -68,7 +68,7 @@ public:
     [[nodiscard]] inline void*  GetNativeWindow() const    { return mWindowHandle; }
     /**
      * @brief Get the properties of the window.
-     * @see WindowProperties
+     * @ref WindowProperties
      * @return Properties of the window.
      */
     [[nodiscard]] inline WindowProperties* GetProperties() { return &mWindowProperties; }

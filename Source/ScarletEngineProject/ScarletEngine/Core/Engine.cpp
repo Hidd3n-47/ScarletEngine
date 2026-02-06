@@ -25,7 +25,8 @@ void Engine::Init()
     mMainWindow = WindowManager::CreateWindowInternal("Scarlet Engine");
     mMainWindow->SetEventCallback([](Event& e) { Instance().OnEvent(e); });
 
-    glewInit();
+    const unsigned int glewOkay = glewInit();
+    SCARLET_ASSERT(glewOkay == GLEW_OK && "Failed to initialise glew!");
 
     mRunning = true;
     SCARLET_INFO("Engine Initialised!");
