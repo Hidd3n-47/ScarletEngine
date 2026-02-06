@@ -36,8 +36,6 @@ project "ScarlEnt"
 
     postbuildcommands
     {
-        '{MKDIR} "' .. outputPath .. '/Scarlet/"',
-        '{COPYFILE} "%{cfg.buildtarget.abspath}" "' .. outputPath .. '/Scarlet/"'
     }
 
     filter "system:windows"
@@ -45,9 +43,10 @@ project "ScarlEnt"
 
     filter "configurations:Dev"
         runtime "Debug"
-        defines "DEV_CONFIGURATION"
+        defines { "DEV_CONFIGURATION", "SCARLENT" }
         symbols "On"
 
     filter "configurations:Release"
         runtime "Release"
+        defines "SCARLENT"
         optimize "On"

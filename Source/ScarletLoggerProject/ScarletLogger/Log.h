@@ -19,6 +19,10 @@ public:
     static void Init();
 
     /**
+     * @brief Used to trace info to the console. Trace is coloured white.
+     */
+    static void Trace(const char* name, const char* msg);
+    /**
      * @brief Used to log info to the console. Info is coloured green.
      */
     static void Info(const char* name, const char* msg);
@@ -34,6 +38,12 @@ public:
      * @brief Used to log errors to the console. Errors are coloured red.
      */
     static void Error(const char* name, const char* msg);
+
+    /**
+     * @brief Used to trace info to the console. Trace is coloured white.
+     */
+    template <typename... Args>
+    static void Trace(const char* name, const char* msg, Args&&... args);
 
     /**
      * @brief Used to log info to the console. Info is coloured green.
@@ -61,6 +71,13 @@ public:
 };
 
 /* ============================================================================================================================== */
+
+template <typename... Args>
+void Log::Trace(const char* name, const char* msg, Args&&... args)
+{
+    std::string formatted = std::vformat(std::string_view(msg), std::make_format_args(args...));
+    Trace(name, formatted.c_str());
+}
 
 template <typename... Args>
 void Log::Info(const char* name, const char* msg, Args&&... args)

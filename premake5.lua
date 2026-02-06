@@ -7,9 +7,12 @@ configurations
     "Release"
 }
 
-outputName    = "%{cfg.buildcfg}"
-outputPath    = path.join(_MAIN_SCRIPT_DIR, "Scratch", "Bin", outputName)
-outputIntPath = path.join(_MAIN_SCRIPT_DIR, "Scratch", "Bin-Int", outputName)
+outputName        = "%{cfg.buildcfg}"
+outputPath        = path.join(_MAIN_SCRIPT_DIR, "Scratch", "Bin", outputName)
+outputIntPath     = path.join(_MAIN_SCRIPT_DIR, "Scratch", "Bin-Int", outputName)
+testOutputPath    = path.join(_MAIN_SCRIPT_DIR, "Scratch", "Bin", outputName, "Tests")
+testOutputIntPath = path.join(_MAIN_SCRIPT_DIR, "Scratch", "Bin-Int", outputName, "Tests")
+
 
 -- Ensure that paths are absolute paths.
 outputPath    = path.getabsolute(outputPath)
@@ -20,3 +23,7 @@ include "Source/ScarlEntProject/"
 include "Source/ScarletCoreProject/"
 include "Source/ScarletLoggerProject/"
 include "Source/ScarletEngineProject/"
+
+-- Test Projects
+include "Tests/ScarletTestTemplateProject/"
+include "Tests/ScarlEntTestProject/"

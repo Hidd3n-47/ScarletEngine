@@ -13,6 +13,11 @@ void Log::Init()
     spdlog::set_pattern("%^[%T]%v%$");
 }
 
+void Log::Trace(const char* name, const char* msg)
+{
+    spdlog::trace(std::format(" {}: {}", name, msg));
+}
+
 void Log::Info(const char* name, const char* msg)
 {
     spdlog::info(std::format(" {}: {}", name, msg));
