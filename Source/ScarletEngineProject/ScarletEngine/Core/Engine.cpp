@@ -19,6 +19,8 @@ void Engine::CreateEngine()
 
 void Engine::Init()
 {
+    DEBUG(Log::Init());
+
     WindowManager::InitApi();
     mMainWindow = WindowManager::CreateWindowInternal("Scarlet Engine");
     mMainWindow->SetEventCallback([](Event& e) { Instance().OnEvent(e); });
@@ -26,6 +28,7 @@ void Engine::Init()
     glewInit();
 
     mRunning = true;
+    SCARLET_INFO("Engine Initialised!");
 }
 
 void Engine::Destroy()
@@ -34,6 +37,7 @@ void Engine::Destroy()
     WindowManager::TerminateApi();
 
     delete mInstance;
+    SCARLET_INFO("Engine Destroyed!");
 }
 
 void Engine::Run() const

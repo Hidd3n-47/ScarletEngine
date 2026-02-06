@@ -17,7 +17,7 @@ project "ScarletCore"
 
     includedirs
     {
-        "%{prj.name}/Src/",
+        "$(SolutionDir)Source/ScarletLoggerProject/",
     }
 
     libdirs
@@ -26,6 +26,7 @@ project "ScarletCore"
 
     links
     {
+        "ScarletLogger",
     }
 
     postbuildcommands
