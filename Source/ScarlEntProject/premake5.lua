@@ -36,6 +36,8 @@ project "ScarlEnt"
 
     postbuildcommands
     {
+        '{MKDIR} "' .. testOutputPath .. '/ScarlEntTest/"',
+        '{COPYFILE} "%{cfg.buildtarget.abspath}" "' .. testOutputPath .. '/ScarlEntTest/"'
     }
 
     filter "system:windows"

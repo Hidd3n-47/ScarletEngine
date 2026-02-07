@@ -16,12 +16,12 @@ public:
     Engine& operator=(Engine&&)      = delete;
     Engine& operator=(const Engine&) = delete;
 
-    [[nodiscard]] inline static Engine& Instance() { return *mInstance; }
+    [[nodiscard]] inline static Engine& Instance() noexcept { return *mInstance; }
 
-    static void CreateEngine();
+    static void CreateEngine() noexcept;
 
-    void Init();
-    void Destroy();
+    void Init() noexcept;
+    void Destroy() noexcept;
 
     void Run() const;
 private:

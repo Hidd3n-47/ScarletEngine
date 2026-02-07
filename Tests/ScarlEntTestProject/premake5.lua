@@ -20,6 +20,7 @@ project "ScarlEntTest"
         "$(SolutionDir)Tests/ScarletTestTemplateProject/",
         "$(SolutionDir)Tests/ScarlEntTestProject/",
 
+        "$(SolutionDir)Source/ScarletCoreProject/",
         "$(SolutionDir)Source/ScarlentProject/",
 
         "$(SolutionDir)Deps/Include/",
@@ -32,6 +33,8 @@ project "ScarlEntTest"
 
     links
     {
+       "ScarletCore",
+
        "ScarletTestTemplate",
        "ScarlEnt"
     }
