@@ -2,6 +2,7 @@
 #include <ScarletTestTemplate/Core/TestRegistry.h>
 
 #include "ScarlEntTest/Tests/ArchetypeTests.h"
+#include "ScarlEntTest/Tests/SparseSetTests.h"
 
 namespace Scarlet
 {
@@ -17,6 +18,7 @@ public:
     inline void RegisterTests() override
     {
         ArchetypeTests(this);
+        SparseSetTests(this);
     }
 
 };

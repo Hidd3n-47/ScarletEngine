@@ -4,18 +4,7 @@
 
 #include <ScarlEnt/Archetype.h>
 
-struct Vec2
-{
-    int x = 0;
-    int y = 0;
-};
-
-struct Vec3
-{
-    int x = 0;
-    int y = 0;
-    int z = 0;
-};
+#include "SimpleTestTypes.h"
 
 class ArchetypeTests
 {
