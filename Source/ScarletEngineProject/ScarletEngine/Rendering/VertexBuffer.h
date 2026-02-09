@@ -1,0 +1,50 @@
+#pragma once
+
+namespace Scarlet
+{
+
+/**
+ * @class VertexBuffer: A class responsible for uploading vertices to the GPU and storing a unique \\n
+ * identifier for the vertex buffer.
+ */
+class VertexBuffer
+{
+public:
+    /**
+     * @brief Construct a vertex buffer with a set size and pass in the data/buffer later.
+     * @param size The size of the buffer in bytes.
+     */
+    VertexBuffer(const uint32 size);
+    /**
+     * @brief Construct a vertex buffer with a set size and buffer.
+     * @param vertices A pointer to the buffer of vertices.
+     * @param size The size of the buffer in bytes.
+     */
+    VertexBuffer(const float* vertices, const uint32 size);
+    ~VertexBuffer();
+
+    VertexBuffer(const VertexBuffer&)            = delete;
+    VertexBuffer(VertexBuffer&&)                 = delete;
+    VertexBuffer& operator=(VertexBuffer&&)      = delete;
+    VertexBuffer& operator=(const VertexBuffer&) = delete;
+
+    /**
+     * @brief Bind the buffer so the graphics pipeline uses this vertex buffer.
+     */
+    void Bind() const;
+    /**
+     * @brief Unbind the currently bound vertex buffer.
+     */
+    static void Unbind();
+
+    /**
+     * @brief Set the data of the buffer. This will inform the graphics pipeline to update the buffer.
+     * @param vertices A pointer to the buffer of vertices.
+     * @param size The size of the buffer in bytes.
+     */
+    void SetData(const float* vertices, const uint32 size) const;
+private:
+    uint32 mId;
+};
+
+} // Namespace Scarlet.
