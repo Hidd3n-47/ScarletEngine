@@ -21,9 +21,11 @@ outputIntPath = path.getabsolute(outputIntPath)
 include "Source/ScarletProject/"
 include "Source/ScarlEntProject/"
 include "Source/ScarletCoreProject/"
+include "Source/ScarletMathProject/"
 include "Source/ScarletLoggerProject/"
 include "Source/ScarletEngineProject/"
 
 -- Test Projects
 include "Tests/ScarletTestTemplateProject/"
+include "Tests/ScarletMathTestProject/"
 include "Tests/ScarlEntTestProject/"
