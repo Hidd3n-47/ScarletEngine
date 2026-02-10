@@ -9,15 +9,22 @@
 
 #include "Window/WindowManager.h"
 
+#include "Rendering/Shader.h"
+#include "Rendering/Renderer.h"
+#include "Rendering/VertexArray.h"
+#include "Rendering/IndexBuffer.h"
+#include "Rendering/VertexBuffer.h"
+#include "Rendering/VertexBufferLayout.h"
+
 namespace Scarlet
 {
 
-void Engine::CreateEngine()
+void Engine::CreateEngine() noexcept
 {
     mInstance = new Engine();
 }
 
-void Engine::Init()
+void Engine::Init() noexcept
 {
     DEBUG(Log::Init());
 
@@ -25,15 +32,16 @@ void Engine::Init()
     mMainWindow = WindowManager::CreateWindowInternal("Scarlet Engine");
     mMainWindow->SetEventCallback([](Event& e) { Instance().OnEvent(e); });
 
-    const unsigned int glewOkay = glewInit();
-    SCARLET_ASSERT(glewOkay == GLEW_OK && "Failed to initialise glew!");
+    Renderer::InitApi();
 
     mRunning = true;
     SCARLET_INFO("Engine Initialised!");
 }
 
-void Engine::Destroy()
+void Engine::Destroy() noexcept
 {
+    SCARLET_ASSERT(!mRunning && "Trying to destroy engine whilst Engine::Run is running.");
+
     WindowManager::DestroyWindow(mInstance->mMainWindow);
     WindowManager::TerminateApi();
 
@@ -43,6 +51,19 @@ void Engine::Destroy()
 
 void Engine::Run() const
 {
+    float positions[] = { -0.5f, -0.5f, 0.5f, -0.5f, 0.5f, 0.5f, -0.5f, 0.5f };
+    uint32 indices[] = { 0, 1, 2, 2, 3, 0};
+
+    const VertexArray va;
+    const VertexBuffer vb(positions, 4 * 2 * sizeof(float));
+    VertexBufferLayout layout;
+    layout.Push<float>(2);
+    va.AddBuffer(vb, layout);
+
+    const IndexBuffer ib(indices, 6);
+
+    const Shader shader("E:/Programming/ScarletEngine/EngineAssets/Shaders/editor.vert", "E:/Programming/ScarletEngine/EngineAssets/Shaders/editor.frag");
+
     while (mRunning)
     {
         WindowManager::ApiPoll();
@@ -50,11 +71,11 @@ void Engine::Run() const
         glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        glBegin(GL_TRIANGLES);
-        glVertex2f(-0.5f, -0.5f);
-        glVertex2f(0.0f, 0.5f);
-        glVertex2f(0.5f, -0.5f);
-        glEnd();
+        va.Bind();
+        ib.Bind();
+        shader.Bind();
+
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 
         mMainWindow->Update();
     }
