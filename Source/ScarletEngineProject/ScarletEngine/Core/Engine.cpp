@@ -16,6 +16,9 @@
 #include "Rendering/VertexBuffer.h"
 #include "Rendering/VertexBufferLayout.h"
 
+#include "Rendering/MeshData.h"
+#include "Rendering/MeshLoader.h"
+
 namespace Scarlet
 {
 
@@ -33,6 +36,9 @@ void Engine::Init() noexcept
     mMainWindow->SetEventCallback([](Event& e) { Instance().OnEvent(e); });
 
     Renderer::InitApi();
+
+    Resource::MeshData cube;
+    MeshLoader::LoadMesh("E:/Programming/ScarletEngine/EngineAssets/Cube.obj", cube);
 
     mRunning = true;
     SCARLET_INFO("Engine Initialised!");

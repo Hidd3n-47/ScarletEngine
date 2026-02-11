@@ -5,6 +5,10 @@
 #include <sstream>
 #include <fstream>
 
+#include <ScarletMath/Math.h>
+
+#include "MeshData.h"
+
 namespace Scarlet
 {
 
@@ -41,14 +45,24 @@ constexpr ObjKeyword StringToObjKeyword(const std::string_view& keyword)
     return ObjKeyword::ERR;
 }
 
+
+bool FileEndsWithExtension(const char* str, const char* suffix)
+{
+    const size_t len = std::strlen(str);
+
+    if (len < 4) return false;
+
+    return std::strcmp(&str[len - 4], suffix) == 0;
+}
+
 } // Anonymous namespace.
+
 
 void MeshLoader::LoadMesh(const char* filepath, Resource::MeshData& mesh)
 {
-    //todo make debug or find a good way to check this
-    if (filepath.GetExtension() != ".obj")
+    if (!FileEndsWithExtension(filepath, ".obj"))
     {
-        SCARLET_WARN("Meshes have to be of type '.obj' extension, and hence failed to load given mesh at path: {0}", filepath);
+        SCARLET_WARN("Meshes have to be of type '.obj' extension, and hence failed to load given mesh at path: {}", filepath);
         // return error.
         return;
     }
@@ -58,14 +72,14 @@ void MeshLoader::LoadMesh(const char* filepath, Resource::MeshData& mesh)
 
     if (fin.fail())
     {
-        SCARLET_WARN("There was an error opening the mesh file at given path: {0}", filepath);
+        SCARLET_WARN("There was an error opening the mesh file at given path: {}", filepath);
         // return error.
         return;
     }
 
     vector<Face> faces;
-    vector<ScarlettMath::Vec3> normals;
-    vector<ScarlettMath::Vec2> textureCoordinates;
+    vector<Math::Vec3> normals;
+    vector<Math::Vec2> textureCoordinates;
 
     std::string line;
     uint32 lineNumber = 0;
@@ -76,7 +90,7 @@ void MeshLoader::LoadMesh(const char* filepath, Resource::MeshData& mesh)
         const size_t spacePosition = line.find(' ');
         if (spacePosition == std::string::npos)
         {
-            SCARLET_WARN("Unrecognised line format when loading mesh at path: '{0}'\nThe unrecognised line is: '{1}: {2}'", filepath, lineNumber, line);
+            SCARLET_WARN("Unrecognised line format when loading mesh at path: '{}'\nThe unrecognised line is: '{}: {}'", filepath, lineNumber, line);
             continue;
         }
         std::string         keywordString{ line.substr(0, spacePosition) };
@@ -87,7 +101,7 @@ void MeshLoader::LoadMesh(const char* filepath, Resource::MeshData& mesh)
         {
         case ObjKeyword::VERTEX:
         {
-            ScarlettMath::Vec3 position;
+            Math::Vec3 position;
             input >> position.x >> position.y >> position.z;
             mesh.vertices.emplace_back(position);
             break;
@@ -152,14 +166,14 @@ void MeshLoader::LoadMesh(const char* filepath, Resource::MeshData& mesh)
         }
         case ObjKeyword::TEXTURE_COORD:
         {
-            ScarlettMath::Vec2 textureCoord;
+            Math::Vec2 textureCoord;
             input >> textureCoord.x >> textureCoord.y;
             textureCoordinates.emplace_back(textureCoord);
             break;
         }
         case ObjKeyword::VERTEX_NORMAL:
         {
-            ScarlettMath::Vec3 normal;
+            Math::Vec3 normal;
             input >> normal.x >> normal.y >> normal.z;
             normals.emplace_back(normal);
             break;

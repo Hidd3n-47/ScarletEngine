@@ -24,6 +24,7 @@ project "ScarletEngine"
         "%{prj.name}/Src/",
 
         "$(SolutionDir)Source/ScarletCoreProject/",
+        "$(SolutionDir)Source/ScarletMathProject/",
         "$(SolutionDir)Source/ScarletLoggerProject/",
 
         "$(SolutionDir)Deps/Include/"
@@ -37,6 +38,7 @@ project "ScarletEngine"
     links
     {
         "ScarletCore",
+        "ScarletMath",
         "ScarletLogger",
 
         "glfw3_mt.lib",
