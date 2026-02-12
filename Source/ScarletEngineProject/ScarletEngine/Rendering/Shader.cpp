@@ -3,7 +3,9 @@
 
 #include <glew/glew.h>
 
-#include <Core/IOManager.h>
+#include <ScarletMath/Math.h>
+
+#include "Core/IOManager.h"
 
 namespace Scarlet
 {
@@ -93,6 +95,32 @@ uint32 Shader::CompileShader(const uint32 type, const std::string& source)
     }
 
     return id;
+}
+
+template <>
+void Shader::UploadUniform(const char* name, const Math::Mat4& value)
+{
+    glUniformMatrix4fv(GetUniformLocation(name), 1, GL_FALSE, &value[0][0]);
+}
+
+int Shader::GetUniformLocation(const char* name)
+{
+    if (mUniformLocationCache.contains(name))
+    {
+        return mUniformLocationCache[name];
+    }
+
+    const int location = glGetUniformLocation(mId, name);
+
+    if (location == -1)
+    {
+        SCARLET_WARN("Shader warning: Uniform '{}' does not exist.", name);
+        return -1;
+    }
+
+    mUniformLocationCache[name] = location;
+
+    return location;
 }
 
 } // Namespace Scarlet.

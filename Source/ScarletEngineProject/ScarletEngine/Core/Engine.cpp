@@ -15,6 +15,7 @@
 #include "Rendering/IndexBuffer.h"
 #include "Rendering/VertexBuffer.h"
 #include "Rendering/BufferLayout.h"
+#include "Rendering/Camera.h"
 
 #include "Rendering/MeshData.h"
 #include "Rendering/MeshLoader.h"
@@ -54,9 +55,6 @@ void Engine::Destroy() noexcept
 
 void Engine::Run() const
 {
-    float positions[] = { -0.5f, -0.5f, 0.5f, -0.5f, 0.5f, 0.5f, -0.5f, 0.5f };
-    uint32 indices[] = { 0, 1, 2, 2, 3, 0};
-
     Resource::MeshData cube;
     MeshLoader::LoadMesh("E:/Programming/ScarletEngine/EngineAssets/Cube.obj", cube);
 
@@ -69,7 +67,10 @@ void Engine::Run() const
 
     const IndexBuffer ib(cube.indices.data(), cube.indices.size());
 
-    const Shader shader("E:/Programming/ScarletEngine/EngineAssets/Shaders/editor.vert", "E:/Programming/ScarletEngine/EngineAssets/Shaders/editor.frag");
+    Shader shader("E:/Programming/ScarletEngine/EngineAssets/Shaders/editor.vert", "E:/Programming/ScarletEngine/EngineAssets/Shaders/editor.frag");
+
+    Camera camera;
+    camera.UpdateViewAndProjectionMatrix({ 0.0f, 10.0f, 2.0f });
 
     while (mRunning)
     {
@@ -81,6 +82,9 @@ void Engine::Run() const
         va.Bind();
         ib.Bind();
         shader.Bind();
+
+        shader.UploadUniform("uViewMatrix", camera.GetViewMatrix());
+        shader.UploadUniform("uProjectionMatrix", camera.GetProjectionMatrix());
 
         glDrawElements(GL_TRIANGLES, cube.indices.size(), GL_UNSIGNED_INT, nullptr);
 

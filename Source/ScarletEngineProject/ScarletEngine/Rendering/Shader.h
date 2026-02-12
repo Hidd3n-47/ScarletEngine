@@ -31,8 +31,18 @@ public:
      * @brief Unbind the currently bound shader program.
      */
     static void Unbind();
+
+    /**
+     * @brief Upload a value for the given uniform name to the GPU.
+     * @tparam T The type that is being uploaded to the GPU.
+     * @param name The name of the uniform in the shader.
+     * @param value The value being uploaded to the uniform.
+     */
+    template <typename T>
+    void UploadUniform(const char* name, const T& value);
 private:
     uint32 mId;
+    std::unordered_map<std::string, int> mUniformLocationCache;
 
     /**
      * @brief Create the shaders from the source code and link to the shader program identifier.
@@ -48,6 +58,13 @@ private:
      * @return The identifier for the compiled shader that can be linked to the shader program identifier.
      */
     static uint32 CompileShader(const uint32 type, const std::string& source);
+
+    /**
+     * @brief Get the unique identifier of the uniform with a given name.
+     * @param name The name of the uniform. This name must match the name in the shader exactly.
+     * @return The unique identifier of the uniform with the given name, or -1 if not found.
+     */
+    [[nodiscard]] int GetUniformLocation(const char* name);
 };
 
 } // Namespace Scarlet.
