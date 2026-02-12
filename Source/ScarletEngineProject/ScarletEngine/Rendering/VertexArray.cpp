@@ -14,21 +14,22 @@ VertexArray::~VertexArray()
     glDeleteVertexArrays(1, &mId);
 }
 
-void VertexArray::AddBuffer(const VertexBuffer& vertexBuffer, const VertexBufferLayout& vertexBufferLayout) const
+void VertexArray::AddBuffer(const VertexBuffer& vertexBuffer) const
 {
     Bind();
 
     vertexBuffer.Bind();
 
-    const vector<VertexBufferElement>& elements = vertexBufferLayout.GetElements();
+    const BufferLayout& vertexBufferLayout = vertexBuffer.GetBufferLayout();
+    const vector<BufferElement>& elements  = vertexBufferLayout.GetElements();
 
     uint32 offset = 0;
     for (size_t i{ 0 }; i < elements.size(); ++i)
     {
-        const VertexBufferElement& e = elements[i];
+        const auto& [count, type, size, normalised] = elements[i];
         glEnableVertexAttribArray(i);
-        glVertexAttribPointer(i, e.count, e.type, e.normalised, static_cast<int>(vertexBufferLayout.GetStride()), reinterpret_cast<const void*>(offset));
-        offset += e.count * e.size;
+        glVertexAttribPointer(i, count, type, normalised, static_cast<int>(vertexBufferLayout.GetStride()), reinterpret_cast<const void*>(offset));
+        offset += count * size;
     }
 }
 

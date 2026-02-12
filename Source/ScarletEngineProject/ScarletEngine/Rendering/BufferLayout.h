@@ -6,21 +6,21 @@ namespace Scarlet
 {
 
 /**
- * @struct VertexBufferElement: Information relating to the specific element.
+ * @struct BufferElement: Information relating to the specific element.
  */
-struct VertexBufferElement
+struct BufferElement
 {
     uint32 count = 0;
-    uint32 type = 0;
-    uint32 size = 0;
+    uint32 type  = 0;
+    uint32 size  = 0;
     bool   normalised = false;
 };
 
 /**
- * @class VertexBufferLayout: A class representing the layout of a given vertex buffer. This can be used to \nn
+ * @class BufferLayout: A class representing the layout of a given vertex buffer. This can be used to \nn
  * set up the vertex array and shaders to know how to process the vertex buffer.
  */
-class VertexBufferLayout
+class BufferLayout
 {
 public:
     /**
@@ -37,10 +37,10 @@ public:
      */
     [[nodiscard]] inline uint32 GetStride() const { return mStride; }
     /** @brief Get a reference to the elements pushed. */
-    [[nodiscard]] inline const vector<VertexBufferElement>& GetElements() const { return mElements; }
+    [[nodiscard]] inline const vector<BufferElement>& GetElements() const { return mElements; }
 private:
     uint32 mStride = 0;
-    vector<VertexBufferElement> mElements;
+    vector<BufferElement> mElements;
 
     /**
      * @brief Convert a C++ to an OpenGL type that can be used for OpenGL calls.
@@ -58,7 +58,7 @@ private:
 /* ============================================================================================================================== */
 
 template <typename T>
-void VertexBufferLayout::Push(const uint32 count)
+void BufferLayout::Push(const uint32 count)
 {
     constexpr uint32 size = sizeof(T);
     constexpr uint32 type = TypeToGlType<T>();
@@ -68,13 +68,13 @@ void VertexBufferLayout::Push(const uint32 count)
 }
 
 template <>
-inline constexpr uint32 VertexBufferLayout::TypeToGlType<float>()
+inline constexpr uint32 BufferLayout::TypeToGlType<float>()
 {
     return GL_FLOAT;
 }
 
 template <>
-inline constexpr uint32 VertexBufferLayout::TypeToGlType<uint32>()
+inline constexpr uint32 BufferLayout::TypeToGlType<uint32>()
 {
     return GL_UNSIGNED_INT;
 }

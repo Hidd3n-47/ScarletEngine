@@ -34,13 +34,13 @@ enum class ObjKeyword : uint8
 
 constexpr ObjKeyword StringToObjKeyword(const std::string_view& keyword)
 {
-    if (keyword == "v")     return ObjKeyword::VERTEX;
-    if (keyword == "f")     return ObjKeyword::FACE;
-    if (keyword == "o")     return ObjKeyword::OBJECT_NAME;
-    if (keyword == "vt")    return ObjKeyword::TEXTURE_COORD;
-    if (keyword == "vn")    return ObjKeyword::VERTEX_NORMAL;
-    if (keyword == "#")     return ObjKeyword::COMMENT;
-    if (keyword == "s")     return ObjKeyword::SMOOTHING_GROUP;
+    if (keyword == "v")  return ObjKeyword::VERTEX;
+    if (keyword == "f")  return ObjKeyword::FACE;
+    if (keyword == "o")  return ObjKeyword::OBJECT_NAME;
+    if (keyword == "vt") return ObjKeyword::TEXTURE_COORD;
+    if (keyword == "vn") return ObjKeyword::VERTEX_NORMAL;
+    if (keyword == "#")  return ObjKeyword::COMMENT;
+    if (keyword == "s")  return ObjKeyword::SMOOTHING_GROUP;
 
     return ObjKeyword::ERR;
 }
@@ -63,7 +63,6 @@ void MeshLoader::LoadMesh(const char* filepath, Resource::MeshData& mesh)
     if (!FileEndsWithExtension(filepath, ".obj"))
     {
         SCARLET_WARN("Meshes have to be of type '.obj' extension, and hence failed to load given mesh at path: {}", filepath);
-        // return error.
         return;
     }
 
@@ -73,7 +72,6 @@ void MeshLoader::LoadMesh(const char* filepath, Resource::MeshData& mesh)
     if (fin.fail())
     {
         SCARLET_WARN("There was an error opening the mesh file at given path: {}", filepath);
-        // return error.
         return;
     }
 
@@ -154,7 +152,6 @@ void MeshLoader::LoadMesh(const char* filepath, Resource::MeshData& mesh)
                 if (slash1 == std::string::npos || slash1 == 0 || slash2 == std::string::npos || slash1 + 1 == slash2)
                 {
                     SCARLET_WARN("Failed to load mesh due to invalid face value for mesh at path: '{}'\nThe line with the invalid face is: '{}: {}'", filepath, lineNumber, line);
-                    // return error.
                     return;
                 }
 
@@ -196,21 +193,18 @@ void MeshLoader::LoadMesh(const char* filepath, Resource::MeshData& mesh)
         if (normals.size() <= f.normal)
         {
             SCARLET_WARN("Failed to load mesh due to a mismatch between the number of normals and the normal index for the mesh with path: '{0}'", filepath);
-            // return error.
             return;
         }
 
         if (textureCoordinates.size() <= f.textureCoord)
         {
             SCARLET_WARN("Failed to load mesh due to a mismatch between the number of texture coordinates and the texture coordinates index for the mesh with path: '{0}'", filepath);
-            // return error.
             return;
         }
 
         if (mesh.vertices.size() <= f.index)
         {
             SCARLET_WARN("Failed to load mesh due to a mismatch between the number of vertices and the index for the mesh with path: '{0}'", filepath);
-            // return error.
             return;
         }
 

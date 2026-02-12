@@ -14,7 +14,7 @@
 #include "Rendering/VertexArray.h"
 #include "Rendering/IndexBuffer.h"
 #include "Rendering/VertexBuffer.h"
-#include "Rendering/VertexBufferLayout.h"
+#include "Rendering/BufferLayout.h"
 
 #include "Rendering/MeshData.h"
 #include "Rendering/MeshLoader.h"
@@ -37,9 +37,6 @@ void Engine::Init() noexcept
 
     Renderer::InitApi();
 
-    Resource::MeshData cube;
-    MeshLoader::LoadMesh("E:/Programming/ScarletEngine/EngineAssets/Cube.obj", cube);
-
     mRunning = true;
     SCARLET_INFO("Engine Initialised!");
 }
@@ -60,13 +57,17 @@ void Engine::Run() const
     float positions[] = { -0.5f, -0.5f, 0.5f, -0.5f, 0.5f, 0.5f, -0.5f, 0.5f };
     uint32 indices[] = { 0, 1, 2, 2, 3, 0};
 
-    const VertexArray va;
-    const VertexBuffer vb(positions, 4 * 2 * sizeof(float));
-    VertexBufferLayout layout;
-    layout.Push<float>(2);
-    va.AddBuffer(vb, layout);
+    Resource::MeshData cube;
+    MeshLoader::LoadMesh("E:/Programming/ScarletEngine/EngineAssets/Cube.obj", cube);
 
-    const IndexBuffer ib(indices, 6);
+    const VertexArray va;
+    VertexBuffer vb(cube.vertices.data(), cube.vertices.size() * sizeof(Resource::Vertex));
+    vb.PushLayoutElement<float>(3);
+    vb.PushLayoutElement<float>(3);
+    vb.PushLayoutElement<float>(2);
+    va.AddBuffer(vb);
+
+    const IndexBuffer ib(cube.indices.data(), cube.indices.size());
 
     const Shader shader("E:/Programming/ScarletEngine/EngineAssets/Shaders/editor.vert", "E:/Programming/ScarletEngine/EngineAssets/Shaders/editor.frag");
 
@@ -81,7 +82,7 @@ void Engine::Run() const
         ib.Bind();
         shader.Bind();
 
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+        glDrawElements(GL_TRIANGLES, cube.indices.size(), GL_UNSIGNED_INT, nullptr);
 
         mMainWindow->Update();
     }

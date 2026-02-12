@@ -1,7 +1,6 @@
 #pragma once
 
 #include "VertexBuffer.h"
-#include "VertexBufferLayout.h"
 
 namespace Scarlet
 {
@@ -26,9 +25,8 @@ public:
      * @ref VertexBuffer
      * @ref VertexBufferLayout
      * @param vertexBuffer The vertex buffer that the array is responsible for.
-     * @param vertexBufferLayout The layout of the vertex Buffer.
      */
-    void AddBuffer(const VertexBuffer& vertexBuffer, const VertexBufferLayout& vertexBufferLayout) const;
+    void AddBuffer(const VertexBuffer& vertexBuffer) const;
 
     /**
      * @brief Bind the array so the graphics pipeline uses this vertex array.

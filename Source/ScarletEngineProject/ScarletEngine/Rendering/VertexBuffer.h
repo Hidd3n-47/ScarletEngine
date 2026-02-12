@@ -1,5 +1,7 @@
 #pragma once
 
+#include "BufferLayout.h"
+
 namespace Scarlet
 {
 
@@ -20,7 +22,7 @@ public:
      * @param vertices A pointer to the buffer of vertices.
      * @param size The size of the buffer in bytes.
      */
-    VertexBuffer(const float* vertices, const uint32 size);
+    VertexBuffer(const void* vertices, const uint32 size);
     ~VertexBuffer();
 
     VertexBuffer(const VertexBuffer&)            = delete;
@@ -42,9 +44,19 @@ public:
      * @param vertices A pointer to the buffer of vertices.
      * @param size The size of the buffer in bytes.
      */
-    void SetData(const float* vertices, const uint32 size) const;
+    void SetData(const void* vertices, const uint32 size) const;
+
+    template <typename T>
+    inline void PushLayoutElement(const uint32 count = 0)
+    {
+        mLayout.Push<T>(count);
+    }
+
+    [[nodiscard]] inline const BufferLayout& GetBufferLayout() const { return mLayout; }
 private:
     uint32 mId;
+
+    BufferLayout mLayout;
 };
 
 } // Namespace Scarlet.
