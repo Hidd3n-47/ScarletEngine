@@ -150,4 +150,9 @@ template <typename T>
     return trans;
 }
 
+[[nodiscard]] static Mat4 Transpose(const Mat4& matrix)
+{
+    return glm::transpose(matrix);
+}
+
 } // Namespace Scarlet::Math.

@@ -53,6 +53,9 @@ public:
 
     inline T* operator->()             { return mReferencePtr; }
     inline const T* operator->() const { return mReferencePtr; }
+
+    [[nodiscard]] inline bool operator==(const WeakHandle<T> other) { return mReferencePtr == other.mReferencePtr; }
+    [[nodiscard]] inline bool operator==(const WeakHandle<T> other) const { return mReferencePtr == other.mReferencePtr; }
 private:
     T* mReferencePtr = nullptr;
 };

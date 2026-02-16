@@ -103,6 +103,12 @@ void Shader::UploadUniform(const char* name, const Math::Mat4& value)
     glUniformMatrix4fv(GetUniformLocation(name), 1, GL_FALSE, &value[0][0]);
 }
 
+template <>
+void Shader::UploadUniform(const char* name, const int& value)
+{
+    glUniform1i(GetUniformLocation(name), value);
+}
+
 int Shader::GetUniformLocation(const char* name)
 {
     if (mUniformLocationCache.contains(name))

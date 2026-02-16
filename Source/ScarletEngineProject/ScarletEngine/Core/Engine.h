@@ -5,8 +5,15 @@
 namespace Scarlet
 {
 
+namespace Resource
+{
+class Mesh;
+class Texture;
+} // Namespace Resource.
+
 class Event;
 class Window;
+class Renderer;
 
 class Engine
 {
@@ -35,6 +42,12 @@ private:
     bool mRunning = false;
 
     void OnEvent(Event& e);
+
+    Resource::Texture* mUvMapTexture;
+
+    Resource::Mesh* mCube;
+    Resource::Mesh* mMonkey;
+    Resource::Mesh* mCone;
 };
 
 } // Namespace Scarlet.

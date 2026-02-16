@@ -20,6 +20,30 @@ struct Face
     uint32 index, normal, textureCoord;
 };
 
+struct VertexKey
+{
+    uint32 pos;
+    uint32 uv;
+    uint32 normal;
+
+    bool operator==(const VertexKey& other) const
+    {
+        return pos    == other.pos    &&
+               uv     == other.uv     &&
+               normal == other.normal;
+    }
+};
+
+struct VertexKeyHasher
+{
+    size_t operator()(const VertexKey& k) const
+    {
+        return ((k.pos    * 73856093) ^
+                (k.uv     * 19349663) ^
+                (k.normal * 83492791));
+    }
+};
+
 enum class ObjKeyword : uint8
 {
     ERR             = 0,
@@ -107,7 +131,7 @@ void MeshLoader::LoadMesh(const char* filepath, Resource::MeshData& mesh)
         case ObjKeyword::FACE:
         {
             std::string faceStr[3];
-            input >> faceStr[0] >> faceStr[1] >> faceStr[2];
+            input >> faceStr[0] >> faceStr[2] >> faceStr[1];
 
             for (const auto& str : faceStr)
             {
@@ -188,31 +212,24 @@ void MeshLoader::LoadMesh(const char* filepath, Resource::MeshData& mesh)
         }
     }
 
+    std::unordered_map<VertexKey, uint32, VertexKeyHasher> uniqueVertices;
+
     for (const Face& f : faces)
     {
-        if (normals.size() <= f.normal)
+        const VertexKey key{ .pos = f.index, .uv = f.textureCoord, .normal = f.normal };
+
+        if (!uniqueVertices.contains(key))
         {
-            SCARLET_WARN("Failed to load mesh due to a mismatch between the number of normals and the normal index for the mesh with path: '{0}'", filepath);
-            return;
+            Resource::Vertex v;
+            v.position  = mesh.vertices[f.index].position;
+            v.normal    = normals[f.normal];
+            v.textureUv = textureCoordinates[f.textureCoord];
+
+            mesh.vertices.emplace_back(v);
+            uniqueVertices[key] = static_cast<uint32>(mesh.vertices.size()) - 1;
         }
 
-        if (textureCoordinates.size() <= f.textureCoord)
-        {
-            SCARLET_WARN("Failed to load mesh due to a mismatch between the number of texture coordinates and the texture coordinates index for the mesh with path: '{0}'", filepath);
-            return;
-        }
-
-        if (mesh.vertices.size() <= f.index)
-        {
-            SCARLET_WARN("Failed to load mesh due to a mismatch between the number of vertices and the index for the mesh with path: '{0}'", filepath);
-            return;
-        }
-
-        mesh.indices.emplace_back(f.index);
-
-        auto& [_, normal, textureCoord] = mesh.vertices[f.index];
-        normal = normals[f.normal];
-        textureCoord = textureCoordinates[f.textureCoord];
+        mesh.indices.push_back(uniqueVertices[key]);
     }
 }
 

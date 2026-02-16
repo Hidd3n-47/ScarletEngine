@@ -46,12 +46,33 @@ public:
      */
     void SetData(const void* vertices, const uint32 size) const;
 
+    /**
+     * @brief Add a layout element for the vertex attribute location in shader.
+     * @tparam T The type uploaded to the GPU.
+     * @param count The count of the type being uploaded to the GPU.
+     */
     template <typename T>
-    inline void PushLayoutElement(const uint32 count = 0)
+    inline void PushVertexLayoutElement(const uint32 count = 0)
     {
-        mLayout.Push<T>(count);
+        mLayout.PushVertexLayout<T>(count);
     }
 
+    /**
+     * @brief Add a layout element for the instance attribute location in the shader.
+     * @tparam T The type uploaded to the GPU.
+     * @param count The count of the type being uploaded to the GPU.
+     */
+    template <typename T>
+    inline void PushInstanceLayoutElement(const uint32 count = 0)
+    {
+        mLayout.PushInstanceLayout<T>(count);
+    }
+
+    /**
+     * @brief Get the buffer layout of the given vertex buffer.
+     * @ref BufferLayout
+     * @return The buffer layout of the given vertex buffer.
+     */
     [[nodiscard]] inline const BufferLayout& GetBufferLayout() const { return mLayout; }
 private:
     uint32 mId;

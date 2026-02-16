@@ -1,24 +1,15 @@
 #include "ScarletEnginePch.h"
 #include "Engine.h"
 
-#define GLEW_STATIC
-#include <glew/glew.h>
-
 #include "Events/Event.h"
 #include "Events/ApplicationEvents.h"
 
 #include "Window/WindowManager.h"
 
-#include "Rendering/Shader.h"
 #include "Rendering/Renderer.h"
-#include "Rendering/VertexArray.h"
-#include "Rendering/IndexBuffer.h"
-#include "Rendering/VertexBuffer.h"
-#include "Rendering/BufferLayout.h"
-#include "Rendering/Camera.h"
 
-#include "Rendering/MeshData.h"
-#include "Rendering/MeshLoader.h"
+#include "Rendering/Mesh.h"
+#include "Rendering/Texture.h"
 
 namespace Scarlet
 {
@@ -38,6 +29,12 @@ void Engine::Init() noexcept
 
     Renderer::InitApi();
 
+    mUvMapTexture = new Resource::Texture{ "E:/Programming/ScarletEngine/EngineAssets/uvMap.png" };
+
+    mCube   = new Resource::Mesh{ "E:/Programming/ScarletEngine/EngineAssets/Cube.obj" };
+    mMonkey = new Resource::Mesh{ "E:/Programming/ScarletEngine/EngineAssets/Monkey.obj" };
+    mCone   = new Resource::Mesh{ "E:/Programming/ScarletEngine/EngineAssets/Cone.obj" };
+
     mRunning = true;
     SCARLET_INFO("Engine Initialised!");
 }
@@ -55,38 +52,29 @@ void Engine::Destroy() noexcept
 
 void Engine::Run() const
 {
-    Resource::MeshData cube;
-    MeshLoader::LoadMesh("E:/Programming/ScarletEngine/EngineAssets/Cube.obj", cube);
-
-    const VertexArray va;
-    VertexBuffer vb(cube.vertices.data(), cube.vertices.size() * sizeof(Resource::Vertex));
-    vb.PushLayoutElement<float>(3);
-    vb.PushLayoutElement<float>(3);
-    vb.PushLayoutElement<float>(2);
-    va.AddBuffer(vb);
-
-    const IndexBuffer ib(cube.indices.data(), cube.indices.size());
-
-    Shader shader("E:/Programming/ScarletEngine/EngineAssets/Shaders/editor.vert", "E:/Programming/ScarletEngine/EngineAssets/Shaders/editor.frag");
-
-    Camera camera;
-    camera.UpdateViewAndProjectionMatrix({ 0.0f, 10.0f, 2.0f });
+    Math::Mat4 cubePos{ 1.0f };
+    Math::Mat4 cubePos1{ 1.0f };
+    Math::Mat4 otherPos{ 1.0f };
+    Math::Mat4 otherPos1{ 1.0f };
+    Math::Mat4 conePos{ 1.0f };
+    cubePos[3][0]   = 5.0f;
+    cubePos[3][1]   = 0.0f;
+    cubePos[3][2]   = 2.0f;
+    cubePos1[3][2]  = 2.5f;
+    otherPos[3][0]  = -2.5f;
+    otherPos1[3][2] = -2.5f;
+    conePos[3][0]   = 6.0f;
 
     while (mRunning)
     {
         WindowManager::ApiPoll();
 
-        glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
-
-        va.Bind();
-        ib.Bind();
-        shader.Bind();
-
-        shader.UploadUniform("uViewMatrix", camera.GetViewMatrix());
-        shader.UploadUniform("uProjectionMatrix", camera.GetProjectionMatrix());
-
-        glDrawElements(GL_TRIANGLES, cube.indices.size(), GL_UNSIGNED_INT, nullptr);
+        Renderer::Instance().AddRenderCommand(Resource::Material{ WeakHandle{ mUvMapTexture } }, WeakHandle{ mCube }, cubePos);
+        Renderer::Instance().AddRenderCommand(Resource::Material{ WeakHandle{ mUvMapTexture } }, WeakHandle{ mCube }, cubePos1);
+        Renderer::Instance().AddRenderCommand(Resource::Material{ WeakHandle{ mUvMapTexture } }, WeakHandle{ mMonkey }, otherPos);
+        Renderer::Instance().AddRenderCommand(Resource::Material{ WeakHandle{ mUvMapTexture } }, WeakHandle{ mMonkey }, otherPos1);
+        Renderer::Instance().AddRenderCommand(Resource::Material{ WeakHandle{ mUvMapTexture } }, WeakHandle{ mCone }, conePos);
+        Renderer::Instance().Render();
 
         mMainWindow->Update();
     }

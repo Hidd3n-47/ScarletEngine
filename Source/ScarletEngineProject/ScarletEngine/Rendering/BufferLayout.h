@@ -24,23 +24,40 @@ class BufferLayout
 {
 public:
     /**
-     * @brief Add a new element to the elements.
+     * @brief Add a new element to the vertex elements.
      * @tparam T The type that is being uploaded.
      * @param count The count of the specific type.
      */
     template <typename T>
-    void Push(const uint32 count = 0);
+    void PushVertexLayout(const uint32 count = 0);
+    /**
+     * @brief Add a new element to the instance elements.
+     * @tparam T The type that is being uploaded.
+     * @param count The count of the specific type.
+     */
+    template <typename T>
+    void PushInstanceLayout(const uint32 count = 0);
 
     /**
      * @brief Get the stride between vertices, this is how many bytes to go from on vertex to another.
      * @return The stride between vertices.
      */
-    [[nodiscard]] inline uint32 GetStride() const { return mStride; }
-    /** @brief Get a reference to the elements pushed. */
-    [[nodiscard]] inline const vector<BufferElement>& GetElements() const { return mElements; }
+    [[nodiscard]] inline uint32 GetVertexStride() const { return mVertexStride; }
+    /**
+     * @brief Get the stride between instance data, this is how many bytes to go from on instances data to another.
+     * @return The stride between instance.
+     */
+    [[nodiscard]] inline uint32 GetInstanceStride() const { return mInstanceStride; }
+
+    /** @brief Get a reference to the vertex elements pushed. */
+    [[nodiscard]] inline const vector<BufferElement>& GetVertexElements() const { return mVertexElements; }
+    /** @brief Get a reference to the instance elements pushed. */
+    [[nodiscard]] inline const vector<BufferElement>& GetInstanceElements() const { return mInstanceElements; }
 private:
-    uint32 mStride = 0;
-    vector<BufferElement> mElements;
+    uint32 mVertexStride   = 0;
+    uint32 mInstanceStride = 0;
+    vector<BufferElement> mVertexElements;
+    vector<BufferElement> mInstanceElements;
 
     /**
      * @brief Convert a C++ to an OpenGL type that can be used for OpenGL calls.
@@ -58,13 +75,23 @@ private:
 /* ============================================================================================================================== */
 
 template <typename T>
-void BufferLayout::Push(const uint32 count)
+void BufferLayout::PushVertexLayout(const uint32 count)
 {
     constexpr uint32 size = sizeof(T);
     constexpr uint32 type = TypeToGlType<T>();
 
-    mElements.emplace_back(count, type, size, false);
-    mStride += size * count;
+    mVertexElements.emplace_back(count, type, size, false);
+    mVertexStride += size * count;
+}
+
+template <typename T>
+void BufferLayout::PushInstanceLayout(const uint32 count)
+{
+    constexpr uint32 size = sizeof(T);
+    constexpr uint32 type = TypeToGlType<T>();
+
+    mInstanceElements.emplace_back(count, type, size, false);
+    mInstanceStride += size * count;
 }
 
 template <>
