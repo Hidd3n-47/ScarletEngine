@@ -12,6 +12,8 @@
 namespace Scarlet
 {
 
+class Window;
+
 namespace Resource
 {
 class Mesh;
@@ -27,8 +29,11 @@ public:
 
     /**
      * @brief Initialise the backend rendering API and create an instance of the renderer.
+     * @param window: A handle to the main window that is being rendered to.
      */
-    static void InitApi();
+    static void InitApi(WeakHandle<Window> window);
+
+    static void TerminateApi();
 
     /**
      * @brief Add a rendering command to render a mesh to the screen.
@@ -54,11 +59,13 @@ private:
     Renderer();
     inline static Renderer* mInstance = nullptr;
 
-    std::unordered_map<RenderGroup, vector<Math::Mat4>> mCommands;
-
     Shader mShader;
     InstanceBuffer mInstanceBuffer;
     Camera mRenderCamera;
+
+    uint32 mWindowWidth, mWindowHeight;
+
+    std::unordered_map<RenderGroup, vector<Math::Mat4>> mCommands;
 };
 
 } // Namespace Scarlet.

@@ -29,3 +29,6 @@ include "Source/ScarletEngineProject/"
 include "Tests/ScarletTestTemplateProject/"
 include "Tests/ScarletMathTestProject/"
 include "Tests/ScarlEntTestProject/"
+
+-- Dependency Projects.
+include "Deps/ImGui/"

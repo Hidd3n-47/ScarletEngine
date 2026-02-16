@@ -27,7 +27,7 @@ void Engine::Init() noexcept
     mMainWindow = WindowManager::CreateWindowInternal("Scarlet Engine");
     mMainWindow->SetEventCallback([](Event& e) { Instance().OnEvent(e); });
 
-    Renderer::InitApi();
+    Renderer::InitApi(mMainWindow);
 
     mUvMapTexture = new Resource::Texture{ "E:/Programming/ScarletEngine/EngineAssets/uvMap.png" };
 
@@ -42,6 +42,7 @@ void Engine::Init() noexcept
 void Engine::Destroy() noexcept
 {
     SCARLET_ASSERT(!mRunning && "Trying to destroy engine whilst Engine::Run is running.");
+    Renderer::TerminateApi();
 
     WindowManager::DestroyWindow(mInstance->mMainWindow);
     WindowManager::TerminateApi();

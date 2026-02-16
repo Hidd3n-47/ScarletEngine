@@ -27,7 +27,8 @@ project "ScarletEngine"
         "$(SolutionDir)Source/ScarletMathProject/",
         "$(SolutionDir)Source/ScarletLoggerProject/",
 
-        "$(SolutionDir)Deps/Include/"
+        "$(SolutionDir)Deps/Include/",
+        "$(SolutionDir)Deps/ImGui/"
     }
 
     libdirs
@@ -40,6 +41,8 @@ project "ScarletEngine"
         "ScarletCore",
         "ScarletMath",
         "ScarletLogger",
+
+        "imgui",
 
         "glfw3_mt.lib",
         "glew32s.lib",
