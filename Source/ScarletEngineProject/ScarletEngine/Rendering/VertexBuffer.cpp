@@ -6,20 +6,20 @@
 namespace Scarlet
 {
 
-VertexBuffer::VertexBuffer(const uint32 size)
+VertexBuffer::VertexBuffer(const size_t size)
 {
     glCreateBuffers(1, &mId);
 
     Bind();
-    glBufferData(GL_ARRAY_BUFFER, size, nullptr, GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, static_cast<long long>(size), nullptr, GL_DYNAMIC_DRAW);
 }
 
-VertexBuffer::VertexBuffer(const  void* vertices, const uint32 size)
+VertexBuffer::VertexBuffer(const  void* vertices, const size_t size)
 {
     glCreateBuffers(1, &mId);
 
     Bind();
-    glBufferData(GL_ARRAY_BUFFER, size, vertices, GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, static_cast<int>(size), vertices, GL_DYNAMIC_DRAW);
 }
 
 VertexBuffer::~VertexBuffer()
@@ -37,11 +37,11 @@ void VertexBuffer::Unbind()
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void VertexBuffer::SetData(const void* vertices, const uint32 size) const
+void VertexBuffer::SetData(const void* vertices, const size_t size) const
 {
     glBindBuffer(GL_ARRAY_BUFFER, mId);
 
-    glBufferSubData(GL_ARRAY_BUFFER, 0, size, vertices);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, static_cast<long long>(size), vertices);
 }
 
 } // Namespace Scarlet.

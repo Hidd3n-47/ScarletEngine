@@ -14,13 +14,13 @@ public:
      * @brief Construct an index buffer with the number of indices but pass in the indices later.
      * @param count The number of indices in the buffer.
      */
-    IndexBuffer(const uint32 count);
+    IndexBuffer(const size_t count);
     /**
      * @brief Construct an index buffer with the indices and the number of indices.
      * @param indices A pointer to the indices buffer.
      * @param count The number of indices in the buffer.
      */
-    IndexBuffer(const uint32* indices, const uint32 count);
+    IndexBuffer(const uint32* indices, const size_t count);
     ~IndexBuffer();
 
     IndexBuffer(const IndexBuffer&)            = delete;

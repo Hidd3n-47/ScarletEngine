@@ -16,13 +16,13 @@ public:
      * @brief Construct a vertex buffer with a set size and pass in the data/buffer later.
      * @param size The size of the buffer in bytes.
      */
-    VertexBuffer(const uint32 size);
+    VertexBuffer(const size_t size);
     /**
      * @brief Construct a vertex buffer with a set size and buffer.
      * @param vertices A pointer to the buffer of vertices.
      * @param size The size of the buffer in bytes.
      */
-    VertexBuffer(const void* vertices, const uint32 size);
+    VertexBuffer(const void* vertices, const size_t size);
     ~VertexBuffer();
 
     VertexBuffer(const VertexBuffer&)            = delete;
@@ -44,7 +44,7 @@ public:
      * @param vertices A pointer to the buffer of vertices.
      * @param size The size of the buffer in bytes.
      */
-    void SetData(const void* vertices, const uint32 size) const;
+    void SetData(const void* vertices, const size_t size) const;
 
     /**
      * @brief Add a layout element for the vertex attribute location in shader.

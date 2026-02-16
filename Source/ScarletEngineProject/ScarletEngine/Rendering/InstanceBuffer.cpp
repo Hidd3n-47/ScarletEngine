@@ -8,12 +8,12 @@
 namespace Scarlet
 {
 
-InstanceBuffer::InstanceBuffer(const uint32 maxSize, const uint32 vertexBufferLayoutSize)
+InstanceBuffer::InstanceBuffer(const size_t maxSize)
 {
     glCreateBuffers(1, &mId);
 
     Bind();
-    glBufferData(GL_ARRAY_BUFFER, maxSize, nullptr, GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, static_cast<long long>(maxSize), nullptr, GL_DYNAMIC_DRAW);
 
 }
 
@@ -32,11 +32,11 @@ void InstanceBuffer::Unbind()
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void InstanceBuffer::SetData(const void* instances, const uint32 size) const
+void InstanceBuffer::SetData(const void* instances, const size_t size) const
 {
     glBindBuffer(GL_ARRAY_BUFFER, mId);
 
-    glBufferSubData(GL_ARRAY_BUFFER, 0, size, instances);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, static_cast<long long>(size), instances);
 }
 
 } // Namespace Scarlet.

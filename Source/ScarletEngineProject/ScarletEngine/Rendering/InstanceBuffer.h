@@ -9,9 +9,8 @@ public:
     /**
      * @brief Construct an instance buffer with a set size and pass in the data/buffer later.
      * @param maxSize The maximum size of the buffer in bytes.
-     * @param vertexBufferLayoutSize The number of elements in the vertex buffer layout, this allows the pipeline to bind to the next slot after the vertex information.
      */
-    InstanceBuffer(const uint32 maxSize, const uint32 vertexBufferLayoutSize);
+    InstanceBuffer(const size_t maxSize);
     ~InstanceBuffer();
 
     InstanceBuffer(const InstanceBuffer&)            = delete;
@@ -33,7 +32,7 @@ public:
      * @param instances A pointer to the buffer of instances.
      * @param size The size of the buffer in bytes.
      */
-    void SetData(const void* instances, const uint32 size) const;
+    void SetData(const void* instances, const size_t size) const;
 
 private:
     uint32 mId;

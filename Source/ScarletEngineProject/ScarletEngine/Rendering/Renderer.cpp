@@ -31,7 +31,7 @@ void Renderer::InitApi()
 
 Renderer::Renderer()
     : mShader("E:/Programming/ScarletEngine/EngineAssets/Shaders/editor.vert", "E:/Programming/ScarletEngine/EngineAssets/Shaders/editor.frag")
-    , mInstanceBuffer(100 * sizeof(Math::Mat4), 3)
+    , mInstanceBuffer(MAX_INSTANCE_COUNT * sizeof(Math::Mat4))
 {
     mRenderCamera.UpdateViewAndProjectionMatrix({ 2.0f, -10.0f, 2.0f });
 }
@@ -56,6 +56,8 @@ void Renderer::Render()
     mInstanceBuffer.Bind();
     for (auto& [group, commands] : mCommands)
     {
+        SCARLET_ASSERT(commands.size() <= MAX_INSTANCE_COUNT && "Trying to upload more meshes than the instance buffer can hold. Need to implement a flush first.");
+
         group.mesh->mVertexArray->Bind();
 
         group.material.texture->Bind();
@@ -63,7 +65,7 @@ void Renderer::Render()
 
         mInstanceBuffer.SetData(commands.data(), commands.size() * sizeof(Math::Mat4));
 
-        glDrawElementsInstanced(GL_TRIANGLES, static_cast<int>(group.mesh->GetIndexCount()), GL_UNSIGNED_INT, nullptr, 100);
+        glDrawElementsInstanced(GL_TRIANGLES, static_cast<int>(group.mesh->GetIndexCount()), GL_UNSIGNED_INT, nullptr, static_cast<int>(commands.size()));
 
         commands.clear();
     }

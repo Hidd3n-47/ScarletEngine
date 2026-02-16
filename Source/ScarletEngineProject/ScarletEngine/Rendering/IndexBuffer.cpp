@@ -6,14 +6,14 @@
 namespace Scarlet
 {
 
-IndexBuffer::IndexBuffer(const uint32 count)
+IndexBuffer::IndexBuffer(const size_t count)
 {
     glCreateBuffers(1, &mId);
     Bind();
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, static_cast<long long>(count * sizeof(uint32)), nullptr, GL_DYNAMIC_DRAW);
 }
 
-IndexBuffer::IndexBuffer(const uint32* indices, const uint32 count)
+IndexBuffer::IndexBuffer(const uint32* indices, const size_t count)
 {
     glCreateBuffers(1, &mId);
     Bind();

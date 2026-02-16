@@ -48,6 +48,8 @@ public:
      * @return A reference to the instance buffer the renderer is using.
      */
     InstanceBuffer& GetInstanceBuffer() { return mInstanceBuffer; }
+
+    inline static constexpr uint32 MAX_INSTANCE_COUNT{ 100 };
 private:
     Renderer();
     inline static Renderer* mInstance = nullptr;
