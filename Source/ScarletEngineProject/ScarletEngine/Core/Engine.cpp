@@ -65,7 +65,7 @@ void Engine::Run() const
     cubePos[2][3] = 2.0f;
 
     Math::Mat4 cubePos1 { 1.0f };
-    cubePos1[2][3] =  2.5f;
+    cubePos1[2][3] = 2.5f;
 
     Math::Mat4 monkeyPos{ 1.0f };
     monkeyPos[0][3] = -2.5f;
@@ -76,16 +76,18 @@ void Engine::Run() const
     Math::Mat4 conePos{ 1.0f };
     conePos[0][3] = 6.0f;
 
+    Resource::Material uvMaterial{ WeakHandle{ mUvMapTexture }, { 1.0f, 1.0f, 1.0f } };
+
     while (mRunning)
     {
         WindowManager::ApiPoll();
 
-        Renderer::Instance().AddRenderCommand(Resource::Material{ WeakHandle{ mUvMapTexture } }, WeakHandle{ mCube }, cubeFloor);
-        Renderer::Instance().AddRenderCommand(Resource::Material{ WeakHandle{ mUvMapTexture } }, WeakHandle{ mCube }, cubePos);
-        Renderer::Instance().AddRenderCommand(Resource::Material{ WeakHandle{ mUvMapTexture } }, WeakHandle{ mCube }, cubePos1);
-        Renderer::Instance().AddRenderCommand(Resource::Material{ WeakHandle{ mUvMapTexture } }, WeakHandle{ mMonkey }, monkeyPos);
-        Renderer::Instance().AddRenderCommand(Resource::Material{ WeakHandle{ mUvMapTexture } }, WeakHandle{ mMonkey }, monkeyPos1);
-        Renderer::Instance().AddRenderCommand(Resource::Material{ WeakHandle{ mUvMapTexture } }, WeakHandle{ mCone }, conePos);
+        Renderer::Instance().AddRenderCommand(WeakHandle{ &uvMaterial }, WeakHandle{ mCube }  , cubeFloor);
+        Renderer::Instance().AddRenderCommand(WeakHandle{ &uvMaterial }, WeakHandle{ mCube }  , cubePos);
+        Renderer::Instance().AddRenderCommand(WeakHandle{ &uvMaterial }, WeakHandle{ mCube }  , cubePos1);
+        Renderer::Instance().AddRenderCommand(WeakHandle{ &uvMaterial }, WeakHandle{ mMonkey }, monkeyPos);
+        Renderer::Instance().AddRenderCommand(WeakHandle{ &uvMaterial }, WeakHandle{ mMonkey }, monkeyPos1);
+        Renderer::Instance().AddRenderCommand(WeakHandle{ &uvMaterial }, WeakHandle{ mCone }  , conePos);
         Renderer::Instance().Render();
 
         mMainWindow->Update();

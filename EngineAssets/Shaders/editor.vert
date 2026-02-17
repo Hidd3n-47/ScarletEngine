@@ -21,12 +21,13 @@ void main()
 {
     mat4 modelMatrix = mat4(modelMatrixCol1, modelMatrixCol2, modelMatrixCol3, modelMatrixCol4);
 
-    gl_Position = uProjectionMatrix * uViewMatrix * modelMatrix  * vec4(position, 1.0);
+	mat4 viewProj = uProjectionMatrix * uViewMatrix ;
+
+    gl_Position = viewProj * modelMatrix  * vec4(position, 1.0f);
 	gl_Position.x = -gl_Position.x;
 
     textureUv = uv;
 	
     mat3 normalMatrix = transpose(inverse(mat3(modelMatrix)));
 	fragNormal = normalize(normalMatrix * normal);
-	fragNormal = normalize(normal);
-};
+}

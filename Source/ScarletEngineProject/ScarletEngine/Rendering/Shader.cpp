@@ -98,6 +98,18 @@ uint32 Shader::CompileShader(const uint32 type, const std::string& source)
 }
 
 template <>
+void Shader::UploadUniform(const char* name, const float& value)
+{
+    glUniform1f(GetUniformLocation(name), value);
+}
+
+template <>
+void Shader::UploadUniform(const char* name, const Math::Vec3& value)
+{
+    glUniform3f(GetUniformLocation(name), value.x, value.y, value.z);
+}
+
+template <>
 void Shader::UploadUniform(const char* name, const Math::Mat4& value)
 {
     glUniformMatrix4fv(GetUniformLocation(name), 1, GL_FALSE, &value[0][0]);

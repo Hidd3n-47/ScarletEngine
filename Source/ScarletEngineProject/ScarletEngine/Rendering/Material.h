@@ -12,8 +12,10 @@ class Texture;
 struct Material
 {
     WeakHandle<Texture> texture;
+    Math::Vec3 ambientColor{ 1.0f};
+    Math::Vec3 diffuseColor{ 1.0f };
 
-    [[nodiscard]] inline bool operator==(const Material& other) const { return texture == other.texture; }
+    [[nodiscard]] inline bool operator==(const Material& other) const { return texture == other.texture && ambientColor == other.ambientColor; }
 };
 
 } // Namespace Scarlet::Resource.

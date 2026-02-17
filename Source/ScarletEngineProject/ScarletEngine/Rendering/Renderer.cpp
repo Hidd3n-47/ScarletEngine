@@ -95,7 +95,7 @@ Renderer::~Renderer()
 #endif // DEV_CONFIGURATION.
 }
 
-void Renderer::AddRenderCommand(const Resource::Material material, const WeakHandle<Resource::Mesh> meshRef, Math::Mat4& modelMatrix)
+void Renderer::AddRenderCommand(const WeakHandle<Resource::Material> material, const WeakHandle<Resource::Mesh> meshRef, Math::Mat4& modelMatrix)
 {
     const RenderGroup group{.material = material, .mesh = meshRef };
 
@@ -104,6 +104,10 @@ void Renderer::AddRenderCommand(const Resource::Material material, const WeakHan
 
 void Renderer::Render()
 {
+    static float ambientIntensity = 0.34f;
+    static float diffuseIntensity = 0.78f;
+    static float direction[3] = { -1.0f, 1.0f, -1.0f };
+
 #ifdef DEV_CONFIGURATION
     mFramebuffer->Bind();
 #endif // DEV_CONFIGURATION.
@@ -116,6 +120,11 @@ void Renderer::Render()
     mShader.UploadUniform("uProjectionMatrix", mRenderCamera.GetProjectionMatrix());
     mShader.UploadUniform("uTexture", 0);
 
+    mShader.UploadUniform("uLight.color", Math::Vec3{ 1.0f, 1.0f, 1.0f });
+    mShader.UploadUniform("uLight.ambientIntensity", ambientIntensity);
+    mShader.UploadUniform("uLight.diffuseIntensity", diffuseIntensity);
+    mShader.UploadUniform("uLight.direction", Math::Normalize(Math::Vec3{ direction[0], direction[1], direction[2] }));
+
     mInstanceBuffer.Bind();
     for (auto& [group, commands] : mCommands)
     {
@@ -123,7 +132,11 @@ void Renderer::Render()
 
         group.mesh->mVertexArray->Bind();
 
-        group.material.texture->Bind();
+        group.material->texture->Bind();
+
+        mShader.UploadUniform("uMaterial.ambientColor", group.material->ambientColor);
+        mShader.UploadUniform("uMaterial.diffuseColor", group.material->diffuseColor);
+
         group.mesh->Bind();
 
         mInstanceBuffer.SetData(commands.data(), commands.size() * sizeof(Math::Mat4));
@@ -211,6 +224,13 @@ void Renderer::Render()
     ImGui::End(); // Console.
 
     ImGui::Begin("Properties");
+
+    if (ImGui::CollapsingHeader("Lighting"))
+    {
+        ImGui::DragFloat("Ambient", &ambientIntensity, 0.01f, 0.0f, 1.0f);
+        ImGui::DragFloat("Diffuse", &diffuseIntensity, 0.01f, 0.0f, 1.0f);
+        ImGui::DragFloat3("Direction", direction, 0.1f);
+    }
     ImGui::End(); // Properties.
 
     ImGui::Render();

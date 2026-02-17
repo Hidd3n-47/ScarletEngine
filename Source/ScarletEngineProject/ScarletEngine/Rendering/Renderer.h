@@ -42,7 +42,7 @@ public:
      * @param meshRef A reference to the mesh being rendered.
      * @param modelMatrix The model matrix (i.e. world transform) for the instance.
      */
-    void AddRenderCommand(const Resource::Material material, const WeakHandle<Resource::Mesh> meshRef, Math::Mat4& modelMatrix);
+    void AddRenderCommand(const WeakHandle<Resource::Material>, const WeakHandle<Resource::Mesh> meshRef, Math::Mat4& modelMatrix);
 
     /**
      * @brief A function to go through all commands and execute the draw calls.
