@@ -31,6 +31,8 @@ public:
     void Destroy() noexcept;
 
     void Run() const;
+
+    inline void CloseEngine() { mRunning = false; }
 private:
     Engine()  = default;
     ~Engine() = default;

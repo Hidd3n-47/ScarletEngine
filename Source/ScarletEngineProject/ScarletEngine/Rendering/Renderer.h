@@ -13,6 +13,7 @@ namespace Scarlet
 {
 
 class Window;
+class Framebuffer;
 
 namespace Resource
 {
@@ -56,14 +57,21 @@ public:
 
     inline static constexpr uint32 MAX_INSTANCE_COUNT{ 100 };
 private:
-    Renderer();
+    Renderer(const uint32 width, const uint32 height);
+    ~Renderer();
+
     inline static Renderer* mInstance = nullptr;
+
+    uint32 mViewportWidth, mViewportHeight;
+    uint32 mLastFrameWidth, mLastFrameHeight;
 
     Shader mShader;
     InstanceBuffer mInstanceBuffer;
     Camera mRenderCamera;
 
-    uint32 mWindowWidth, mWindowHeight;
+#ifdef DEV_CONFIGURATION
+    Framebuffer* mFramebuffer;
+#endif // DEV_CONFIGURATION.
 
     std::unordered_map<RenderGroup, vector<Math::Mat4>> mCommands;
 };

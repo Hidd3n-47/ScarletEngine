@@ -7,3 +7,6 @@
 #include <ScarletCore/PrimitiveTypes.h>
 
 #include <ScarletCore/vector.h>
+
+#include <string>
+#include <unordered_map>

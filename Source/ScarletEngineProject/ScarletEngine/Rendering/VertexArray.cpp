@@ -24,12 +24,12 @@ void VertexArray::AddBuffer(const VertexBuffer& vertexBuffer) const
     const vector<BufferElement>& vertexElements = vertexBufferLayout.GetVertexElements();
 
     uint32 offset = 0;
-    const size_t vertexSize = vertexElements.size();
-    for (size_t i{ 0 }; i < vertexSize; ++i)
+    const uint32 vertexSize = static_cast<uint32>(vertexElements.size());
+    for (uint32 i{ 0 }; i < vertexSize; ++i)
     {
         const auto& [count, type, size, normalised] = vertexElements[i];
         glEnableVertexAttribArray(i);
-        glVertexAttribPointer(i, count, type, normalised, static_cast<int>(vertexBufferLayout.GetVertexStride()), reinterpret_cast<const void*>(offset));
+        glVertexAttribPointer(i, static_cast<int>(count), type, normalised, static_cast<int>(vertexBufferLayout.GetVertexStride()), reinterpret_cast<const void*>(offset));
         offset += count * size;
     }
 
@@ -37,11 +37,11 @@ void VertexArray::AddBuffer(const VertexBuffer& vertexBuffer) const
 
     offset = 0;
     const vector<BufferElement>& instanceElements = vertexBufferLayout.GetInstanceElements();
-    for (size_t i{ 0 }; i < instanceElements.size(); ++i)
+    for (uint32 i{ 0 }; i < static_cast<uint32>(instanceElements.size()); ++i)
     {
         const auto& [count, type, size, normalised] = instanceElements[i];
         glEnableVertexAttribArray(i + vertexSize);
-        glVertexAttribPointer(i + vertexSize, count, type, normalised, static_cast<int>(vertexBufferLayout.GetInstanceStride()), reinterpret_cast<const void*>(offset));
+        glVertexAttribPointer(i + vertexSize, static_cast<int>(count), type, normalised, static_cast<int>(vertexBufferLayout.GetInstanceStride()), reinterpret_cast<const void*>(offset));
         glVertexAttribDivisor(i + vertexSize, 1);
         offset += count * size;
     }
