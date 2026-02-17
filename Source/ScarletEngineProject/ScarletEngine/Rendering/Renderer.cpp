@@ -81,7 +81,7 @@ Renderer::Renderer(const uint32 width, const uint32 height)
     , mShader("E:/Programming/ScarletEngine/EngineAssets/Shaders/editor.vert", "E:/Programming/ScarletEngine/EngineAssets/Shaders/editor.frag")
     , mInstanceBuffer(MAX_INSTANCE_COUNT * sizeof(Math::Mat4))
 {
-    mRenderCamera.UpdateViewAndProjectionMatrix({ 2.0f, -10.0f, 0.0f });
+    mRenderCamera.UpdateViewAndProjectionMatrix({ 0.0f, -10.0f, 2.0f });
 
 #ifdef DEV_CONFIGURATION
     mFramebuffer = new Framebuffer(width, height);
@@ -99,7 +99,7 @@ void Renderer::AddRenderCommand(const Resource::Material material, const WeakHan
 {
     const RenderGroup group{.material = material, .mesh = meshRef };
 
-    mCommands[group].emplace_back((modelMatrix));
+    mCommands[group].emplace_back(Math::Transpose(modelMatrix));
 }
 
 void Renderer::Render()
@@ -194,7 +194,7 @@ void Renderer::Render()
 
     if (!resizing)
     {
-        ImGui::Image(mFramebuffer->GetTextureId(), ImGui::GetContentRegionAvail(), ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
+        ImGui::Image(mFramebuffer->GetColorAttachmentId(), ImGui::GetContentRegionAvail(), ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
 
         if (width != mViewportWidth || height != mViewportHeight)
         {

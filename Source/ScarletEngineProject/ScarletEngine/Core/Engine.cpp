@@ -53,27 +53,38 @@ void Engine::Destroy() noexcept
 
 void Engine::Run() const
 {
-    Math::Mat4 cubePos{ 1.0f };
-    Math::Mat4 cubePos1{ 1.0f };
-    Math::Mat4 otherPos{ 1.0f };
-    Math::Mat4 otherPos1{ 1.0f };
+    Math::Mat4 cubeFloor{ 1.0f };
+    cubeFloor[2][3] = -2.0f;
+    cubeFloor[0][0] =  8.0f;
+    cubeFloor[1][1] =  8.0f;
+    cubeFloor[2][2] =  1.0f;
+
+    Math::Mat4 cubePos  { 1.0f };
+    cubePos[0][3] = 5.0f;
+    cubePos[1][3] = 0.0f;
+    cubePos[2][3] = 2.0f;
+
+    Math::Mat4 cubePos1 { 1.0f };
+    cubePos1[2][3] =  2.5f;
+
+    Math::Mat4 monkeyPos{ 1.0f };
+    monkeyPos[0][3] = -2.5f;
+
+    Math::Mat4 monkeyPos1{ 1.0f };
+    monkeyPos1[2][3] = -2.5f;
+
     Math::Mat4 conePos{ 1.0f };
-    cubePos[3][0]   = 5.0f;
-    cubePos[3][1]   = 0.0f;
-    cubePos[3][2]   = 2.0f;
-    cubePos1[3][2]  = 2.5f;
-    otherPos[3][0]  = -2.5f;
-    otherPos1[3][2] = -2.5f;
-    conePos[3][0]   = 6.0f;
+    conePos[0][3] = 6.0f;
 
     while (mRunning)
     {
         WindowManager::ApiPoll();
 
+        Renderer::Instance().AddRenderCommand(Resource::Material{ WeakHandle{ mUvMapTexture } }, WeakHandle{ mCube }, cubeFloor);
         Renderer::Instance().AddRenderCommand(Resource::Material{ WeakHandle{ mUvMapTexture } }, WeakHandle{ mCube }, cubePos);
         Renderer::Instance().AddRenderCommand(Resource::Material{ WeakHandle{ mUvMapTexture } }, WeakHandle{ mCube }, cubePos1);
-        Renderer::Instance().AddRenderCommand(Resource::Material{ WeakHandle{ mUvMapTexture } }, WeakHandle{ mMonkey }, otherPos);
-        Renderer::Instance().AddRenderCommand(Resource::Material{ WeakHandle{ mUvMapTexture } }, WeakHandle{ mMonkey }, otherPos1);
+        Renderer::Instance().AddRenderCommand(Resource::Material{ WeakHandle{ mUvMapTexture } }, WeakHandle{ mMonkey }, monkeyPos);
+        Renderer::Instance().AddRenderCommand(Resource::Material{ WeakHandle{ mUvMapTexture } }, WeakHandle{ mMonkey }, monkeyPos1);
         Renderer::Instance().AddRenderCommand(Resource::Material{ WeakHandle{ mUvMapTexture } }, WeakHandle{ mCone }, conePos);
         Renderer::Instance().Render();
 
