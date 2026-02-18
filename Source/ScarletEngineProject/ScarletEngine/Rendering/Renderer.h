@@ -69,6 +69,8 @@ private:
     InstanceBuffer mInstanceBuffer;
     Camera mRenderCamera;
 
+    Math::Vec3 mCameraPosition{ 0.0f, -10.0f, 2.0f };
+
 #ifdef DEV_CONFIGURATION
     Framebuffer* mFramebuffer;
 #endif // DEV_CONFIGURATION.

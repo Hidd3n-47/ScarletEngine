@@ -81,8 +81,6 @@ Renderer::Renderer(const uint32 width, const uint32 height)
     , mShader("E:/Programming/ScarletEngine/EngineAssets/Shaders/editor.vert", "E:/Programming/ScarletEngine/EngineAssets/Shaders/editor.frag")
     , mInstanceBuffer(MAX_INSTANCE_COUNT * sizeof(Math::Mat4))
 {
-    mRenderCamera.UpdateViewAndProjectionMatrix({ 0.0f, -10.0f, 2.0f });
-
 #ifdef DEV_CONFIGURATION
     mFramebuffer = new Framebuffer(width, height);
 #endif // DEV_CONFIGURATION.
@@ -104,9 +102,12 @@ void Renderer::AddRenderCommand(const WeakHandle<Resource::Material> material, c
 
 void Renderer::Render()
 {
-    static float ambientIntensity = 0.34f;
-    static float diffuseIntensity = 0.78f;
+    static float ambientIntensity = 0.190f;
+    static float diffuseIntensity = 0.960f;
     static float direction[3] = { -1.0f, 1.0f, -1.0f };
+    static float rimPower = 3.4f;
+
+    mRenderCamera.UpdateViewAndProjectionMatrix(mCameraPosition);
 
 #ifdef DEV_CONFIGURATION
     mFramebuffer->Bind();
@@ -120,10 +121,12 @@ void Renderer::Render()
     mShader.UploadUniform("uProjectionMatrix", mRenderCamera.GetProjectionMatrix());
     mShader.UploadUniform("uTexture", 0);
 
+    mShader.UploadUniform("uCameraPosition", mCameraPosition);
     mShader.UploadUniform("uLight.color", Math::Vec3{ 1.0f, 1.0f, 1.0f });
     mShader.UploadUniform("uLight.ambientIntensity", ambientIntensity);
     mShader.UploadUniform("uLight.diffuseIntensity", diffuseIntensity);
     mShader.UploadUniform("uLight.direction", Math::Normalize(Math::Vec3{ direction[0], direction[1], direction[2] }));
+    mShader.UploadUniform("uRimLightPower", rimPower);
 
     mInstanceBuffer.Bind();
     for (auto& [group, commands] : mCommands)
@@ -225,12 +228,19 @@ void Renderer::Render()
 
     ImGui::Begin("Properties");
 
+    if (ImGui::CollapsingHeader("Camera"))
+    {
+        ImGui::DragFloat3("Position", &mCameraPosition[0], 0.05f);
+    }
+
     if (ImGui::CollapsingHeader("Lighting"))
     {
         ImGui::DragFloat("Ambient", &ambientIntensity, 0.01f, 0.0f, 1.0f);
         ImGui::DragFloat("Diffuse", &diffuseIntensity, 0.01f, 0.0f, 1.0f);
+        ImGui::DragFloat("RimExponent", &rimPower, 0.1f, -5.0f, 5.0f);
         ImGui::DragFloat3("Direction", direction, 0.1f);
     }
+
     ImGui::End(); // Properties.
 
     ImGui::Render();

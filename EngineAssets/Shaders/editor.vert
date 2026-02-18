@@ -13,6 +13,7 @@ layout(location = 6) in vec4 modelMatrixCol4;
 
 out vec2 textureUv;
 out vec3 fragNormal;
+out vec3 vertexPosition;
 
 uniform mat4 uViewMatrix;
 uniform mat4 uProjectionMatrix;
@@ -20,8 +21,10 @@ uniform mat4 uProjectionMatrix;
 void main()
 {
     mat4 modelMatrix = mat4(modelMatrixCol1, modelMatrixCol2, modelMatrixCol3, modelMatrixCol4);
-
-	mat4 viewProj = uProjectionMatrix * uViewMatrix ;
+	
+	vertexPosition = position;
+	
+	mat4 viewProj = uProjectionMatrix * uViewMatrix;
 
     gl_Position = viewProj * modelMatrix  * vec4(position, 1.0f);
 	gl_Position.x = -gl_Position.x;

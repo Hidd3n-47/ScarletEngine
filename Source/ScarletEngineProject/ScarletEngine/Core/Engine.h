@@ -46,10 +46,12 @@ private:
     void OnEvent(Event& e);
 
     Resource::Texture* mUvMapTexture;
+    Resource::Texture* mGlockTexture;
 
     Resource::Mesh* mCube;
     Resource::Mesh* mMonkey;
     Resource::Mesh* mCone;
+    Resource::Mesh* mGlock;
 };
 
 } // Namespace Scarlet.

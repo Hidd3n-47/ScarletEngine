@@ -37,9 +37,6 @@ private:
     Math::Vec3 mForwardVector{ 0.0f,  1.0f, 0.0f };
     Math::Vec3 mRightVector  { 1.0f,  0.0f, 0.0f };
     Math::Vec3 mUpVector     { 0.0f,  0.0f, 1.0f };
-    /*Math::Vec3 mForwardVector{ 0.0f,  1.0f, 0.0f };
-    Math::Vec3 mRightVector{ -1.0f,  0.0f, 0.0f };
-    Math::Vec3 mUpVector{ 0.0f,  0.0f, 1.0f };*/
 
     float mAspectRatio = 16.0f / 9.0f;
     float mNearPlane   = 0.1f;
