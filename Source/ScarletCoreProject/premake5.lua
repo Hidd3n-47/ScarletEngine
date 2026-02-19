@@ -1,6 +1,5 @@
 -- ---------------------------- ScarletCore Project.
 project "ScarletCore"
-    location "%{prj.name}"
     kind "StaticLib"
     language "C++"
     staticruntime "Off"

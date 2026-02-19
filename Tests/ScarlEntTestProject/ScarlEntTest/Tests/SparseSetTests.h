@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdexcept>
+
 #include <ScarletTestTemplate/Core/TestRegistry.h>
 
 #define SCARLENT_TEST

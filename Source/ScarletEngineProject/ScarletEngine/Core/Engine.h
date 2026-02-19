@@ -41,8 +41,6 @@ private:
 
     WeakHandle<Window> mMainWindow;
 
-    bool mRunning = false;
-
     void OnEvent(Event& e);
 
     Resource::Texture* mUvMapTexture;
@@ -52,6 +50,8 @@ private:
     Resource::Mesh* mMonkey;
     Resource::Mesh* mCone;
     Resource::Mesh* mGlock;
+
+    bool mRunning = false;
 };
 
 } // Namespace Scarlet.

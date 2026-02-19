@@ -1,5 +1,8 @@
 #pragma once
 
+// Todo Christian: This should be moved into a project definition. Tests should live in a different sln which can define this during compilation.
+#define SCARLENT_TEST
+
 #ifdef SCARLENT
 #define SCARLENT_API __declspec(dllexport)
 #else  // SCARLENT.
