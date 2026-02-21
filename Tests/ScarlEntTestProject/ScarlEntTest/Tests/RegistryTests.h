@@ -29,6 +29,8 @@ public:
     {
         bool passed = false;
 
+        // Terminate in case it has been initialised by other tests. If it hasn't, terminating will do nothing so it's safe.
+        ScarlEnt::Registry::Terminate();
         ScarlEnt::Registry::Init();
 
         try

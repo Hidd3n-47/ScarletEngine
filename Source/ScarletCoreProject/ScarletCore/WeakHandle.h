@@ -56,6 +56,9 @@ public:
 
     [[nodiscard]] inline bool operator==(const WeakHandle<T> other) { return mReferencePtr == other.mReferencePtr; }
     [[nodiscard]] inline bool operator==(const WeakHandle<T> other) const { return mReferencePtr == other.mReferencePtr; }
+
+    [[nodiscard]] inline       T& operator *() { return *mReferencePtr; }
+    [[nodiscard]] inline const T& operator *() const { return *mReferencePtr;}
 private:
     T* mReferencePtr = nullptr;
 };

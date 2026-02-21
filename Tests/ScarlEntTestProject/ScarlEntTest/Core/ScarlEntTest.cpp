@@ -1,6 +1,7 @@
 #include <ScarletTestTemplate/Src/EntryPoint.h>
 #include <ScarletTestTemplate/Core/TestRegistry.h>
 
+#include "ScarlEntTest/Tests/SceneTests.h"
 #include "ScarlEntTest/Tests/RegistryTests.h"
 #include "ScarlEntTest/Tests/ArchetypeTests.h"
 #include "ScarlEntTest/Tests/SparseSetTests.h"
@@ -18,9 +19,12 @@ public:
 
     inline void RegisterTests() override
     {
-        RegistryTests(this);
         ArchetypeTests(this);
         SparseSetTests(this);
+
+        RegistryTests(this);
+
+        SceneTests(this);
     }
 
 };

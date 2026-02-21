@@ -22,6 +22,11 @@
 
 #else // DEV_CONFIGURATION.
 
+#ifdef SCARLENT_TEST
+#include <stdexcept>
+#define SCARLENT_ASSERT(...) if (!(__VA_ARGS__)) throw std::runtime_error("Assertion failed!")
+#else // SCARLENT_TEST.
 #define SCARLENT_ASSERT(...)
+#endif // !SCARLENT_TEST.
 
 #endif // ! DEV_CONFIGURATION.

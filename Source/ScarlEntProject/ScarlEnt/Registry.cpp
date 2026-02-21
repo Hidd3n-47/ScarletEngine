@@ -15,6 +15,7 @@ void Registry::Init()
 void Registry::Terminate()
 {
     delete mInstance;
+    mInstance = nullptr;
 }
 
 Scarlet::WeakHandle<Scene> Registry::CreateScene(const std::string_view friendlyName)
