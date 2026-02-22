@@ -23,19 +23,19 @@ class Archetype : public IComponentArray
 {
 public:
     /**
-     * @brief Get the component for a given index.
+     * @brief Get the component for a given entityId.
      * @tparam Component The component type.
      * @param entityId The ID of the entity whose component is being requested.
-     * @return A pointer to the component at the requested index.
+     * @return A reference to the component of the requested identifier.
      */
     template <typename Component>
-    inline Component* GetComponent(const Scarlet::Ulid entityId)
+    inline Component& GetComponent(const Scarlet::Ulid entityId)
     {
         SCARLENT_ASSERT(mEntityIdToIndex.contains(entityId) && "Trying to retrieve a component for an entity that is not added to this archetype.");
 
         const uint32 index = mEntityIdToIndex[entityId];
 
-        return &std::get<vector<Component>>(mComponents)[index];
+        return std::get<vector<Component>>(mComponents)[index];
     }
 
     /**

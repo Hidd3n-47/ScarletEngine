@@ -46,14 +46,14 @@ public:
     void RemoveEntity(Scarlet::Ulid entityId);
 
     /**
-     * @brief Get a \ref WeakHandle to a component an entity.
+     * @brief Get a reference to a component on an entity.
      * @tparam Component The component being requested.
      * @tparam ArchetypeComponents The components of the entity, this is to retrieve the component from the correct archetype.
      * @param entityId The identifier to the entity whose component is being requested for.
-     * @return 
+     * @return A reference to the component on the entity.
      */
     template <typename Component, typename...ArchetypeComponents>
-    [[nodiscard]] Scarlet::WeakHandle<Component> GetComponent(const Scarlet::Ulid entityId);
+    [[nodiscard]] Component& GetComponent(const Scarlet::Ulid entityId);
 
     /**
      * @brief Get the ID for the component type.
@@ -100,13 +100,13 @@ inline void ComponentManager::RemoveEntity(Scarlet::Ulid entityId)
 }
 
 template <typename Component, typename...ArchetypeComponents>
-inline Scarlet::WeakHandle<Component> ComponentManager::GetComponent(const Scarlet::Ulid entityId)
+inline Component& ComponentManager::GetComponent(const Scarlet::Ulid entityId)
 {
     SCARLENT_ASSERT(mEntityIdToComponentArray.contains(entityId) && "Trying to retrieve a component that has not been created.");
 
     IComponentArray* array = mEntityIdToComponentArray[entityId];
 
-    return Scarlet::WeakHandle<Component>{ static_cast<Archetype<ArchetypeComponents...>*>(array)->template GetComponent<Component>(entityId) };
+    return static_cast<Archetype<ArchetypeComponents...>*>(array)->template GetComponent<Component>(entityId);
 }
 
 } // Namespace ScarlEnt.

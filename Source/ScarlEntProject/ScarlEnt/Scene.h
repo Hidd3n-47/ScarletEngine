@@ -2,6 +2,7 @@
 
 #include <ScarletCore/Ulid.h>
 
+#include "EntityHandle.h"
 #include "ComponentManager.h"
 
 namespace ScarlEnt
@@ -13,14 +14,23 @@ class SCARLENT_API Scene
 {
     friend class Registry;
 public:
+    /**
+     * @brief Add an entity to the scene.
+     * @tparam ArchetypeComponents The component types of the archetype.
+     * @tparam Args The argument types of the component constructors.
+     * @param args The forwarded arguments passed to the constructors of the components.
+     * @return A \ref EntityHandle to the entity.
+     */
     template <typename...ArchetypeComponents, typename...Args>
-    [[nodiscard]] Scarlet::Ulid AddEntity(Args&& ...args);
+    [[nodiscard]] EntityHandle<ArchetypeComponents...> AddEntity(Args&& ...args);
 
+    /**
+     * @brief Remove an entity from the scene.
+     * @tparam ArchetypeComponents The component types of the archetype.
+     * @param entity A \ref EntityHandle to the entity.
+     */
     template <typename...ArchetypeComponents>
-    void RemoveEntity(const Scarlet::Ulid entityId);
-
-    template <typename Component, typename...ArchetypeComponents>
-    [[nodiscard]] Scarlet::WeakHandle<Component> GetComponent(const Scarlet::Ulid entityId);
+    void RemoveEntity(const EntityHandle<ArchetypeComponents...> entity);
 
     /** @brief Get the friendly name of the scene */
     [[nodiscard]] inline std::string_view GetFriendlyName() const { return mFriendlyName; }
@@ -39,21 +49,15 @@ private:
 /* ============================================================================================================================== */
 
 template <typename... ArchetypeComponents, typename... Args>
-inline Scarlet::Ulid Scene::AddEntity(Args&&... args)
+inline EntityHandle<ArchetypeComponents...> Scene::AddEntity(Args&&... args)
 {
-    return mComponentManager.AddEntity<ArchetypeComponents...>(std::forward<Args>(args)...);
+    return EntityHandle<ArchetypeComponents...>{ Scarlet::WeakHandle{ &mComponentManager }, std::forward<Args>(args)... };
 }
 
 template <typename...ArchetypeComponents>
-void Scene::RemoveEntity(const Scarlet::Ulid entityId)
+void Scene::RemoveEntity(const EntityHandle<ArchetypeComponents...> entity)
 {
-    mComponentManager.RemoveEntity<ArchetypeComponents...>(entityId);
-}
-
-template <typename Component, typename...ArchetypeComponents>
-inline Scarlet::WeakHandle<Component> Scene::GetComponent(const Scarlet::Ulid entityId)
-{
-    return mComponentManager.GetComponent<Component, ArchetypeComponents...>(entityId);
+    mComponentManager.RemoveEntity<ArchetypeComponents...>(entity.mEntityId);
 }
 
 } // Namespace ScarlEnt.
