@@ -14,6 +14,9 @@ class SCARLENT_API Scene
 {
     friend class Registry;
 public:
+    template <typename...Components>
+    void RegisterSystem(const std::function<void(Components&...)>& updateFunction);
+
     /**
      * @brief Add an entity to the scene.
      * @tparam ArchetypeComponents The component types of the archetype.
@@ -47,6 +50,12 @@ private:
 };
 
 /* ============================================================================================================================== */
+
+template <typename...Components>
+inline void Scene::RegisterSystem(const std::function<void(Components&...)>& updateFunction)
+{
+    mComponentManager.RegisterSystem<Components...>(updateFunction);
+}
 
 template <typename... ArchetypeComponents, typename... Args>
 inline EntityHandle<ArchetypeComponents...> Scene::AddEntity(Args&&... args)

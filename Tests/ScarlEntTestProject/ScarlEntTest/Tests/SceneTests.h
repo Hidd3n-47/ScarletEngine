@@ -44,7 +44,7 @@ public:
 
     static bool AddedComponentWithEntityHasCorrectInitialValuesTest2()
     {
-        constexpr int solution = 47;
+        constexpr int solution    = 47;
         constexpr int solutionSqr = solution * solution;
 
         Scarlet::WeakHandle<ScarlEnt::Scene> scene = ScarlEnt::Registry::Instance().CreateScene("Testing");
@@ -79,7 +79,7 @@ public:
     {
         bool passed = true;
 
-        constexpr int solution = 47;
+        constexpr int solution    = 47;
         constexpr int solutionSqr = solution * solution;
         constexpr int solutionCbd = solution * solutionSqr;
 
@@ -121,7 +121,7 @@ public:
 
     static bool FirstComponentsCorrectWhenRemovingSecondEntity()
     {
-        constexpr int solution = 47;
+        constexpr int solution    = 47;
         constexpr int solutionSqr = solution * solution;
 
         bool passed = true;
@@ -193,7 +193,7 @@ public:
 
     static bool MiddleComponentsCorrectWhenRemovingFirstAndSecondEntityComplexTypes()
     {
-        constexpr int solution = 47;
+        constexpr int solution    = 47;
         constexpr int solutionSqr = solution * solution;
         constexpr int solutionCbd = solution * solutionSqr;
 

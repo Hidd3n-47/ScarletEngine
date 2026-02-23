@@ -11,6 +11,7 @@ class ArchetypeTests
 public:
     explicit inline ArchetypeTests(Scarlet::TestRegistry* testRegistry)
     {
+        testRegistry->AddTestCase("ArchetypeTest", "ArchetypeAssertsIfTryingToAddEntityWithDifferentComponents", ArchetypeAssertsIfTryingToAddEntityWithDifferentComponents);
         testRegistry->AddTestCase("ArchetypeTest", "SinglePrimitiveTypeInitialisedCorrectly", SinglePrimitiveTypeInitialisedCorrectly);
         testRegistry->AddTestCase("ArchetypeTest", "SingleCustomTypeInitialisedCorrectly", SingleCustomTypeInitialisedCorrectly);
         testRegistry->AddTestCase("ArchetypeTest", "DoublePrimitiveTypeInitialisedCorrectly", DoublePrimitiveTypeInitialisedCorrectly);
@@ -18,6 +19,25 @@ public:
         testRegistry->AddTestCase("ArchetypeTest", "MultipleItemsAddedToArchetypeCorrectly", MultipleItemsAddedToArchetypeCorrectly);
         testRegistry->AddTestCase("ArchetypeTest", "RemovingLastKeepsFirst", RemovingLastKeepsFirst);
         testRegistry->AddTestCase("ArchetypeTest", "RemovingFirstKeepsLast", RemovingFirstKeepsLast);
+        testRegistry->AddTestCase("ArchetypeTest", "GettingArrayFromArchetypeIsCorrect", GettingArrayFromArchetypeIsCorrect);
+    }
+
+    static bool ArchetypeAssertsIfTryingToAddEntityWithDifferentComponents()
+    {
+        bool passed = false;
+
+        ScarlEnt::Archetype archetype(Scarlet::Ulid{}, 0);
+
+        try
+        {
+            archetype.AddEntity(Scarlet::Ulid{}, 'c');
+        }
+        catch (std::runtime_error&)
+        {
+            passed = true;
+        }
+
+        return passed;
     }
 
     static bool SinglePrimitiveTypeInitialisedCorrectly()
@@ -25,8 +45,7 @@ public:
         constexpr int initialValue = 2;
         const Scarlet::Ulid id;
 
-        ScarlEnt::Archetype<int> archetype;
-        archetype.AddEntity(id, static_cast<int>(initialValue));
+        ScarlEnt::Archetype archetype(id, static_cast<int>(initialValue));
 
         return archetype.GetComponent<int>(id) == initialValue;
     }
@@ -36,8 +55,7 @@ public:
         constexpr int initialValue = 2;
         const Scarlet::Ulid id;
 
-        ScarlEnt::Archetype<Vec2> archetype;
-        archetype.AddEntity(id, { initialValue, initialValue * initialValue });
+        ScarlEnt::Archetype archetype(id, Vec2{ initialValue, initialValue * initialValue });
 
         const Vec2& vector = archetype.GetComponent<Vec2>(id);
 
@@ -50,8 +68,7 @@ public:
         constexpr int initialValue = 2;
         const Scarlet::Ulid id;
 
-        ScarlEnt::Archetype<int, long> archetype;
-        archetype.AddEntity(id, static_cast<int>(initialValue), initialValue * initialValue);
+        ScarlEnt::Archetype archetype(id, static_cast<int>(initialValue), static_cast<long>(initialValue * initialValue));
 
         return archetype.GetComponent<int>(id) == initialValue && archetype.GetComponent<long>(id) == initialValue * initialValue;
     }
@@ -63,8 +80,7 @@ public:
         constexpr int initialCubed  = initialSquare * initialValue;
         const Scarlet::Ulid id;
 
-        ScarlEnt::Archetype<Vec2, Vec3> archetype;
-        archetype.AddEntity(id, Vec2{ initialValue, initialSquare }, Vec3{ initialValue, initialSquare, initialCubed });
+        ScarlEnt::Archetype archetype(id, Vec2{ initialValue, initialSquare }, Vec3{ initialValue, initialSquare, initialCubed });
 
         const Vec2& vector2 = archetype.GetComponent<Vec2>(id);
         const Vec3& vector3 = archetype.GetComponent<Vec3>(id);
@@ -81,8 +97,7 @@ public:
         const Scarlet::Ulid id1;
         const Scarlet::Ulid id2;
 
-        ScarlEnt::Archetype<Vec2, Vec3> archetype;
-        archetype.AddEntity(id1, Vec2{ initialValue, initialSquare }, Vec3{ initialValue, initialSquare, initialCubed });
+        ScarlEnt::Archetype archetype(id1, Vec2{ initialValue, initialSquare }, Vec3{ initialValue, initialSquare, initialCubed });
         archetype.AddEntity(id2, Vec2{ initialCubed, initialSquare }, Vec3{ initialCubed, initialSquare, initialValue });
 
         const Vec2& vector2 = archetype.GetComponent<Vec2>(id1);
@@ -105,8 +120,7 @@ public:
         const Scarlet::Ulid id1;
         const Scarlet::Ulid id2;
 
-        ScarlEnt::Archetype<Vec2, Vec3> archetype;
-        archetype.AddEntity(id1, Vec2{ initialValue, initialSquare }, Vec3{ initialValue, initialSquare, initialCubed });
+        ScarlEnt::Archetype archetype(id1, Vec2{ initialValue, initialSquare }, Vec3{ initialValue, initialSquare, initialCubed });
         archetype.AddEntity(id2, Vec2{ initialCubed, initialSquare }, Vec3{ initialCubed, initialSquare, initialValue });
 
         archetype.RemoveEntity(id2);
@@ -126,8 +140,7 @@ public:
         const Scarlet::Ulid id1;
         const Scarlet::Ulid id2;
 
-        ScarlEnt::Archetype<Vec2, Vec3> archetype;
-        archetype.AddEntity(id1, Vec2{ initialValue, initialSquare }, Vec3{ initialValue, initialSquare, initialCubed });
+        ScarlEnt::Archetype archetype(id1, Vec2{ initialValue, initialSquare }, Vec3{ initialValue, initialSquare, initialCubed });
         archetype.AddEntity(id2, Vec2{ initialCubed, initialSquare }, Vec3{ initialCubed, initialSquare, initialValue });
 
         archetype.RemoveEntity(id1);
@@ -137,5 +150,32 @@ public:
 
         return vector2.x == initialCubed && vector2.y == initialSquare &&
                vector3.x == initialCubed && vector3.y == initialSquare && vector3.z == initialValue;
+    }
+
+    static bool GettingArrayFromArchetypeIsCorrect()
+    {
+        constexpr int initialValue  = 47;
+        constexpr int initialSquare = initialValue * initialValue;
+        constexpr int initialCubed  = initialSquare * initialValue;
+
+        bool passed = true;
+
+        ScarlEnt::Archetype archetype(Scarlet::Ulid{}, static_cast<int>(initialValue), float{}, long{}, 'a');
+        archetype.AddEntity(Scarlet::Ulid{}, static_cast<int>(initialSquare), float{}, long{}, 'b');
+        archetype.AddEntity(Scarlet::Ulid{}, static_cast<int>(initialCubed), float{}, long{}, 'c');
+
+        const auto [intArray, charArray] = archetype.GetComponentArrays<int, char>();
+
+        passed &= intArray->componentArray.size() == 3;
+        passed &= intArray->componentArray[0] == initialValue;
+        passed &= intArray->componentArray[1] == initialSquare;
+        passed &= intArray->componentArray[2] == initialCubed;
+
+        passed &= charArray->componentArray.size() == 3;
+        passed &= charArray->componentArray[0] == 'a';
+        passed &= charArray->componentArray[1] == 'b';
+        passed &= charArray->componentArray[2] == 'c';
+
+        return passed;
     }
 };

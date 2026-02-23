@@ -73,6 +73,14 @@ public:
     [[nodiscard]] inline Scarlet::WeakHandle<Scene> GetActiveScene() const 
                         { return mCurrentSceneIndex >=0 ? Scarlet::WeakHandle{ mScenes[mCurrentSceneIndex] } : Scarlet::WeakHandle<Scene>{}; }
 
+    /**
+     * @brief Get the ID for the component type.
+     * @tparam ComponentType The type of the component.
+     * @return The type ID for the component.
+     */
+    template <typename ComponentType>
+    [[nodiscard]] inline static const char* GetComponentTypeId() { return typeid(ComponentType).name(); }
+
 #ifdef SCARLENT_TEST
     /**
      * @brief Get the number of scenes created.
@@ -87,7 +95,7 @@ private:
 
     inline static Registry* mInstance = nullptr;
 
-    unordered_map<std::string, uint64> mComponentIdMap;
+    unordered_map<const char*, uint64> mComponentIdMap;
     uint32 mNumberOfRegisteredComponents = 0;
 
     int32 mCurrentSceneIndex = -1;
@@ -100,7 +108,7 @@ template <typename T>
 inline uint64 Registry::GetOrRegisterComponentBit()
 {
     // Map a component to its TypeId name.
-    const std::string componentName = typeid(T).name();
+    const char* componentName = GetComponentTypeId<T>();
 
     if (mComponentIdMap.contains(componentName))
     {

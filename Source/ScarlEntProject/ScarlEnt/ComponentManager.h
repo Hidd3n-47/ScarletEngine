@@ -16,7 +16,7 @@ typedef std::string ComponentTypeId;
 /**
  * @class ComponentManager: The owner of the components and instance used to create and destroy components.<br/>
  */
-class ComponentManager
+class SCARLENT_API ComponentManager
 {
 public:
     ComponentManager() = default;
@@ -27,15 +27,19 @@ public:
     ComponentManager& operator=(ComponentManager&&)      = delete;
     ComponentManager& operator=(const ComponentManager&) = delete;
 
+    template <typename...Components>
+    void RegisterSystem(const std::function<void(Components&...)>& updateFunction)
+    {
+    }
+
     /**
      * @brief Add an entity to an Archetype defined by the components from the templated arguments.
      * @tparam ArchetypeComponents The components that create the archetype.
-     * @tparam Args The argument types for the components constructors.
-     * @param args The forward arguments to the constructors of the components.
+     * @param values The forward arguments to the constructors of the components.
      * @return The \ref Ulid of the entity.
      */
-    template <typename...ArchetypeComponents, typename...Args>
-    [[nodiscard]] Scarlet::Ulid AddEntity(Args&&...args);
+    template <typename...ArchetypeComponents>
+    [[nodiscard]] Scarlet::Ulid AddEntity(ArchetypeComponents&&...values);
 
     /**
      * @brief Remove an entity from an archetype.
@@ -55,23 +59,15 @@ public:
     template <typename Component, typename...ArchetypeComponents>
     [[nodiscard]] Component& GetComponent(const Scarlet::Ulid entityId);
 
-    /**
-     * @brief Get the ID for the component type.
-     * @tparam ComponentType The type of the component.
-     * @return The type ID for the component.
-     */
-    template <typename ComponentType>
-    inline static ComponentTypeId GetComponentTypeId() { return ComponentTypeId{ typeid(ComponentType).name() }; }
-
 private:
-    unordered_map<uint64, IComponentArray*> mComponents;
-    unordered_map<Scarlet::Ulid, IComponentArray*> mEntityIdToComponentArray;
+    unordered_map<uint64, Archetype*> mComponents;
+    unordered_map<Scarlet::Ulid, Archetype*> mEntityIdToComponentArray;
 };
 
 /* ============================================================================================================================== */
 
-template <typename... ArchetypeComponents, typename... Args>
-inline Scarlet::Ulid ComponentManager::AddEntity(Args&&... args)
+template <typename... ArchetypeComponents>
+inline Scarlet::Ulid ComponentManager::AddEntity(ArchetypeComponents&&... values)
 {
     const Scarlet::Ulid entityId{};
 
@@ -79,12 +75,13 @@ inline Scarlet::Ulid ComponentManager::AddEntity(Args&&... args)
 
     if (!mComponents.contains(componentsBitset))
     {
-        mComponents[componentsBitset] = new Archetype<ArchetypeComponents...>();
+        mComponents[componentsBitset] = new Archetype(entityId, std::forward<ArchetypeComponents>(values)...);
+        mEntityIdToComponentArray[entityId] = mComponents[componentsBitset];
+        return entityId;
     }
-
     mEntityIdToComponentArray[entityId] = mComponents[componentsBitset];
 
-    static_cast<Archetype<ArchetypeComponents...>*>(mComponents[componentsBitset])->AddEntity(entityId, std::forward<Args>(args)...);
+    mComponents[componentsBitset]->AddEntity(entityId, std::forward<ArchetypeComponents>(values)...);
     return entityId;
 }
 
@@ -93,10 +90,10 @@ inline void ComponentManager::RemoveEntity(Scarlet::Ulid entityId)
 {
     SCARLENT_ASSERT(mEntityIdToComponentArray.contains(entityId) && "Trying to remove an entity that has not been created.");
 
-    IComponentArray* array = mEntityIdToComponentArray[entityId];
+    Archetype* array = mEntityIdToComponentArray[entityId];
     mEntityIdToComponentArray.erase(entityId);
 
-    static_cast<Archetype<ArchetypeComponents...>*>(array)->RemoveEntity(entityId);
+    array->RemoveEntity(entityId);
 }
 
 template <typename Component, typename...ArchetypeComponents>
@@ -104,9 +101,9 @@ inline Component& ComponentManager::GetComponent(const Scarlet::Ulid entityId)
 {
     SCARLENT_ASSERT(mEntityIdToComponentArray.contains(entityId) && "Trying to retrieve a component that has not been created.");
 
-    IComponentArray* array = mEntityIdToComponentArray[entityId];
+    Archetype* array = mEntityIdToComponentArray[entityId];
 
-    return static_cast<Archetype<ArchetypeComponents...>*>(array)->template GetComponent<Component>(entityId);
+    return array->GetComponent<Component>(entityId);
 }
 
 } // Namespace ScarlEnt.
