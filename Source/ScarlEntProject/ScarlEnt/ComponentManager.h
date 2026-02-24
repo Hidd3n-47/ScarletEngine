@@ -5,6 +5,7 @@
 
 #include <ScarletCore/Ulid.h>
 
+#include "System.h"
 #include "Registry.h"
 #include "Archetype.h"
 
@@ -27,10 +28,22 @@ public:
     ComponentManager& operator=(ComponentManager&&)      = delete;
     ComponentManager& operator=(const ComponentManager&) = delete;
 
+    /**
+     * @brief Register a system that will act over a subset of components calling the update function.
+     * @tparam Components The components the system acts on.
+     * @param updateFunction A function pointer to the function acting on the components.
+     */
     template <typename...Components>
     void RegisterSystem(const std::function<void(Components&...)>& updateFunction)
     {
+        mSystems.emplace_back(new System<Components...>(updateFunction));
     }
+
+    /**
+     * @brief Go through each registered system and update. Each archetype will be iterated over and compared to the required components of the system, updating the components \\n
+     * based on the registered update function if so.
+     */
+    void Update() const;
 
     /**
      * @brief Add an entity to an Archetype defined by the components from the templated arguments.
@@ -62,9 +75,25 @@ public:
 private:
     unordered_map<uint64, Archetype*> mComponents;
     unordered_map<Scarlet::Ulid, Archetype*> mEntityIdToComponentArray;
+
+    vector<ISystem*> mSystems;
 };
 
 /* ============================================================================================================================== */
+
+inline void ComponentManager::Update() const
+{
+    for (ISystem* system : mSystems)
+    {
+        for (auto& [bitset, archetype] : mComponents)
+        {
+            if ((bitset & system->componentBitset) == system->componentBitset)
+            {
+                system->Update(archetype);
+            }
+        }
+    }
+}
 
 template <typename... ArchetypeComponents>
 inline Scarlet::Ulid ComponentManager::AddEntity(ArchetypeComponents&&... values)

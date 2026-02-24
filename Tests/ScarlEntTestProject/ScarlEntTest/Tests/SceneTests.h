@@ -22,6 +22,9 @@ public:
         testRegistry->AddTestCase("SceneTests", "SecondComponentsCorrectWhenRemovingFirstEntity", SecondComponentsCorrectWhenRemovingFirstEntity);
         testRegistry->AddTestCase("SceneTests", "MiddleComponentsCorrectWhenRemovingFirstAndSecondEntity", MiddleComponentsCorrectWhenRemovingFirstAndSecondEntity);
         testRegistry->AddTestCase("SceneTests", "MiddleComponentsCorrectWhenRemovingFirstAndSecondEntityComplexTypes", MiddleComponentsCorrectWhenRemovingFirstAndSecondEntityComplexTypes);
+        testRegistry->AddTestCase("SceneTests", "SceneUpdateChangedEntitiesCorrectly", SceneUpdateChangedEntitiesCorrectly);
+        testRegistry->AddTestCase("SceneTests", "SceneUpdateIteratesThroughAllArchetypesWithSameSubset", SceneUpdateIteratesThroughAllArchetypesWithSameSubset);
+        testRegistry->AddTestCase("SceneTests", "SceneUpdateChangedEntitiesCorrectlyWithMultipleComponents", SceneUpdateChangedEntitiesCorrectlyWithMultipleComponents);
 
         ScarlEnt::Registry::Terminate();
         ScarlEnt::Registry::Init();
@@ -218,6 +221,105 @@ public:
         passed &= component2.x == solutionSqr;
         passed &= component2.y == solutionSqr;
         passed &= component2.z == solutionSqr;
+
+        ScarlEnt::Registry::Instance().RemoveScene(scene);
+
+        return passed;
+    }
+
+    static bool SceneUpdateChangedEntitiesCorrectly()
+    {
+        constexpr int solution    = 47;
+        constexpr int solutionSqr = solution * solution;
+        constexpr int solutionCbd = solution * solutionSqr;
+
+        bool passed = true;
+
+        Scarlet::WeakHandle<ScarlEnt::Scene> scene = ScarlEnt::Registry::Instance().CreateScene("Testing");
+
+        ScarlEnt::EntityHandle entity1 = scene->AddEntity<Vec3>( Vec3{ solution, solutionSqr, solutionCbd });
+
+        scene->RegisterSystem<Vec3>([](Vec3& vector) { vector.x *= 2; vector.y *= 3; vector.z *= 4; });
+
+        scene->Update();
+
+        const Vec3& component = entity1.GetComponent<Vec3>();
+        passed &= component.x == solution    * 2;
+        passed &= component.y == solutionSqr * 3;
+        passed &= component.z == solutionCbd * 4;
+
+        ScarlEnt::Registry::Instance().RemoveScene(scene);
+
+        return passed;
+    }
+
+    static bool SceneUpdateIteratesThroughAllArchetypesWithSameSubset()
+    {
+        constexpr int solution    = 47;
+        constexpr int solutionSqr = solution * solution;
+        constexpr int solutionCbd = solution * solutionSqr;
+
+        bool passed = true;
+
+        Scarlet::WeakHandle<ScarlEnt::Scene> scene = ScarlEnt::Registry::Instance().CreateScene("Testing");
+
+        ScarlEnt::EntityHandle entity1 = scene->AddEntity<Vec3>(Vec3{ solution, solutionSqr, solutionCbd });
+        ScarlEnt::EntityHandle entity2 = scene->AddEntity<Vec2, Vec3>(Vec2{ solution, solution }, Vec3{ solution, solutionSqr, solutionCbd });
+
+        scene->RegisterSystem<Vec3>([](Vec3& vector) { vector.x *= 2; vector.y *= 3; vector.z *= 4; });
+
+        scene->Update();
+
+        auto CheckComponent = [](bool& passed, const Vec3& component) {
+                passed &= component.x == solution    * 2;
+                passed &= component.y == solutionSqr * 3;
+                passed &= component.z == solutionCbd * 4;
+            };
+
+        CheckComponent(passed, entity1.GetComponent<Vec3>());
+        CheckComponent(passed, entity2.GetComponent<Vec3>());
+
+        const Vec2& otherComponent = entity2.GetComponent<Vec2>();
+        passed &= otherComponent.x == solution;
+        passed &= otherComponent.y == solution;
+
+        ScarlEnt::Registry::Instance().RemoveScene(scene);
+
+        return passed;
+    }
+
+    static bool SceneUpdateChangedEntitiesCorrectlyWithMultipleComponents()
+    {
+        constexpr int solution    = 47;
+        constexpr int solutionSqr = solution * solution;
+        constexpr int solutionCbd = solution * solutionSqr;
+
+        bool passed = true;
+
+        Scarlet::WeakHandle<ScarlEnt::Scene> scene = ScarlEnt::Registry::Instance().CreateScene("Testing");
+
+        ScarlEnt::EntityHandle entity1 = scene->AddEntity<Vec2, Vec3>(Vec2{ solution, solution }, Vec3{ solution, solutionSqr, solutionCbd });
+
+        scene->RegisterSystem<Vec2, Vec3>([](Vec2& v2, Vec3& v3) {
+                v2.x *= v2.x;
+                v2.y *= v2.y;
+
+                v3.x *= 2;
+                v3.y *= 3;
+                v3.z *= 4;
+            });
+
+        scene->Update();
+
+        const Vec2& comp1 = entity1.GetComponent<Vec2>();
+        const Vec3& comp2 = entity1.GetComponent<Vec3>();
+
+        passed &= comp1.x == solutionSqr;
+        passed &= comp1.y == solutionSqr;
+
+        passed &= comp2.x == solution    * 2;
+        passed &= comp2.y == solutionSqr * 3;
+        passed &= comp2.z == solutionCbd * 4;
 
         ScarlEnt::Registry::Instance().RemoveScene(scene);
 

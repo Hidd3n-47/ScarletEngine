@@ -14,6 +14,16 @@ class SCARLENT_API Scene
 {
     friend class Registry;
 public:
+    /**
+     * @brief Update the scene. This will update all the registered systems.
+     */
+    void Update() const;
+
+    /**
+     * @brief Register a system that will act over a subset of components calling the update function.
+     * @tparam Components The components the system acts on.
+     * @param updateFunction The function acting on the components.
+     */
     template <typename...Components>
     void RegisterSystem(const std::function<void(Components&...)>& updateFunction);
 
@@ -50,6 +60,11 @@ private:
 };
 
 /* ============================================================================================================================== */
+
+inline void Scene::Update() const
+{
+    mComponentManager.Update();
+}
 
 template <typename...Components>
 inline void Scene::RegisterSystem(const std::function<void(Components&...)>& updateFunction)

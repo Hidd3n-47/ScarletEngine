@@ -68,6 +68,8 @@ public:
     template <typename Component>
     [[nodiscard]] ComponentArray<Component>* GetComponentArray();
 
+    /** @brief Get the number of entities a part of the archetype. */
+    [[nodiscard]] inline size_t GetSize() const { return mEntityIds.size(); }
 private:
     vector<IComponentArray*> mComponents;
 
