@@ -403,6 +403,7 @@ bin-int/
 
 # Solution and project files.
 *.sln
+*.slnx
 *.vcxproj
 *.vcxproj.*
 
