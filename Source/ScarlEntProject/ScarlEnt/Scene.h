@@ -3,6 +3,8 @@
 #include <ScarletCore/Ulid.h>
 
 #include "EntityHandle.h"
+#include "MutableEntityHandle.h"
+
 #include "ComponentManager.h"
 
 namespace ScarlEnt
@@ -17,7 +19,7 @@ public:
     /**
      * @brief Update the scene. This will update all the registered systems.
      */
-    void Update() const;
+    void Update();
 
     /**
      * @brief Register a system that will act over a subset of components calling the update function.
@@ -38,6 +40,12 @@ public:
     [[nodiscard]] EntityHandle<ArchetypeComponents...> AddEntity(Args&& ...args);
 
     /**
+     * @brief Create and add a mutable entity to the scene.
+     * @return A \ref MutableEntityHandle to the entity.
+     */
+    [[nodiscard]] MutableEntityHandle AddMutableEntity();
+
+    /**
      * @brief Remove an entity from the scene.
      * @tparam ArchetypeComponents The component types of the archetype.
      * @param entity A \ref EntityHandle to the entity.
@@ -50,8 +58,10 @@ public:
 
     /** @brief Get the index of the scene in the registry. */
     [[nodiscard]] inline size_t GetRegistryIndex() const { return mRegistryIndex; }
+
 private:
     Scene(const std::string_view friendlyName, const size_t index);
+    ~Scene() = default;
 
     std::string mFriendlyName;
     size_t      mRegistryIndex;
@@ -60,11 +70,6 @@ private:
 };
 
 /* ============================================================================================================================== */
-
-inline void Scene::Update() const
-{
-    mComponentManager.Update();
-}
 
 template <typename...Components>
 inline void Scene::RegisterSystem(const std::function<void(Components&...)>& updateFunction)

@@ -5,6 +5,7 @@
 #include <ScarletCore/PrimitiveTypes.h>
 
 #include "Archetype.h"
+#include "SparseSet.h"
 
 namespace ScarlEnt
 {
@@ -24,9 +25,16 @@ struct ISystem
      * @brief Update the system by calling the systems update function on a specific archetype.
      * @param archetype The archetype of components that the systems update function will act on.
      */
-    virtual void Update(Archetype* archetype) = 0;
+    virtual void UpdateArchetype(Archetype* archetype) = 0;
 
-    uint64 componentBitset;
+    /**
+     * @brief Update the system by calling the systems update function on specific subset of components in the \ref SparseSet.
+     * @param entityIds The runtime entity identifiers of mutable entities with the subset of components.
+     * @param componentSparseSet The \ref SparseSet to the component arrays.
+     */
+    virtual void UpdateSparseSet(const std::unordered_set<uint32>& entityIds, SparseSet<ISparseComponentArray*, Registry::COMPONENTS_PAGE_SIZE>& componentSparseSet) = 0;
+
+    uint64 componentBitset = 0;
 };
 
 /**
@@ -40,24 +48,43 @@ struct System : ISystem
     explicit System(const std::function<void(Components&...)>& updateFunction) noexcept
         : updateFunction(updateFunction) 
     {
-        componentBitset = (Registry::Instance().GetOrRegisterComponentBit<Components>() | ...);
+        componentBitset = (Registry::Instance().GetOrRegisterComponentId<Components>().bitmask | ...);
     }
 
     /**
-     * @copydoc ISystem::Update
+     * @copydoc ISystem::UpdateArchetype
      */
-    void Update(Archetype* archetype) override
+    void UpdateArchetype(Archetype* archetype) override
     {
         auto components = archetype->GetComponentArrays<Components...>();
+        const size_t size = archetype->GetSize();
 
         std::apply(
             [&](auto&... arrays)
             {
-                const std::size_t size = archetype->GetSize();
-
                 for (std::size_t i = 0; i < size; ++i)
                 {
                     updateFunction(arrays->componentArray[i]...);
+                }
+            },
+            components
+        );
+    }
+
+    /**
+     * @copydoc ISystem::UpdateSparseSet
+     */
+    void UpdateSparseSet(const std::unordered_set<uint32>& entityIds, SparseSet<ISparseComponentArray*, Registry::COMPONENTS_PAGE_SIZE>& componentSparseSet) override
+    {
+        auto components = std::forward_as_tuple<SparseSet<Components, Registry::COMPONENT_BITSET_PAGE_SIZE>&...>(
+            *static_cast<SparseSet<Components, Registry::COMPONENT_BITSET_PAGE_SIZE>*>(componentSparseSet[Registry::Instance().GetOrRegisterComponentId<Components>().id])...);
+
+        std::apply(
+            [&](auto&... sparseSets)
+            {
+                for (const uint32 entityId : entityIds)
+                {
+                    updateFunction(sparseSets[entityId]...);
                 }
             },
             components

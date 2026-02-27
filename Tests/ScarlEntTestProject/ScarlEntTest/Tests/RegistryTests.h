@@ -23,6 +23,8 @@ public:
         testRegistry->AddTestCase("RegistryTests", "CanCreateAndDestroyAScene", CanCreateAndDestroyAScene);
         testRegistry->AddTestCase("RegistryTests", "SettingSceneChangesCurrentlyActiveScene", SettingSceneChangesCurrentlyActiveScene);
         testRegistry->AddTestCase("RegistryTests", "IndexOfSceneUpdatesCorrectlyWhenRemovingAScene", IndexOfSceneUpdatesCorrectlyWhenRemovingAScene);
+        testRegistry->AddTestCase("RegistryTests", "AssertWhenTryingToGetComponentIdOfNonRegisteredComponent", AssertWhenTryingToGetComponentIdOfNonRegisteredComponent);
+        testRegistry->AddTestCase("RegistryTests", "GetTheCorrectIdFromComponentBitset", GetTheCorrectIdFromComponentBitset);
     }
 
     static bool DoubleInitCausesAssert()
@@ -47,18 +49,18 @@ public:
 
     static bool RegisteringFirstComponentReturnsOne()
     {
-        return ScarlEnt::Registry::Instance().GetOrRegisterComponentBit<Vec2>() == 0b1;
+        return ScarlEnt::Registry::Instance().GetOrRegisterComponentId<Vec2>().bitmask == 0b1;
     }
 
     static bool RegisteringSecondComponentReturnsTwo()
     {
-        return ScarlEnt::Registry::Instance().GetOrRegisterComponentBit<Vec3>() == 0b10;
+        return ScarlEnt::Registry::Instance().GetOrRegisterComponentId<Vec3>().bitmask == 0b10;
     }
 
     static bool GettingRegisteredComponentReturnsSameId()
     {
-        return ScarlEnt::Registry::Instance().GetOrRegisterComponentBit<Vec2>() == 0b1
-            && ScarlEnt::Registry::Instance().GetOrRegisterComponentBit<Vec3>() == 0b10;
+        return ScarlEnt::Registry::Instance().GetOrRegisterComponentId<Vec2>().bitmask == 0b1
+            && ScarlEnt::Registry::Instance().GetOrRegisterComponentId<Vec3>().bitmask == 0b10;
     }
 
     static bool NoActiveSceneReturnsAnInvalidHandle()
@@ -118,6 +120,33 @@ public:
         passed &= scene2->GetRegistryIndex() == 0;
 
         ScarlEnt::Registry::Instance().RemoveScene(scene2);
+
+        return passed;
+    }
+
+    static bool AssertWhenTryingToGetComponentIdOfNonRegisteredComponent()
+    {
+        bool passed = false;
+
+        try
+        {
+            (void)ScarlEnt::Registry::Instance().GetComponentIdFromBitmask(0b1000);
+        }
+        catch (const std::runtime_error&)
+        {
+            passed = true;
+        }
+
+        return passed;
+    }
+
+    static bool GetTheCorrectIdFromComponentBitset()
+    {
+        bool passed = true;
+
+        const ScarlEnt::ComponentId componentId = ScarlEnt::Registry::Instance().GetOrRegisterComponentId<int>();
+
+        passed &= ScarlEnt::Registry::Instance().GetComponentIdFromBitmask(componentId.bitmask) == componentId.id;
 
         return passed;
     }

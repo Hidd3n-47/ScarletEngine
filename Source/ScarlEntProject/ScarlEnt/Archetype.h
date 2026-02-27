@@ -89,7 +89,7 @@ template<typename...Components>
 inline Archetype::Archetype(const Scarlet::Ulid entityId, Components&&...values)
 {
 #ifdef DEV_CONFIGURATION
-    mArchetypeComponentBitmask = (Registry::Instance().GetOrRegisterComponentBit<Components>() | ...);
+    mArchetypeComponentBitmask = (Registry::Instance().GetOrRegisterComponentId<Components>().bitmask | ...);
 #endif // DEV_CONFIGURATION.
 
     size_t index = 0;
@@ -111,7 +111,9 @@ inline Component& Archetype::GetComponent(const Scarlet::Ulid entityId)
 template<typename...Components>
 inline void Archetype::AddEntity(const Scarlet::Ulid entityId, Components&&... componentValues)
 {
-    SCARLENT_ASSERT((Registry::Instance().GetOrRegisterComponentBit<Components>() | ...) == mArchetypeComponentBitmask && "Adding an entity with a different archetype component definition.");
+#ifdef DEV_CONFIGURATION
+    SCARLENT_ASSERT((Registry::Instance().GetOrRegisterComponentId<Components>().bitmask | ...) == mArchetypeComponentBitmask && "Adding an entity with a different archetype component definition.");
+#endif // DEV_CONFIGURATION.
 
     mEntityIds.emplace_back(entityId);
     mEntityIdToIndex[entityId] = mEntityIds.size() - 1;

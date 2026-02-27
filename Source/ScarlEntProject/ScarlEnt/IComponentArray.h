@@ -55,4 +55,11 @@ struct ComponentArray : IComponentArray
     vector<T> componentArray;
 };
 
+struct ISparseComponentArray
+{
+    virtual ~ISparseComponentArray() = default;
+
+    virtual void Remove(const uint64 id) = 0;
+};
+
 } // Namespace ScarlEnt.

@@ -13,6 +13,8 @@
 
 #include <assert.h>
 
+#define DEBUG(X) X
+
 #ifdef SCARLENT_TEST
 #include <stdexcept>
 #define SCARLENT_ASSERT(...) if (!(__VA_ARGS__)) throw std::runtime_error("Assertion failed!")
@@ -21,6 +23,8 @@
 #endif // !SCARLENT_TEST.
 
 #else // DEV_CONFIGURATION.
+
+#define DEBUG(X)
 
 #ifdef SCARLENT_TEST
 #include <stdexcept>

@@ -11,7 +11,9 @@ class ArchetypeTests
 public:
     explicit inline ArchetypeTests(Scarlet::TestRegistry* testRegistry)
     {
+#ifdef DEV_CONFIGURATION
         testRegistry->AddTestCase("ArchetypeTest", "ArchetypeAssertsIfTryingToAddEntityWithDifferentComponents", ArchetypeAssertsIfTryingToAddEntityWithDifferentComponents);
+#endif // DEV_CONFIGURATION.
         testRegistry->AddTestCase("ArchetypeTest", "SinglePrimitiveTypeInitialisedCorrectly", SinglePrimitiveTypeInitialisedCorrectly);
         testRegistry->AddTestCase("ArchetypeTest", "SingleCustomTypeInitialisedCorrectly", SingleCustomTypeInitialisedCorrectly);
         testRegistry->AddTestCase("ArchetypeTest", "DoublePrimitiveTypeInitialisedCorrectly", DoublePrimitiveTypeInitialisedCorrectly);

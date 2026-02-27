@@ -9,6 +9,7 @@
 #include <ScarletCore/PrimitiveTypes.h>
 
 #include "Defines.h"
+#include "ComponentId.h"
 
 namespace ScarlEnt
 {
@@ -64,7 +65,14 @@ public:
      * @return The unique bit of the component.
      */
     template <typename T>
-    uint64 GetOrRegisterComponentBit();
+    [[nodiscard]] ComponentId GetOrRegisterComponentId();
+
+    /**
+     * @brief Get the identifier of the component from the bitmask.
+     * @param bitmask The bitmask of the component.
+     * @return The identifier of the component.
+     */
+    [[nodiscard]] uint32 GetComponentIdFromBitmask(const uint64 bitmask);
 
     /**
      * @brief Get the currently active scene.
@@ -89,13 +97,17 @@ public:
      */
     [[nodiscard]] inline size_t GetNumberOfScenes() const { return mScenes.size(); }
 #endif // SCARLENT_TEST.
+
+    static constexpr size_t COMPONENTS_PAGE_SIZE = 10;
+    static constexpr size_t COMPONENT_BITSET_PAGE_SIZE = 1000;
 private:
     Registry()  = default;
     ~Registry() = default;
 
     inline static Registry* mInstance = nullptr;
 
-    unordered_map<const char*, uint64> mComponentIdMap;
+    unordered_map<const char*, ComponentId> mComponentIdMap;
+    unordered_map<uint64, uint32> mComponentBitmaskToId;
     uint32 mNumberOfRegisteredComponents = 0;
 
     int32 mCurrentSceneIndex = -1;
@@ -105,7 +117,7 @@ private:
 /* ============================================================================================================================== */
 
 template <typename T>
-inline uint64 Registry::GetOrRegisterComponentBit()
+inline ComponentId Registry::GetOrRegisterComponentId()
 {
     // Map a component to its TypeId name.
     const char* componentName = GetComponentTypeId<T>();
@@ -117,10 +129,20 @@ inline uint64 Registry::GetOrRegisterComponentBit()
 
     SCARLENT_ASSERT(mNumberOfRegisteredComponents < 63 && "Currently the registry can only handle 64 components. Limits reached.");
 
-    const uint64 componentId = 1 << mNumberOfRegisteredComponents++;
-    mComponentIdMap[componentName] = componentId;
+    const uint64 bitmask = 1ull << mNumberOfRegisteredComponents;
+    mComponentIdMap[componentName] = ComponentId{ .id = mNumberOfRegisteredComponents, .bitmask = bitmask };
+    mComponentBitmaskToId[bitmask] = mNumberOfRegisteredComponents;
 
-    return componentId;
+    ++mNumberOfRegisteredComponents;
+
+    return mComponentIdMap[componentName];
 }
+
+inline uint32 Registry::GetComponentIdFromBitmask(const uint64 bitmask)
+{
+    SCARLENT_ASSERT(mComponentBitmaskToId.contains(bitmask) && "Trying to get component ID for a non-registered component");
+    return mComponentBitmaskToId[bitmask];
+}
+
 
 } // Namespace ScarlEnt

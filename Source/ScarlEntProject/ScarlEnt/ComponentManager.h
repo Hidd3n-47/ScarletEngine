@@ -8,6 +8,8 @@
 #include "System.h"
 #include "Registry.h"
 #include "Archetype.h"
+#include "SparseSet.h"
+#include "MutableEntityId.h"
 
 namespace ScarlEnt
 {
@@ -20,6 +22,9 @@ typedef std::string ComponentTypeId;
 class SCARLENT_API ComponentManager
 {
 public:
+    template <typename Component>
+    using MutableComponentArray = SparseSet<Component, Registry::COMPONENT_BITSET_PAGE_SIZE>;
+
     ComponentManager() = default;
     ~ComponentManager();
 
@@ -43,7 +48,7 @@ public:
      * @brief Go through each registered system and update. Each archetype will be iterated over and compared to the required components of the system, updating the components \\n
      * based on the registered update function if so.
      */
-    void Update() const;
+    void Update();
 
     /**
      * @brief Add an entity to an Archetype defined by the components from the templated arguments.
@@ -53,6 +58,43 @@ public:
      */
     template <typename...ArchetypeComponents>
     [[nodiscard]] Scarlet::Ulid AddEntity(ArchetypeComponents&&...values);
+
+    /**
+     * @brief Create and add mutable entity.
+     * @return A \ref MutableEntityId of the mutable entity that was added.
+     */
+    [[nodiscard]] MutableEntityId AddMutableEntity();
+
+    /**
+     * @brief Remove a mutable entity. This will remove all the components associated with the mutable entity.
+     * @param mutableEntityRuntimeId: The runtime identifier of the mutable entity that is being removed.
+     */
+    void RemoveMutableEntity(const uint32 mutableEntityRuntimeId);
+
+    /**
+     * @brief Add a component to a mutable entity.
+     * @tparam Component The component being added to the mutable entity.
+     * @param mutableEntityRuntimeId The runtime identifier of the mutable entity whose component is being added.
+     */
+    template <typename Component, typename...Args>
+    void AddComponent(const uint32 mutableEntityRuntimeId, Args&&...args);
+
+    /**
+     * @brief Remove a component from a mutable entity.
+     * @tparam Component The component being removed from the mutable entity.
+     * @param mutableEntityRuntimeId The runtime identifier of the mutable entity whose component is being removed.
+     */
+    template <typename Component>
+    void RemoveComponent(const uint32 mutableEntityRuntimeId);
+
+    /**
+     * @brief Get a reference to a component on a mutable entity.
+     * @tparam Component The component being requested.
+     * @param mutableEntityRuntimeId The runtime identifier of the mutable entity whose component is being requested.
+     * @return A reference to the component on the mutable entity.
+     */
+    template <typename Component>
+    [[nodiscard]] Component& GetMutableEntityComponent(const uint32 mutableEntityRuntimeId);
 
     /**
      * @brief Remove an entity from an archetype.
@@ -72,55 +114,110 @@ public:
     template <typename Component, typename...ArchetypeComponents>
     [[nodiscard]] Component& GetComponent(const Scarlet::Ulid entityId);
 
-private:
-    unordered_map<uint64, Archetype*> mComponents;
-    unordered_map<Scarlet::Ulid, Archetype*> mEntityIdToComponentArray;
+#ifdef SCARLENT_TEST
+    [[nodiscard]] inline uint64 GetMutableEntityComponentBitset(const uint32 runtimeMutableId) { return mMutableEntityToComponentBitset[runtimeMutableId]; }
+    [[nodiscard]] inline const SparseSet<ISparseComponentArray*, Registry::COMPONENTS_PAGE_SIZE>& GetMutableComponentArrays() const { return mComponentIdToSparseSetArray; }
+#endif // SCARLENT_TEST
 
+private:
+    // Archetype - i.e. Immutable entities.
+    unordered_map<uint64, Archetype*>        mArchetypeComponents;
+    unordered_map<Scarlet::Ulid, Archetype*> mEntityIdToArchetypeComponentArray;
+
+    // SparseSet - i.e. Mutable entities.
+    uint32 mMutableEntitiesId = 0;
+    vector<ISparseComponentArray*> mSparseSetComponentArrays;
+    SparseSet<ISparseComponentArray*, Registry::COMPONENTS_PAGE_SIZE> mComponentIdToSparseSetArray;
+    SparseSet<uint64, Registry::COMPONENT_BITSET_PAGE_SIZE>           mMutableEntityToComponentBitset;
+    unordered_map<uint64, std::unordered_set<uint32>>                 mComponentBitsetToMutableEntities;
+
+    // Systems.
     vector<ISystem*> mSystems;
 };
 
 /* ============================================================================================================================== */
-
-inline void ComponentManager::Update() const
-{
-    for (ISystem* system : mSystems)
-    {
-        for (auto& [bitset, archetype] : mComponents)
-        {
-            if ((bitset & system->componentBitset) == system->componentBitset)
-            {
-                system->Update(archetype);
-            }
-        }
-    }
-}
 
 template <typename... ArchetypeComponents>
 inline Scarlet::Ulid ComponentManager::AddEntity(ArchetypeComponents&&... values)
 {
     const Scarlet::Ulid entityId{};
 
-    const uint64 componentsBitset = (Registry::Instance().GetOrRegisterComponentBit<ArchetypeComponents>() | ...);
+    const uint64 componentsBitset = (Registry::Instance().GetOrRegisterComponentId<ArchetypeComponents>().bitmask | ...);
 
-    if (!mComponents.contains(componentsBitset))
+    if (!mArchetypeComponents.contains(componentsBitset))
     {
-        mComponents[componentsBitset] = new Archetype(entityId, std::forward<ArchetypeComponents>(values)...);
-        mEntityIdToComponentArray[entityId] = mComponents[componentsBitset];
+        mArchetypeComponents[componentsBitset] = new Archetype(entityId, std::forward<ArchetypeComponents>(values)...);
+        mEntityIdToArchetypeComponentArray[entityId] = mArchetypeComponents[componentsBitset];
         return entityId;
     }
-    mEntityIdToComponentArray[entityId] = mComponents[componentsBitset];
+    mEntityIdToArchetypeComponentArray[entityId] = mArchetypeComponents[componentsBitset];
 
-    mComponents[componentsBitset]->AddEntity(entityId, std::forward<ArchetypeComponents>(values)...);
+    mArchetypeComponents[componentsBitset]->AddEntity(entityId, std::forward<ArchetypeComponents>(values)...);
     return entityId;
+}
+
+template <typename Component, typename...Args>
+inline void ComponentManager::AddComponent(const uint32 mutableEntityRuntimeId, Args&&...args)
+{
+    const ComponentId componentId = Registry::Instance().GetOrRegisterComponentId<Component>();
+
+    if (!mComponentIdToSparseSetArray.Contains(componentId.id))
+    {
+        mSparseSetComponentArrays.emplace_back(new MutableComponentArray<Component>());
+        mComponentIdToSparseSetArray.Add(componentId.id, mSparseSetComponentArrays.back());
+    }
+
+    const uint64 entityBitset = mMutableEntityToComponentBitset.Pop(mutableEntityRuntimeId);
+    const uint64 newBitset = entityBitset | componentId.bitmask;
+
+    mMutableEntityToComponentBitset.Add(mutableEntityRuntimeId, newBitset);
+
+    mComponentBitsetToMutableEntities[entityBitset].erase(mutableEntityRuntimeId);
+    mComponentBitsetToMutableEntities[newBitset].emplace(mutableEntityRuntimeId);
+
+    static_cast<MutableComponentArray<Component>*>(mComponentIdToSparseSetArray[componentId.id])->Add(mutableEntityRuntimeId, std::forward<Args>(args)...);
+}
+
+template <typename Component>
+inline void ComponentManager::RemoveComponent(const uint32 mutableEntityRuntimeId)
+{
+    const ComponentId componentId = Registry::Instance().GetOrRegisterComponentId<Component>();
+
+    SCARLENT_ASSERT(mComponentIdToSparseSetArray.Contains(componentId.id) && "Trying to remove a component that hasn't been added.");
+
+    const uint64 entityBitset = mMutableEntityToComponentBitset.Pop(mutableEntityRuntimeId);
+    const uint64 newBitset = entityBitset & ~componentId.bitmask;
+
+    if (!mMutableEntityToComponentBitset.Contains(mutableEntityRuntimeId))
+    {
+        mMutableEntityToComponentBitset.Add(mutableEntityRuntimeId, newBitset);
+    }
+
+    mMutableEntityToComponentBitset[mutableEntityRuntimeId] = newBitset;
+
+    mComponentBitsetToMutableEntities[entityBitset].erase(mutableEntityRuntimeId);
+    mComponentBitsetToMutableEntities[newBitset].emplace(mutableEntityRuntimeId);
+
+    SCARLENT_ASSERT(static_cast<MutableComponentArray<Component>*>(mComponentIdToSparseSetArray[componentId.id])->Contains(mutableEntityRuntimeId) && "Trying to remove a component that hasn't been added to entity.");
+    static_cast<MutableComponentArray<Component>*>(mComponentIdToSparseSetArray[componentId.id])->Remove(mutableEntityRuntimeId);
+}
+
+template <typename Component>
+inline Component& ComponentManager::GetMutableEntityComponent(const uint32 mutableEntityRuntimeId)
+{
+    const ComponentId componentId = Registry::Instance().GetOrRegisterComponentId<Component>();
+    SCARLENT_ASSERT(mComponentIdToSparseSetArray.Contains(componentId.id) && "Trying to get a component that hasn't been added to an entity yet.");
+
+    return (*static_cast<MutableComponentArray<Component>*>(mComponentIdToSparseSetArray[componentId.id]))[mutableEntityRuntimeId];
 }
 
 template <typename... ArchetypeComponents>
 inline void ComponentManager::RemoveEntity(Scarlet::Ulid entityId)
 {
-    SCARLENT_ASSERT(mEntityIdToComponentArray.contains(entityId) && "Trying to remove an entity that has not been created.");
+    SCARLENT_ASSERT(mEntityIdToArchetypeComponentArray.contains(entityId) && "Trying to remove an entity that has not been created.");
 
-    Archetype* array = mEntityIdToComponentArray[entityId];
-    mEntityIdToComponentArray.erase(entityId);
+    Archetype* array = mEntityIdToArchetypeComponentArray[entityId];
+    mEntityIdToArchetypeComponentArray.erase(entityId);
 
     array->RemoveEntity(entityId);
 }
@@ -128,9 +225,9 @@ inline void ComponentManager::RemoveEntity(Scarlet::Ulid entityId)
 template <typename Component, typename...ArchetypeComponents>
 inline Component& ComponentManager::GetComponent(const Scarlet::Ulid entityId)
 {
-    SCARLENT_ASSERT(mEntityIdToComponentArray.contains(entityId) && "Trying to retrieve a component that has not been created.");
+    SCARLENT_ASSERT(mEntityIdToArchetypeComponentArray.contains(entityId) && "Trying to retrieve a component that has not been created.");
 
-    Archetype* array = mEntityIdToComponentArray[entityId];
+    Archetype* array = mEntityIdToArchetypeComponentArray[entityId];
 
     return array->GetComponent<Component>(entityId);
 }

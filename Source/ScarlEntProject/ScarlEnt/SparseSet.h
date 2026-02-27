@@ -20,35 +20,29 @@ namespace ScarlEnt
  * The smaller the page size the more densely packed the sparse array will be, however, it will be closer to a map, causing more overhead due to more iteration.
  */
 template <typename T, size_t PageSize>
-class SparseSet
+class SparseSet : public ISparseComponentArray
 {
 public:
     using PagedSparse = vector<array<size_t, PageSize>*>;
 
     /**
      * @brief Add an item with ID to the \ref SparseSet.
-     * @tparam Args The argument types used to construct \c T.
      * @param id The unique ID of the item being added to the \ref SparseSet.
-     * @param args The arguments forwarded to construct type \c T.
+     * @param value 
      */
-    template <typename...Args>
-    inline void Add(const uint64 id, Args&&...args)
+    inline void Add(const uint64 id, T&& value)
     {
         // The sparse-array is a vector of array pointers.
         // It makes use of pointers to prevent allocation of the arrays whilst allowing for ordered pages.
         // Pages are only allocated when finally indexed in.
 
-        const size_t pageIndex = GetPageIndexForId(id);
+        SCARLENT_ASSERT(!Contains(id) && "Trying to add an ID that is already present in the sparse-set.");
 
-        // Ensure that the ID is not already present in the sparse set.
-        SCARLENT_ASSERT(mSparse.capacity() <= pageIndex                    // <- Capacity is less than page index, therefore not added.
-                     || mSparse[pageIndex] == nullptr                      // <- Page doesn't exist, therefore not added.
-                     || (*mSparse[pageIndex])[id % PageSize] == invalid_id // <- ID is invalid_id, therefore not added.
-                     && "Trying to add ID that is already present.");
+        const size_t pageIndex = GetPageIndexForId(id);
 
         // Add data to the dense array, and keep track of the most recent ID that has been allocated in a dense array.
         // This dense array of ID is used when removing when the back is swapped.
-        mDense.emplace_back(std::forward<Args>(args)...);
+        mDense.emplace_back(std::move(value));
         mDenseToId.emplace_back(id);
 
         if (mSparse.capacity() <= pageIndex)
@@ -72,18 +66,61 @@ public:
     }
 
     /**
+     * @brief Add an item with ID to the \ref SparseSet.
+     * @tparam Args The argument types used to construct \c T.
+     * @param id The unique ID of the item being added to the \ref SparseSet.
+     * @param args The arguments forwarded to construct type \c T.
+     */
+    template <typename...Args>
+    inline void Add(const uint64 id, Args&&...args)
+    {
+        Add(id, T{ std::forward<Args>(args)... });
+    }
+
+    /**
+     * @brief Get the value associated with an identifier and remove it from the dense array.
+     * @param id The identifier of the item being retrieved and removed from the dense array.
+     * @return The value of the item being retrieved and removed from the dense array.
+     */
+    [[nodiscard]] inline T Pop(const uint64 id)
+    {
+        SCARLENT_ASSERT(Contains(id) && "Trying to remove an ID that is not present in the sparse-set.");
+
+        const size_t pageIndex = GetPageIndexForId(id);
+        const uint64 index     = (*mSparse[pageIndex])[GetIndexInPageForId(id)] - id_offset;
+        const size_t last      = mDenseToId.back();
+
+        const T item = mDense[index];
+
+        // If the last element is not being removed, swap elements and update indices.
+        if (index != mDense.size() - 1)
+        {
+            // Swap back and then pop back.
+            std::swap(mDense[index], mDense.back());
+            std::swap(mDenseToId[index], mDenseToId.back());
+
+            // Update the moved ID to be the index + id_offset as 0 is mapped to invalid_id.
+            (*mSparse[last / PageSize])[last % PageSize] = index + id_offset;
+        }
+
+        // Invalidate the removed ID.
+        (*mSparse[pageIndex])[GetIndexInPageForId(id)] = invalid_id;
+
+        mDense.pop_back();
+        mDenseToId.pop_back();
+
+        return item;
+    }
+
+    /**
      * @brief Remove the item with corresponding ID from the dense array.
      * @param id The \c id being removed.
      */
-    inline void Remove(const uint64 id)
+    inline void Remove(const uint64 id) override
     {
-        const size_t pageIndex = GetPageIndexForId(id);
+        SCARLENT_ASSERT(Contains(id) && "Trying to remove an ID that is not present in the sparse-set.");
 
-        // Ensure that the ID is present in the sparse set.
-        SCARLENT_ASSERT(mSparse.capacity() >  pageIndex                    // <- Capacity is greater than page index, therefore possibly added.
-                     && mSparse[pageIndex] != nullptr                      // <- Page exists, therefore possibly added.
-                     && (*mSparse[pageIndex])[id % PageSize] != invalid_id // <- ID is not invalid_id, therefore ID is mapped to some part in the dense array.
-                     && "Trying to remove an ID that is not present in the sparse-set.");
+        const size_t pageIndex = GetPageIndexForId(id);
 
         // IDs are offset (not 0 index based so that 0 is invalid ID), remove id_offset to get true id.
         const size_t index = (*mSparse[pageIndex])[id % PageSize] - id_offset;
@@ -124,9 +161,34 @@ public:
     static constexpr uint64 invalid_id = 0;
     static constexpr uint64 id_offset  = 1;
 
-#ifdef SCARLENT_TEST
+    /** @brief Get a reference to the dense array.       */
+    [[nodiscard]] inline vector<T>& GetDense() { return mDense; }
+
+    [[nodiscard]] inline T& operator[](const uint64 id)
+    {
+        SCARLENT_ASSERT(Contains(id) && "Trying to retrieve item at an ID that hasn't been added.");
+
+        const size_t pageIndex = GetPageIndexForId(id);
+        const uint64 index = (*mSparse[pageIndex])[GetIndexInPageForId(id)] - id_offset;
+
+        return mDense[index];
+    }
+
     /** @brief Get a constant reference to the dense array.       */
-    [[nodiscard]] inline const vector<T>&      GetDense()     const { return mDense; }
+    [[nodiscard]] inline const vector<T>& GetDense() const { return mDense; }
+
+    [[nodiscard]] inline bool Contains(const uint64 id)
+    {
+        const size_t pageIndex = GetPageIndexForId(id);
+
+        // Ensure that the ID is present in the sparse set.
+        return mSparse.capacity() > pageIndex                                // <- Capacity is greater than page index, therefore possibly added.
+            && mSparse[pageIndex] != nullptr                                 // <- Page exists, therefore possibly added.
+            && (*mSparse[pageIndex])[GetIndexInPageForId(id)] != invalid_id; // <- ID is not invalid_id, therefore ID is mapped to some part in the dense array.
+
+    }
+
+#ifdef SCARLENT_TEST
     /** @brief Get a constant reference to the dense to ID array. */
     [[nodiscard]] inline const vector<uint64>& GetDenseToId() const { return mDenseToId; }
     /** @brief Get a constant reference to the parse array.       */

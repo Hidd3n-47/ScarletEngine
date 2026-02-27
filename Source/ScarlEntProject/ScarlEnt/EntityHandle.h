@@ -8,8 +8,6 @@
 namespace ScarlEnt
 {
 
-class Scene;
-
 /**
  * @class EntityHandle: A handle to deal with entities. This is a wrapper class used to assist with interfacing with entities. \\n
  * Entities are just an identifier and so it is impossible to say \code entity.GetComponent\endcode . A wrapper allows the user to \\n
@@ -20,7 +18,7 @@ class Scene;
  * of the scene.
  */
 template <typename...ArchetypeComponents>
-class EntityHandle
+class SCARLENT_API EntityHandle
 {
     friend class Scene;
 public:
