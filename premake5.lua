@@ -32,3 +32,6 @@ include "Tests/ScarlEntTestProject/"
 
 -- Dependency Projects.
 include "Deps/ImGui/"
+
+-- Project.
+include "ScarletProjects/ScarletTestGameProject/"

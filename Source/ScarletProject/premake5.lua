@@ -20,8 +20,9 @@ project "Scarlet"
 
     includedirs
     {
-        "%{prj.name}/Src/",
+        "%{prj.name}/",
 
+        "$(SolutionDir)Source/ScarletLoggerProject/",
         "$(SolutionDir)Source/ScarletCoreProject/",
         "$(SolutionDir)Source/ScarletEngineProject/",
     }

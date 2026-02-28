@@ -873,7 +873,6 @@ public:
         return passed;
     }
 
-#ifdef DEV_CONFIGURATION
     static bool AssertsWhenTryingToUseMutableEntityAfterRemovalInDebugMode()
     {
         bool passed = false;
@@ -894,8 +893,4 @@ public:
 
         return passed;
     }
-#endif // DEV_CONFIGURATION.
-
-    //todo it would be good to test the sets as that is the part I am most not sure of, however not sure a nice way to get access to it.
-    //todo make the unordered_set as a ScarletCore.
 };

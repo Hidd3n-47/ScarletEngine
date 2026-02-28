@@ -6,7 +6,7 @@
 
 #include <assert.h>
 
-#include "ScarletLogger/Log.h"
+#include <ScarletLogger/Log.h>
 
 #define SCARLET_INFO(...)  Scarlet::Log::Info ("Scarlet", __VA_ARGS__)
 #define SCARLET_DEBUG(...) Scarlet::Log::Debug("Scarlet", __VA_ARGS__)
