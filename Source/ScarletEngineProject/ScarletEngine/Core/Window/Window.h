@@ -13,27 +13,19 @@ class Event;
  */
 struct WindowProperties
 {
-    WindowProperties()  = default;
-    ~WindowProperties() = default;
-
-    WindowProperties(const WindowProperties&)            = default;
-    WindowProperties(WindowProperties&&)                 = default;
-    WindowProperties& operator=(WindowProperties&&)      = default;
-    WindowProperties& operator=(const WindowProperties&) = default;
-
-    /** The width of the window.           */
+    /** @brief The width of the window.           */
     uint32 width         = 1920;
-    /** The height of the window.          */
+    /** @brief The height of the window.          */
     uint32 height        = 1080;
-    /** If the window is resizable.        */
+    /** @brief If the window is resizable.        */
     bool   resizable     = false;
-    /** If the window contains a titlebar. */
+    /** @brief If the window contains a titlebar. */
     bool   titleBar      = true;
-    /** Create the current OpenGL context. */
+    /** @brief Create the current OpenGL context. */
     bool   makeGlContext = true;
 
     /** A function pointer to a callback method used to process events. */
-    std::function<void(Event&)> eventCallback;
+    std::function<void(Event&)> eventCallback{};
 };
 
 /**

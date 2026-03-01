@@ -26,6 +26,87 @@
 #include "Core/Engine.h"
 #include "ScarlEnt/Scene.h"
 
+#include "IndexBuffer.h"
+#include "VertexBuffer.h"
+#include "CubeMapTexture.h"
+
+namespace
+{
+
+static constexpr float SKY_BOX_VERTICES[] =
+{
+    -1.0f, -1.0f,  1.0f,
+     1.0f, -1.0f,  1.0f,
+     1.0f, -1.0f, -1.0f,
+    -1.0f, -1.0f, -1.0f,
+    -1.0f,  1.0f,  1.0f,
+     1.0f,  1.0f,  1.0f,
+     1.0f,  1.0f, -1.0f,
+    -1.0f,  1.0f, -1.0f
+};
+
+static constexpr int SKY_BOX_INDEX_COUNT = 36;
+
+static constexpr uint32 SKY_BOX_INDICES[SKY_BOX_INDEX_COUNT] =
+{
+    1, 2, 6,
+    6, 5, 1,
+
+    0, 4, 7,
+    7, 3, 0,
+
+    4, 5, 6,
+    6, 7, 4,
+
+    0, 3, 2,
+    2, 1, 0,
+
+    0, 1, 5,
+    5, 4, 0,
+
+    3, 7, 6,
+    6, 2, 3
+};
+
+Scarlet::Math::Vec3 RotateAroundAxis(const Scarlet::Math::Vec3& v, const Scarlet::Math::Vec3& axis, float angleRad)
+{
+    Scarlet::Math::Vec3 k = Scarlet::Math::Normalize(axis);
+    float cosA = std::cos(angleRad);
+    float sinA = std::sin(angleRad);
+
+    return v * cosA + Scarlet::Math::Cross(k, v) * sinA + k * Scarlet::Math::Dot(k, v) * (1.0f - cosA);
+}
+
+void RotateCamera(Scarlet::Math::Vec3& forward, Scarlet::Math::Vec3& right, Scarlet::Math::Vec3& up,
+    float yawDegrees, float pitchDegrees, float rollDegrees)
+{
+
+    // Convert degrees to radians
+    float yaw   = Scarlet::Math::Radians(yawDegrees);
+    float pitch = Scarlet::Math::Radians(pitchDegrees);
+    float roll  = Scarlet::Math::Radians(rollDegrees);
+
+    // Yaw around global Z (up)
+    forward = RotateAroundAxis(forward, Scarlet::Math::Vec3{ 0,0,1 }, yaw);
+    right = RotateAroundAxis(right, Scarlet::Math::Vec3{ 0,0,1 }, yaw);
+    up = RotateAroundAxis(up, Scarlet::Math::Vec3{ 0,0,1 }, yaw);
+
+    // Pitch around right vector
+    forward = RotateAroundAxis(forward, right, pitch);
+    up = RotateAroundAxis(up, right, pitch);
+
+    // Roll around forward vector
+    right = RotateAroundAxis(right, forward, roll);
+    up = RotateAroundAxis(up, forward, roll);
+
+    // Re-orthonormalize to prevent drift
+    forward = Scarlet::Math::Normalize(forward);
+    right = Scarlet::Math::Normalize(Scarlet::Math::Cross(forward, up));
+    up = Scarlet::Math::Normalize(Scarlet::Math::Cross(right, forward));
+}
+
+} // Anonymous namespace.
+
 namespace Scarlet
 {
 
@@ -218,21 +299,38 @@ Renderer::Renderer(const uint32 width, const uint32 height)
     , mLastFrameWidth(width)
     , mLastFrameHeight(height)
     , mShader("E:/Programming/ScarletEngine/EngineAssets/Shaders/editor.vert", "E:/Programming/ScarletEngine/EngineAssets/Shaders/editor.frag")
+    , mSkyBoxShader("E:/Programming/ScarletEngine/EngineAssets/Shaders/skybox.vert", "E:/Programming/ScarletEngine/EngineAssets/Shaders/skybox.frag")
     , mInstanceBuffer(MAX_INSTANCE_COUNT * sizeof(Math::Mat4))
 {
 #ifdef DEV_CONFIGURATION
     mFramebuffer = new Framebuffer(width, height);
 #endif // DEV_CONFIGURATION.
+
+    mSkyBoxVao = new VertexArray();
+    mSkyBoxVbo = new VertexBuffer(SKY_BOX_VERTICES, sizeof(SKY_BOX_VERTICES) * sizeof(float));
+    mSkyBoxIbo = new IndexBuffer(SKY_BOX_INDICES, sizeof(SKY_BOX_INDICES) / sizeof(uint32));
+
+    mSkyBoxVbo->PushVertexLayoutElement<float>(3);
+
+    mSkyBoxVao->AddBuffer(*mSkyBoxVbo, false);
+
+    mCubeMapTexture = new Resource::CubeMapTexture("E:/Programming/ScarletEngine/EngineAssets/CubeMap/");
 }
 
 Renderer::~Renderer()
 {
+    delete mCubeMapTexture;
+
+    delete mSkyBoxIbo;
+    delete mSkyBoxVbo;
+    delete mSkyBoxVao;
+
 #ifdef DEV_CONFIGURATION
     delete mFramebuffer;
 #endif // DEV_CONFIGURATION.
 }
 
-void Renderer::AddRenderCommand(const WeakHandle<Resource::Material> material, const WeakHandle<Resource::Mesh> meshRef, Math::Mat4& modelMatrix)
+void Renderer::AddRenderCommand(const WeakHandle<Resource::Material> material, const WeakHandle<Resource::Mesh> meshRef, const Math::Mat4& modelMatrix)
 {
     const RenderGroup group{.material = material, .mesh = meshRef };
 
@@ -251,8 +349,8 @@ void Renderer::Render()
 #ifdef DEV_CONFIGURATION
     mFramebuffer->Bind();
 #endif // DEV_CONFIGURATION.
+
     glViewport(0, 0, static_cast<int>(mViewportWidth), static_cast<int>(mViewportHeight));
-    glClearColor(0.12f, 0.8f, 1.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     mShader.Bind();
@@ -287,6 +385,26 @@ void Renderer::Render()
 
         commands.clear();
     }
+
+    glDepthFunc(GL_LEQUAL); 
+    glDisable(GL_CULL_FACE);
+
+    mSkyBoxShader.Bind();
+    
+    mSkyBoxShader.UploadUniform("uSkyBox", 0);
+    mSkyBoxShader.UploadUniform("uViewMatrix", Math::Mat4(Math::Mat3(mRenderCamera.GetViewMatrix())));
+    mSkyBoxShader.UploadUniform("uProjectionMatrix", mRenderCamera.GetProjectionMatrix());
+
+    mSkyBoxVao->Bind();
+    mSkyBoxVbo->Bind();
+    mSkyBoxIbo->Bind();
+
+    mCubeMapTexture->Bind();
+
+    glDrawElements(GL_TRIANGLES, SKY_BOX_INDEX_COUNT, GL_UNSIGNED_INT, nullptr);
+
+    glEnable(GL_CULL_FACE);
+    glDepthFunc(GL_LESS);
 
 #ifdef DEV_CONFIGURATION
     Framebuffer::Unbind();
@@ -352,8 +470,6 @@ void Renderer::Render()
     if (ImGui::Button("+"))
     {
         ImGui::OpenPopup("AddEntity");
-
-        //(void)ScarlettGame::GameCore::Instance().CreateEntity();
     }
 
     if (ImGui::BeginPopup("AddEntity")) {
@@ -437,6 +553,17 @@ void Renderer::Render()
     if (ImGui::CollapsingHeader("Camera"))
     {
         ImGui::DragFloat3("Position", &mCameraPosition[0], 0.05f);
+
+        float rotation[3] = { 0.0f, 0.0f, 0.0f };
+        ImGui::DragFloat3("Rotation", rotation, 0.05f);
+
+        Math::Vec3 forward = mRenderCamera.GetForwardVector();
+        Math::Vec3 right   = mRenderCamera.GetRightVector();
+        Math::Vec3 up      = mRenderCamera.GetUpVector();
+        RotateCamera(forward, right, up, rotation[0], rotation[1], rotation[2]);
+        mRenderCamera.SetForwardVector(forward);
+        mRenderCamera.SetRightVector(right);
+        mRenderCamera.SetUpVector(up);
     }
 
     if (ImGui::CollapsingHeader("Lighting"))

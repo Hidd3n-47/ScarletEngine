@@ -25,8 +25,9 @@ public:
      * @ref VertexBuffer
      * @ref VertexBufferLayout
      * @param vertexBuffer The vertex buffer that the array is responsible for.
+     * @param instancedAttributes \c true if the buffer contains attributes about instances, \c false otherwise. Defaulted to \c true.
      */
-    void AddBuffer(const VertexBuffer& vertexBuffer) const;
+    void AddBuffer(const VertexBuffer& vertexBuffer, const bool instancedAttributes = true) const;
 
     /**
      * @brief Bind the array so the graphics pipeline uses this vertex array.

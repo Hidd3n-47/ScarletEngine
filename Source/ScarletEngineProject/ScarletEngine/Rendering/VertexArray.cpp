@@ -16,7 +16,7 @@ VertexArray::~VertexArray()
     glDeleteVertexArrays(1, &mId);
 }
 
-void VertexArray::AddBuffer(const VertexBuffer& vertexBuffer) const
+void VertexArray::AddBuffer(const VertexBuffer& vertexBuffer, const bool instancedAttributes) const
 {
     Bind();
 
@@ -33,17 +33,20 @@ void VertexArray::AddBuffer(const VertexBuffer& vertexBuffer) const
         offset += count * size;
     }
 
-    Renderer::Instance().GetInstanceBuffer().Bind();
-
-    offset = 0;
-    const vector<BufferElement>& instanceElements = vertexBufferLayout.GetInstanceElements();
-    for (uint32 i{ 0 }; i < static_cast<uint32>(instanceElements.size()); ++i)
+    if (instancedAttributes)
     {
-        const auto& [count, type, size, normalised] = instanceElements[i];
-        glEnableVertexAttribArray(i + vertexSize);
-        glVertexAttribPointer(i + vertexSize, static_cast<int>(count), type, normalised, static_cast<int>(vertexBufferLayout.GetInstanceStride()), reinterpret_cast<const void*>(offset));
-        glVertexAttribDivisor(i + vertexSize, 1);
-        offset += count * size;
+        Renderer::Instance().GetInstanceBuffer().Bind();
+
+        offset = 0;
+        const vector<BufferElement>& instanceElements = vertexBufferLayout.GetInstanceElements();
+        for (uint32 i{ 0 }; i < static_cast<uint32>(instanceElements.size()); ++i)
+        {
+            const auto& [count, type, size, normalised] = instanceElements[i];
+            glEnableVertexAttribArray(i + vertexSize);
+            glVertexAttribPointer(i + vertexSize, static_cast<int>(count), type, normalised, static_cast<int>(vertexBufferLayout.GetInstanceStride()), reinterpret_cast<const void*>(offset));
+            glVertexAttribDivisor(i + vertexSize, 1);
+            offset += count * size;
+        }
     }
 }
 

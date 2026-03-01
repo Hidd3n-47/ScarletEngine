@@ -15,9 +15,14 @@ namespace Scarlet
 class Window;
 class Framebuffer;
 
+class VertexArray;
+class VertexBuffer;
+class IndexBuffer;
+
 namespace Resource
 {
 class Mesh;
+class CubeMapTexture;
 }  // Namespace Resource.
 
 /**
@@ -42,7 +47,7 @@ public:
      * @param meshRef A reference to the mesh being rendered.
      * @param modelMatrix The model matrix (i.e. world transform) for the instance.
      */
-    void AddRenderCommand(const WeakHandle<Resource::Material>, const WeakHandle<Resource::Mesh> meshRef, Math::Mat4& modelMatrix);
+    void AddRenderCommand(const WeakHandle<Resource::Material>, const WeakHandle<Resource::Mesh> meshRef, const Math::Mat4& modelMatrix);
 
     /**
      * @brief A function to go through all commands and execute the draw calls.
@@ -66,8 +71,15 @@ private:
     uint32 mLastFrameWidth, mLastFrameHeight;
 
     Shader mShader;
+    Shader mSkyBoxShader;
     InstanceBuffer mInstanceBuffer;
     Camera mRenderCamera;
+
+    VertexArray*  mSkyBoxVao;
+    VertexBuffer* mSkyBoxVbo;
+    IndexBuffer*  mSkyBoxIbo;
+
+    Resource::CubeMapTexture* mCubeMapTexture;
 
     Math::Vec3 mCameraPosition{ 0.0f, -10.0f, 2.0f };
 

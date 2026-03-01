@@ -19,7 +19,7 @@ VertexBuffer::VertexBuffer(const  void* vertices, const size_t size)
     glCreateBuffers(1, &mId);
 
     Bind();
-    glBufferData(GL_ARRAY_BUFFER, static_cast<int>(size), vertices, GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, static_cast<int>(size), vertices, GL_STATIC_DRAW);
 }
 
 VertexBuffer::~VertexBuffer()

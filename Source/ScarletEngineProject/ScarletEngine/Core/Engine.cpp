@@ -27,8 +27,10 @@ void Engine::Init() noexcept
     DEBUG(Log::Init());
 
     WindowManager::InitApi();
-    mMainWindow = WindowManager::CreateWindowInternal("Scarlet Engine");
-    mMainWindow->SetEventCallback([](Event& e) { Instance().OnEvent(e); });
+
+    WindowProperties windowProperties{ .eventCallback = [](Event& e) { Instance().OnEvent(e); } };
+    DEBUG(windowProperties.resizable = true);
+    mMainWindow = WindowManager::CreateWindowInternal("Scarlet Engine", std::move(windowProperties));
 
     Renderer::InitApi(mMainWindow);
 
@@ -102,13 +104,13 @@ void Engine::Run() const
     {
         WindowManager::ApiPoll();
 
-        Renderer::Instance().AddRenderCommand(WeakHandle{ &uvMaterial }, WeakHandle{ mCube }  , cubeFloor);
-        Renderer::Instance().AddRenderCommand(WeakHandle{ &uvMaterial }, WeakHandle{ mCube }  , cubePos);
-        Renderer::Instance().AddRenderCommand(WeakHandle{ &uvMaterial }, WeakHandle{ mCube }  , cubePos1);
-        Renderer::Instance().AddRenderCommand(WeakHandle{ &uvMaterial }, WeakHandle{ mMonkey }, monkeyPos);
-        Renderer::Instance().AddRenderCommand(WeakHandle{ &uvMaterial }, WeakHandle{ mMonkey }, monkeyPos1);
-        Renderer::Instance().AddRenderCommand(WeakHandle{ &uvMaterial }, WeakHandle{ mCone }, conePos);
-        Renderer::Instance().AddRenderCommand(WeakHandle{ &glockMaterial }, WeakHandle{ mGlock }  , glockPos);
+        Renderer::Instance().AddRenderCommand(WeakHandle{ &uvMaterial }   , WeakHandle{ mCube }  , cubeFloor);
+        Renderer::Instance().AddRenderCommand(WeakHandle{ &uvMaterial }   , WeakHandle{ mCube }  , cubePos);
+        Renderer::Instance().AddRenderCommand(WeakHandle{ &uvMaterial }   , WeakHandle{ mCube }  , cubePos1);
+        Renderer::Instance().AddRenderCommand(WeakHandle{ &uvMaterial }   , WeakHandle{ mMonkey }, monkeyPos);
+        Renderer::Instance().AddRenderCommand(WeakHandle{ &uvMaterial }   , WeakHandle{ mMonkey }, monkeyPos1);
+        Renderer::Instance().AddRenderCommand(WeakHandle{ &uvMaterial }   , WeakHandle{ mCone }  , conePos);
+        Renderer::Instance().AddRenderCommand(WeakHandle{ &glockMaterial }, WeakHandle{ mGlock } , glockPos);
         Renderer::Instance().Render();
 
         mMainWindow->Update();
