@@ -17,7 +17,7 @@ class Scene;
  * The component manager is valid for the life-time of the scene. This coupling of lifetime is okay as entities are only valid for the life-time \\n
  * of the scene.
  */
-class SCARLENT_API MutableEntityHandle
+class SCARLENT_API MutableEntityHandle DEBUG(: public IEntityHandle)
 {
     friend class Scene;
 public:
@@ -113,6 +113,8 @@ public:
     [[nodiscard]] inline uint64 GetComponentBitset() { return mComponentManagerRef->GetMutableEntityComponentBitset(mEntityId.runtimeId); }
     [[nodiscard]] inline Scarlet::WeakHandle<ComponentManager> GetComponentManagerRef() const { return mComponentManagerRef; }
 #endif // SCARLENT_TEST.
+
+    DEBUG([[nodiscard]] inline bool IsMutable() const override { return true; })
 private:
     MutableEntityId mEntityId;
     Scarlet::WeakHandle<ComponentManager> mComponentManagerRef;

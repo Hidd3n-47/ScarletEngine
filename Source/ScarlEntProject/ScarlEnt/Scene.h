@@ -16,6 +16,7 @@ class SCARLENT_API Scene
 {
     friend class Registry;
 public:
+
     /**
      * @brief Update the scene. This will update all the registered systems.
      */
@@ -59,14 +60,19 @@ public:
     /** @brief Get the index of the scene in the registry. */
     [[nodiscard]] inline size_t GetRegistryIndex() const { return mRegistryIndex; }
 
+    DEBUG([[nodiscard]] inline const vector<IEntityHandle*>& GetEntityHandles()        const { return mEntityHandles; })
+    DEBUG([[nodiscard]] inline const vector<IEntityHandle*>& GetMutableEntityHandles() const { return mMutableEntityHandles; })
 private:
     Scene(const std::string_view friendlyName, const size_t index);
-    ~Scene() = default;
+    DEBUG(~Scene());
 
     std::string mFriendlyName;
     size_t      mRegistryIndex;
 
     ComponentManager mComponentManager;
+
+    DEBUG(vector<IEntityHandle*> mEntityHandles;)
+    DEBUG(vector<IEntityHandle*> mMutableEntityHandles;)
 };
 
 /* ============================================================================================================================== */
@@ -80,7 +86,13 @@ inline void Scene::RegisterSystem(const std::function<void(Components&...)>& upd
 template <typename... ArchetypeComponents, typename... Args>
 inline EntityHandle<ArchetypeComponents...> Scene::AddEntity(Args&&... args)
 {
+#ifdef DEV_CONFIGURATION
+    auto handle = EntityHandle<ArchetypeComponents...>{ Scarlet::WeakHandle{ &mComponentManager }, std::forward<Args>(args)... };
+    mEntityHandles.emplace_back(new EntityHandle<ArchetypeComponents...>(handle));
+    return handle;
+#else // DEV_CONFIGURATION.
     return EntityHandle<ArchetypeComponents...>{ Scarlet::WeakHandle{ &mComponentManager }, std::forward<Args>(args)... };
+#endif // !DEV_CONFIGURATION
 }
 
 template <typename...ArchetypeComponents>

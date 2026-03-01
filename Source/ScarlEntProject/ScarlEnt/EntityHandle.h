@@ -3,6 +3,7 @@
 #include <ScarletCore/Ulid.h>
 #include <ScarletCore/WeakHandle.h>
 
+#include "IEntityHandle.h"
 #include "ComponentManager.h"
 
 namespace ScarlEnt
@@ -18,7 +19,7 @@ namespace ScarlEnt
  * of the scene.
  */
 template <typename...ArchetypeComponents>
-class SCARLENT_API EntityHandle
+class EntityHandle DEBUG(: public IEntityHandle)
 {
     friend class Scene;
 public:

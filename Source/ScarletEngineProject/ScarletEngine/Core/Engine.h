@@ -28,7 +28,7 @@ public:
     static void CreateEngine() noexcept;
 
     void Init() noexcept;
-    void Destroy() noexcept;
+    void Destroy() const noexcept;
 
     void Run() const;
 

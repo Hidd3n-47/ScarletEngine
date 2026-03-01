@@ -1,6 +1,8 @@
 #include "ScarletEnginePch.h"
 #include "Engine.h"
 
+#include <ScarlEnt/Registry.h>
+
 #include "Events/Event.h"
 #include "Events/ApplicationEvents.h"
 
@@ -16,6 +18,7 @@ namespace Scarlet
 
 void Engine::CreateEngine() noexcept
 {
+    SCARLET_ASSERT(!mInstance && "Trying to create an instance of the engine one already exists.");
     mInstance = new Engine();
 }
 
@@ -29,6 +32,8 @@ void Engine::Init() noexcept
 
     Renderer::InitApi(mMainWindow);
 
+    ScarlEnt::Registry::Init();
+
     mUvMapTexture = new Resource::Texture{ "E:/Programming/ScarletEngine/EngineAssets/uvMap.png" };
     mGlockTexture = new Resource::Texture{ "E:/Programming/ScarletEngine/EngineAssets/Glock17_BaseColor.png" };
 
@@ -41,15 +46,19 @@ void Engine::Init() noexcept
     SCARLET_INFO("Engine Initialised!");
 }
 
-void Engine::Destroy() noexcept
+void Engine::Destroy() const noexcept
 {
     SCARLET_ASSERT(!mRunning && "Trying to destroy engine whilst Engine::Run is running.");
+
+    ScarlEnt::Registry::Terminate();
+
     Renderer::TerminateApi();
 
     WindowManager::DestroyWindow(mInstance->mMainWindow);
     WindowManager::TerminateApi();
 
     delete mInstance;
+    mInstance = nullptr;
     SCARLET_INFO("Engine Destroyed!");
 }
 

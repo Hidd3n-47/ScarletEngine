@@ -26,6 +26,7 @@ project "ScarletEngine"
         "$(SolutionDir)Source/ScarletCoreProject/",
         "$(SolutionDir)Source/ScarletMathProject/",
         "$(SolutionDir)Source/ScarletLoggerProject/",
+        "$(SolutionDir)Source/ScarlEntProject/",
 
         "$(SolutionDir)Deps/Include/",
         "$(SolutionDir)Deps/ImGui/"
@@ -41,6 +42,7 @@ project "ScarletEngine"
         "ScarletCore",
         "ScarletMath",
         "ScarletLogger",
+        "ScarlEnt",
 
         "imgui",
 

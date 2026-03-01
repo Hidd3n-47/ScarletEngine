@@ -33,7 +33,11 @@ void ApplicationManager::LoadGameDll()
         mGame = nullptr;
     }
 
+#ifdef DEV_CONFIGURATION
     const HMODULE gameDll = LoadLibrary(L"E:/Programming/ScarletEngine/Scratch/Bin/Dev/ScarletTestGameProject/ScarletTestGameProject.dll");
+#else // DEV_CONFIGURATION.
+    const HMODULE gameDll = LoadLibrary(L"E:/Programming/ScarletEngine/Scratch/Bin/Release/ScarletTestGameProject/ScarletTestGameProject.dll");
+#endif // !DEV_CONFIGURATION.
 
     if (!gameDll)
     {
