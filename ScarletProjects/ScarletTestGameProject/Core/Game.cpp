@@ -16,5 +16,7 @@ void Game::Init()
 
 void Game::Terminate()
 {
+    auto scene = ScarlEnt::Registry::Instance().GetActiveScene();
+    ScarlEnt::Registry::Instance().RemoveScene(scene);
     std::cout << "Goodbye from game side.\n";
 }

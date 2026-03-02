@@ -1,6 +1,5 @@
--- ---------------------------- ScarletEngine Project.
-project "ScarletEngine"
-    location "%{prj.name}"
+-- ---------------------------- ScarletEditor Project.
+project "ScarletEditor"
     kind "StaticLib"
     language "C++"
     staticruntime "Off"
@@ -8,9 +7,6 @@ project "ScarletEngine"
 
     targetdir(path.join(outputPath, "%{prj.name}"))
     objdir(path.join(outputIntPath, "%{prj.name}"))
-
-    pchheader "ScarletEnginePch.h"
-    pchsource "%{prj.name}/Src/ScarletEnginePch.cpp"
 
     files
     {
@@ -20,28 +16,29 @@ project "ScarletEngine"
 
     includedirs
     {
-        "%{prj.name}",
-        "%{prj.name}/Src/",
-
-        "$(SolutionDir)Source/ScarletCoreProject/",
-        "$(SolutionDir)Source/ScarletMathProject/",
-        "$(SolutionDir)Source/ScarletLoggerProject/",
-        "$(SolutionDir)Source/ScarlEntProject/",
-
         "$(SolutionDir)Deps/Include/",
+
+        "$(SolutionDir)Source/ScarlEntProject/",
+        "$(SolutionDir)Source/ScarletCoreProject/",
+        "$(SolutionDir)Source/ScarletEngineProject/",
+        "$(SolutionDir)Source/ScarletLoggerProject/",
+
+        "$(SolutionDir)Deps/ImGui/",
     }
 
     libdirs
     {
-        "$(SolutionDir)Deps/Lib/"
+        "$(SolutionDir)Deps/Lib"
     }
 
     links
     {
-        "ScarletCore",
-        "ScarletMath",
-        "ScarletLogger",
         "ScarlEnt",
+        "ScarletCore",
+        "ScarletEngine",
+        "ScarletLogger",
+
+        "ImGui",
 
         "glfw3_mt.lib",
         "glew32s.lib",

@@ -32,7 +32,7 @@ void Engine::Init() noexcept
     DEBUG(windowProperties.resizable = true);
     mMainWindow = WindowManager::CreateWindowInternal("Scarlet Engine", std::move(windowProperties));
 
-    Renderer::InitApi(mMainWindow);
+    Renderer::InitApi();
 
     ScarlEnt::Registry::Init();
 
@@ -104,6 +104,8 @@ void Engine::Run() const
     {
         WindowManager::ApiPoll();
 
+        DEBUG(if (mBeginRenderEvent) mBeginRenderEvent());
+
         Renderer::Instance().AddRenderCommand(WeakHandle{ &uvMaterial }   , WeakHandle{ mCube }  , cubeFloor);
         Renderer::Instance().AddRenderCommand(WeakHandle{ &uvMaterial }   , WeakHandle{ mCube }  , cubePos);
         Renderer::Instance().AddRenderCommand(WeakHandle{ &uvMaterial }   , WeakHandle{ mCube }  , cubePos1);
@@ -112,6 +114,7 @@ void Engine::Run() const
         Renderer::Instance().AddRenderCommand(WeakHandle{ &uvMaterial }   , WeakHandle{ mCone }  , conePos);
         Renderer::Instance().AddRenderCommand(WeakHandle{ &glockMaterial }, WeakHandle{ mGlock } , glockPos);
         Renderer::Instance().Render();
+        DEBUG(if (mEndRenderEvent) mEndRenderEvent());
 
         mMainWindow->Update();
     }

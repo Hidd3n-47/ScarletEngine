@@ -35,6 +35,7 @@ project "Scarlet"
     {
         "ScarletCore",
         "ScarletEngine",
+        "ScarletEditor"
     }
 
     filter "system:windows"
@@ -44,6 +45,7 @@ project "Scarlet"
         runtime "Debug"
         defines "DEV_CONFIGURATION"
         symbols "On"
+        includedirs { "$(SolutionDir)Source/ScarletEditorProject/" }
 
     filter "configurations:Release"
         runtime "Release"

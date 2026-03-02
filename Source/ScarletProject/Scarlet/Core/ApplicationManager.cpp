@@ -6,6 +6,10 @@
 #include <ScarletCore/Defines.h>
 #include <ScarletEngine/Core/Engine.h>
 
+#ifdef DEV_CONFIGURATION
+#include <ScarletEditor/Core/EditorManager.h>)
+#endif // DEV_CONFIGURATION.
+
 #include "IGame.h"
 
 namespace Scarlet
@@ -15,17 +19,16 @@ void ApplicationManager::Init()
 {
     LoadGameDll();
 
+    DEBUG(Editor::EditorManager::Init());
+
     Engine::Instance().SetReloadDllFunction([&] { LoadGameDll(); });
 }
 
 void ApplicationManager::Terminate()
 {
-    if (mGame)
-    {
-        mGame->Terminate();
-        delete mGame;
-        mGame = nullptr;
-    }
+    DEBUG(Editor::EditorManager::Destroy());
+
+    UnloadGameDll();
 }
 
 void ApplicationManager::LoadGameDll()

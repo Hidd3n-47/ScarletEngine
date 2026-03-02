@@ -24,6 +24,7 @@ include "Source/ScarletCoreProject/"
 include "Source/ScarletMathProject/"
 include "Source/ScarletLoggerProject/"
 include "Source/ScarletEngineProject/"
+include "Source/ScarletEditorProject/"
 
 -- Test Projects
 include "Tests/ScarletTestTemplateProject/"

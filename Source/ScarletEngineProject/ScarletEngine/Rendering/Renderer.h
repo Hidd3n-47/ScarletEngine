@@ -35,9 +35,8 @@ public:
 
     /**
      * @brief Initialise the backend rendering API and create an instance of the renderer.
-     * @param window: A handle to the main window that is being rendered to.
      */
-    static void InitApi(WeakHandle<Window> window);
+    static void InitApi();
 
     static void TerminateApi();
 
@@ -62,13 +61,10 @@ public:
 
     inline static constexpr uint32 MAX_INSTANCE_COUNT{ 100 };
 private:
-    Renderer(const uint32 width, const uint32 height);
+    Renderer();
     ~Renderer();
 
     inline static Renderer* mInstance = nullptr;
-
-    uint32 mViewportWidth, mViewportHeight;
-    uint32 mLastFrameWidth, mLastFrameHeight;
 
     Shader mShader;
     Shader mSkyBoxShader;
@@ -82,10 +78,6 @@ private:
     Resource::CubeMapTexture* mCubeMapTexture;
 
     Math::Vec3 mCameraPosition{ 0.0f, -10.0f, 2.0f };
-
-#ifdef DEV_CONFIGURATION
-    Framebuffer* mFramebuffer;
-#endif // DEV_CONFIGURATION.
 
     std::unordered_map<RenderGroup, vector<Math::Mat4>> mCommands;
 };
