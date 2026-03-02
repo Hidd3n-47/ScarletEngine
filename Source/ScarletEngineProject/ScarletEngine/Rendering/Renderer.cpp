@@ -454,7 +454,7 @@ void Renderer::Render()
 
     ImGui::End(); // Dockspace.
 
-    ImGui::Begin("Hierarchy", nullptr, ImGuiDockNodeFlags_NoWindowMenuButton);
+    ImGui::Begin("Hierarchy");
 
     auto scene = ScarlEnt::Registry::Instance().GetActiveScene();
 
@@ -519,7 +519,7 @@ void Renderer::Render()
 
     ImGui::End(); // Hierarchy.
 
-    ImGui::Begin("Viewport", nullptr, ImGuiDockNodeFlags_NoWindowMenuButton);
+    ImGui::Begin("Viewport", nullptr, ImGuiWindowFlags_NoScrollbar);
 
     const ImVec2 size   = ImGui::GetWindowSize();
 

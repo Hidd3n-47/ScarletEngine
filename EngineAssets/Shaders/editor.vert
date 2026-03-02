@@ -22,12 +22,13 @@ void main()
 {
     mat4 modelMatrix = mat4(modelMatrixCol1, modelMatrixCol2, modelMatrixCol3, modelMatrixCol4);
 	
-	vertexPosition = position;
+	vec3 pos = vec3(-position.x, position.y, position.z);
+	
+	vertexPosition = pos;
 	
 	mat4 viewProj = uProjectionMatrix * uViewMatrix;
 
-    gl_Position = viewProj * modelMatrix  * vec4(position, 1.0f);
-	gl_Position.x = -gl_Position.x;
+    gl_Position = viewProj * modelMatrix  * vec4(pos, 1.0f);
 
     textureUv = uv;
 	
