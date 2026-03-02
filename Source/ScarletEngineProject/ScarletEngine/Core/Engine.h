@@ -1,5 +1,7 @@
 #pragma once
 
+#include <functional>
+
 #include <ScarletCore/WeakHandle.h>
 
 namespace Scarlet
@@ -33,6 +35,9 @@ public:
     void Run() const;
 
     inline void CloseEngine() { mRunning = false; }
+
+    inline void ReloadGameDll() { if (mReloadDllFunction) mReloadDllFunction(); }
+    inline void SetReloadDllFunction(const std::function<void()>& reloadDll) { mReloadDllFunction = reloadDll; }
 private:
     Engine()  = default;
     ~Engine() = default;
@@ -52,6 +57,8 @@ private:
     Resource::Mesh* mGlock;
 
     bool mRunning = false;
+
+    std::function<void()> mReloadDllFunction;
 };
 
 } // Namespace Scarlet.

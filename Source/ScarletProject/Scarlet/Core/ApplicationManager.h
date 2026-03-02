@@ -1,5 +1,9 @@
 #pragma once
 
+#include <Windows.h>
+
+#include <ScarletCore/PrimitiveTypes.h>
+
 namespace Scarlet
 {
 
@@ -12,10 +16,14 @@ public:
     void Terminate();
 
     void LoadGameDll();
+    void UnloadGameDll();
 private:
     typedef IGame* (*CreateGameInstanceFunc)();
 
-    IGame* mGame;
+    IGame* mGame = nullptr;
+    uint32 mLoadedDlls = 0;
+
+    HMODULE mGameDll = nullptr;
 
     CreateGameInstanceFunc  CreateGameInstanceFunctionPointer;
 };

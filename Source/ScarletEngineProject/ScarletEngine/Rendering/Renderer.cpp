@@ -522,8 +522,31 @@ void Renderer::Render()
     ImGui::Begin("Viewport", nullptr, ImGuiDockNodeFlags_NoWindowMenuButton);
 
     const ImVec2 size   = ImGui::GetWindowSize();
-    const uint32 width  = static_cast<uint32>(size.x);
-    const uint32 height = static_cast<uint32>(size.y);
+
+    const ImVec2 viewportSize = ImGui::GetWindowSize();
+
+    constexpr float toolbarHeight = 30.0f;
+
+    ImGui::BeginChild("ViewportToolbar", ImVec2(viewportSize.x, toolbarHeight), false, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+
+    if (ImGui::Button("Translate")) { }
+    ImGui::SameLine();
+    if (ImGui::Button("Rotate")) { }
+    ImGui::SameLine();
+    if (ImGui::Button("Scale")) { }
+
+    ImGui::SameLine(viewportSize.x - 150);
+    if (ImGui::Button("Hot Reload DLL"))
+    {
+        Engine::Instance().ReloadGameDll();
+    }
+
+    ImGui::EndChild();
+
+    const ImVec2 remainingSize = ImVec2(viewportSize.x, viewportSize.y - toolbarHeight);
+
+    const uint32 width  = static_cast<uint32>(remainingSize.x);
+    const uint32 height = static_cast<uint32>(remainingSize.y);
 
     const bool resizing = mLastFrameWidth != width || mLastFrameHeight != height;
 
