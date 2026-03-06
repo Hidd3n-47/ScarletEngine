@@ -130,7 +130,13 @@ inline ComponentId Registry::GetOrRegisterComponentId()
     SCARLENT_ASSERT(mNumberOfRegisteredComponents < 63 && "Currently the registry can only handle 64 components. Limits reached.");
 
     const uint64 bitmask = 1ull << mNumberOfRegisteredComponents;
+
+#ifdef DEV_CONFIGURATION
+    mComponentIdMap[componentName] = ComponentId{ .id = mNumberOfRegisteredComponents, .bitmask = bitmask, .name = std::string_view{ componentName } };
+#else // DEV_CONFIGURATION.
     mComponentIdMap[componentName] = ComponentId{ .id = mNumberOfRegisteredComponents, .bitmask = bitmask };
+#endif // !DEV_CONFIGURATION.
+
     mComponentBitmaskToId[bitmask] = mNumberOfRegisteredComponents;
 
     ++mNumberOfRegisteredComponents;

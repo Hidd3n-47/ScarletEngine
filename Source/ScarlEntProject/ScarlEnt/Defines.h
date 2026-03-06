@@ -13,7 +13,7 @@
 
 #include <assert.h>
 
-#define DEBUG(X) X
+#define DEBUG(...) __VA_ARGS__
 
 #ifdef SCARLENT_TEST
 #include <stdexcept>

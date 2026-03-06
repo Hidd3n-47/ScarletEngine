@@ -40,6 +40,19 @@ public:
     }
 
     /**
+     * @brief Create an instance of an \ref EntityHandle.
+     * @param componentManagerRef A weak reference to the component manager responsible for the creation of the entity components.
+     * @remark Since the entity handle holds a reference to the component manager, it is only valid if the component manager is valid. \\n
+     * The component manager is valid for the life-time of the scene. This coupling of lifetime is okay as entities are only valid for the life-time \\n
+     * of the scene.
+     */
+    EntityHandle(const Scarlet::WeakHandle<ComponentManager> componentManagerRef)
+        : mComponentManagerRef(componentManagerRef)
+    {
+        mEntityId = mComponentManagerRef->AddEntity<ArchetypeComponents...>((ArchetypeComponents{}, ...));
+    }
+
+    /**
      * @brief Get a component attached to an entity.
      * @tparam Component The type of the component being requested.
      * @return A reference to the component.
@@ -61,6 +74,7 @@ public:
         return mComponentManagerRef->GetComponent<Component, ArchetypeComponents...>(mEntityId);
     }
 
+    DEBUG([[nodiscard]] inline const vector<ComponentView>& GetComponentViews() override { return mComponentManagerRef->GetEntityComponentView(mEntityId); })
 private:
     Scarlet::Ulid mEntityId;
     Scarlet::WeakHandle<ComponentManager> mComponentManagerRef;

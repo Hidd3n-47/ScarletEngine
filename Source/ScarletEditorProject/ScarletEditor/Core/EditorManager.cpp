@@ -12,11 +12,14 @@
 #include <ImGui/imgui_impl_glfw.h>
 #include <ImGui/backends/imgui_impl_opengl3.h>
 
+#include <ScarletCore/Defines.h>
 #include <ScarletCore/PrimitiveTypes.h>
 
 #include <ScarletEngine/Core/Engine.h>
 #include <ScarletEngine/Core/Window/Window.h>
 #include <ScarletEngine/Rendering/Framebuffer.h>
+
+#include <ScarletEngine/Components/Transform.h>
 
 #include <ScarlEnt/Scene.h>
 #include <ScarlEnt/Registry.h>
@@ -293,7 +296,8 @@ void EditorManager::EndRender()
 
         if (ImGui::MenuItem("Mutable Entity"))
         {
-            (void)scene->AddMutableEntity();
+            auto ent = scene->AddMutableEntity();
+            ent.AddComponent<Component::Transform>();
             ImGui::CloseCurrentPopup();
         }
 
@@ -312,6 +316,14 @@ void EditorManager::EndRender()
             const auto& vec = scene->GetEntityHandles();
             for (size_t i{ 0 }; i < vec.size(); ++i)
             {
+                for (const ScarlEnt::ComponentView& view : vec[i]->GetComponentViews())
+                {
+                    for (auto& [propertyName, property] : *view.GetProperties())
+                    {
+                        SCARLET_DEBUG("Immutable: {}| {} : {}", propertyName, property.GetTypeAsString(), property.GetPropertyValue());
+                    }
+                }
+
                 if (ImGui::TreeNodeEx(std::format("Entity {}", i).c_str(), ImGuiTreeNodeFlags_Leaf))
                 {
                     ImGui::TreePop();
@@ -324,6 +336,15 @@ void EditorManager::EndRender()
             const auto& vec = scene->GetMutableEntityHandles();
             for (size_t i{ 0 }; i < vec.size(); ++i)
             {
+                for (const ScarlEnt::ComponentView& view : vec[i]->GetComponentViews())
+                {
+                    for (auto& [propertyName, property] : *view.GetProperties())
+                    {
+                        SCARLET_DEBUG("Mutable: {}| {} : {}", propertyName, property.GetTypeAsString(), property.GetPropertyValue());
+                    }
+                }
+
+
                 if (ImGui::TreeNodeEx(std::format("Entity {}##mutable", i).c_str(), ImGuiTreeNodeFlags_Leaf))
                 {
                     ImGui::TreePop();

@@ -76,6 +76,10 @@ void ComponentManager::RemoveMutableEntity(const uint32 mutableEntityRuntimeId)
 
     mComponentBitsetToMutableEntities[bitset].erase(mutableEntityRuntimeId);
     mMutableEntityToComponentBitset.Remove(mutableEntityRuntimeId);
+
+#ifdef DEV_CONFIGURATION
+    mMutableEntityIdToComponentViews.erase(mutableEntityRuntimeId);
+#endif // DEV_CONFIGURATION.
 }
 
 } // Namespace ScarlEnt.

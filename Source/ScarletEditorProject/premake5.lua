@@ -19,6 +19,7 @@ project "ScarletEditor"
         "$(SolutionDir)Deps/Include/",
 
         "$(SolutionDir)Source/ScarlEntProject/",
+        "$(SolutionDir)Source/ScarletMathProject/",
         "$(SolutionDir)Source/ScarletCoreProject/",
         "$(SolutionDir)Source/ScarletEngineProject/",
         "$(SolutionDir)Source/ScarletLoggerProject/",
@@ -34,6 +35,7 @@ project "ScarletEditor"
     links
     {
         "ScarlEnt",
+        "ScarletMath",
         "ScarletCore",
         "ScarletEngine",
         "ScarletLogger",

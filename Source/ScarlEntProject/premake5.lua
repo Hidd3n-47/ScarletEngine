@@ -20,6 +20,7 @@ project "ScarlEnt"
         "%{prj.name}",
         "%{prj.name}/Src/",
 
+        "$(SolutionDir)Source/ScarlEntProject/",
         "$(SolutionDir)Source/ScarletCoreProject/",
 
         "$(SolutionDir)Deps/Include/"

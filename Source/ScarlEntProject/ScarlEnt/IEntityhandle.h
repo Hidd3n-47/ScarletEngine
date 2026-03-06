@@ -1,9 +1,13 @@
 #pragma once
 
+#ifdef DEV_CONFIGURATION
+
+#include <ScarletCore/vector.h>
+#include <ScarlEnt/RTTI/ComponentView.h>
+
 namespace ScarlEnt
 {
 
-#ifdef DEV_CONFIGURATION
 
 class IEntityHandle
 {
@@ -11,8 +15,11 @@ public:
     virtual ~IEntityHandle() = default;
 
     [[nodiscard]] inline virtual bool IsMutable() const { return false; }
+
+    [[nodiscard]] inline virtual const vector<ComponentView>& GetComponentViews() = 0;
 };
 
-#endif // DEV_CONFIGURATION.
 
 } // Namespace ScarlEnt.
+
+#endif // DEV_CONFIGURATION.

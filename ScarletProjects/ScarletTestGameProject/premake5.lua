@@ -16,11 +16,15 @@ project "ScarletTestGameProject"
 
     includedirs
     {
+        "$(SolutionDir)Deps/Include/",
+
         "$(SolutionDir)Source/ScarletProject/",
         "$(SolutionDir)Source/ScarletProject/src/",
 
         "$(SolutionDir)Source/ScarlEntProject/",
+        "$(SolutionDir)Source/ScarletMathProject/",
         "$(SolutionDir)Source/ScarletCoreProject/",
+        "$(SolutionDir)Source/ScarletEngineProject/",
     }
 
     libdirs
@@ -30,7 +34,9 @@ project "ScarletTestGameProject"
     links
     {
         "ScarlEnt",
-        "ScarletCore"
+        "ScarletMath",
+        "ScarletCore",
+        "ScarletEngine"
     }
 
     postbuildcommands

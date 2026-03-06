@@ -105,16 +105,17 @@ public:
     {
         const uint64 bitmask = Registry::Instance().GetOrRegisterComponentId<Component>().bitmask;
 
-        return bitmask & mComponentManagerRef->GetMutableEntityComponentBitset(mEntityId.runtimeId);;
+        return bitmask & mComponentManagerRef->GetMutableEntityComponentBitset(mEntityId.runtimeId);
     }
 
 #ifdef SCARLENT_TEST
     [[nodiscard]] inline MutableEntityId GetId() const { return mEntityId; }
-    [[nodiscard]] inline uint64 GetComponentBitset() { return mComponentManagerRef->GetMutableEntityComponentBitset(mEntityId.runtimeId); }
     [[nodiscard]] inline Scarlet::WeakHandle<ComponentManager> GetComponentManagerRef() const { return mComponentManagerRef; }
 #endif // SCARLENT_TEST.
+    [[nodiscard]] inline uint64 GetComponentBitset() { return mComponentManagerRef->GetMutableEntityComponentBitset(mEntityId.runtimeId); }
 
     DEBUG([[nodiscard]] inline bool IsMutable() const override { return true; })
+    DEBUG([[nodiscard]] inline const vector<ComponentView>& GetComponentViews() override { return mComponentManagerRef->GetMutableEntityComponentView(mEntityId.runtimeId); })
 private:
     MutableEntityId mEntityId;
     Scarlet::WeakHandle<ComponentManager> mComponentManagerRef;
