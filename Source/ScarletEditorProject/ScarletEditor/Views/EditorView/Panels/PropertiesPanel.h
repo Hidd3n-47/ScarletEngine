@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#ifdef DEV_CONFIGURATION
+
 #include "UI/Panel.h"
 
 namespace Scarlet::Editor
@@ -24,3 +26,5 @@ public:
 };
 
 } // Namespace Scarlet::Editor.
+
+#endif // DEV_CONFIGURATION.

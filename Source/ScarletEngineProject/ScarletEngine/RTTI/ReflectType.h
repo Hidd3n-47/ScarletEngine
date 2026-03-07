@@ -2,6 +2,8 @@
 
 #ifdef DEV_CONFIGURATION
 
+#include <stdexcept>
+
 #include <ScarletMath/Quat.h>
 
 namespace Scarlet
