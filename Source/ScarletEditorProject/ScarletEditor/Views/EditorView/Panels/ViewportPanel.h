@@ -42,7 +42,7 @@ private:
     /**
      * @brief This function is called from the engine so that the framebuffer can be bound before the render begins.
      */
-    void BeginRender();
+    void BeginRender() const;
 };
 
 } // Namespace Scarlet::Editor.

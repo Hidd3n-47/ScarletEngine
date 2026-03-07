@@ -8,7 +8,6 @@
 
 #include <ScarlEnt/Scene.h>
 #include <ScarlEnt/Registry.h>
-#include <ScarlEnt/RTTI/ComponentView.h>
 
 #include <ScarletEngine/Components/Transform.h>
 
@@ -19,6 +18,9 @@ namespace Scarlet::Editor
 
 void ScenePanel::Render()
 {
+    EditorView* editorView             = dynamic_cast<EditorView*>(mView);
+    SelectionManager& selectionManager = editorView->GetSelectionManager();
+
     auto scene = ScarlEnt::Registry::Instance().GetActiveScene();
 
     // ----------- Title Bar ----------------
@@ -61,16 +63,14 @@ void ScenePanel::Render()
             const auto& vec = scene->GetEntityHandles();
             for (size_t i{ 0 }; i < vec.size(); ++i)
             {
-                for (const ScarlEnt::ComponentView& view : vec[i]->GetComponentViews())
+                ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_Leaf;
+                flags |= selectionManager.GetSelectedEntity() == vec[i] ? ImGuiTreeNodeFlags_Selected : 0;
+                if (ImGui::TreeNodeEx(std::format("Entity {}", i).c_str(), flags))
                 {
-                    for (auto& [propertyName, property] : *view.GetProperties())
+                    if (ImGui::IsItemClicked())
                     {
-                        SCARLET_DEBUG("Immutable: {}| {} : {}", propertyName, property.GetTypeAsString(), property.GetPropertyValue());
+                        selectionManager.SetSelectedEntity(vec[i]);
                     }
-                }
-
-                if (ImGui::TreeNodeEx(std::format("Entity {}", i).c_str(), ImGuiTreeNodeFlags_Leaf))
-                {
                     ImGui::TreePop();
                 }
             }
@@ -81,16 +81,14 @@ void ScenePanel::Render()
             const auto& vec = scene->GetMutableEntityHandles();
             for (size_t i{ 0 }; i < vec.size(); ++i)
             {
-                for (const ScarlEnt::ComponentView& view : vec[i]->GetComponentViews())
+                ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_Leaf;
+                flags |= selectionManager.GetSelectedEntity() == vec[i] ? ImGuiTreeNodeFlags_Selected : 0;
+                if (ImGui::TreeNodeEx(std::format("Entity {}##mutable", i).c_str(), flags))
                 {
-                    for (auto& [propertyName, property] : *view.GetProperties())
+                    if (ImGui::IsItemClicked())
                     {
-                        SCARLET_DEBUG("Mutable: {}| {} : {}", propertyName, property.GetTypeAsString(), property.GetPropertyValue());
+                        selectionManager.SetSelectedEntity(vec[i]);
                     }
-                }
-
-                if (ImGui::TreeNodeEx(std::format("Entity {}##mutable", i).c_str(), ImGuiTreeNodeFlags_Leaf))
-                {
                     ImGui::TreePop();
                 }
             }
