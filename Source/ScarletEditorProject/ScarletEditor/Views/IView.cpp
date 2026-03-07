@@ -1,13 +1,7 @@
+#include "ScarletEditorPch.h"
 #include "IView.h"
 
-#include <ranges>
-
-#include <imgui/imgui.h>
-#include <imgui/imgui_impl_glfw.h>
-#include <imgui/backends/imgui_impl_opengl3.h>
-
 #include <ScarletEngine/Rendering/Framebuffer.h>
-
 
 namespace Scarlet::Editor
 {

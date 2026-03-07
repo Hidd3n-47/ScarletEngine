@@ -1,10 +1,7 @@
-﻿#include "PropertiesPanel.h"
+﻿#include "ScarletEditorPch.h"
+#include "PropertiesPanel.h"
 
 #ifdef DEV_CONFIGURATION
-
-#include <string>
-
-#include <imgui/imgui.h>
 
 #include <ScarletEngine/RTTI/ReflectType.h>
 

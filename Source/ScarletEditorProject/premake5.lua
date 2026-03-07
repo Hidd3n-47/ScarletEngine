@@ -8,6 +8,9 @@ project "ScarletEditor"
     targetdir(path.join(outputPath, "%{prj.name}"))
     objdir(path.join(outputIntPath, "%{prj.name}"))
 
+    pchheader "ScarletEditorPch.h"
+    pchsource "%{prj.name}/Src/ScarletEditorPch.cpp"
+
     files
     {
         "%{prj.name}/**.h",
@@ -16,9 +19,10 @@ project "ScarletEditor"
 
     includedirs
     {
-        "$(SolutionDir)Deps/Include/",
+        "%{prj.name}",
+        "%{prj.name}/Src/",
 
-        "$(SolutionDir)Source/ScarletEditorProject/ScarletEditor",
+        "$(SolutionDir)Deps/Include/",
 
         "$(SolutionDir)Source/ScarlEntProject/",
         "$(SolutionDir)Source/ScarletMathProject/",

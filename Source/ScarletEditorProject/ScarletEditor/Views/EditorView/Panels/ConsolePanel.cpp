@@ -1,6 +1,5 @@
-﻿#include "ConsolePanel.h"
-
-#include <imgui/imgui.h>
+﻿#include "ScarletEditorPch.h"
+#include "ConsolePanel.h"
 
 namespace Scarlet::Editor
 {

@@ -1,10 +1,9 @@
-﻿#include "ScenePanel.h"
+﻿#include "ScarletEditorPch.h"
+#include "ScenePanel.h"
 
 #ifdef DEV_CONFIGURATION
 
 #include <format>
-
-#include <imgui/imgui.h>
 
 #include <ScarlEnt/Scene.h>
 #include <ScarlEnt/Registry.h>

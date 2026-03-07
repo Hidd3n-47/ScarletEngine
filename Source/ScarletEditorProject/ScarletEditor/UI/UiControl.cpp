@@ -1,8 +1,7 @@
+#include "ScarletEditorPch.h"
 #include "UiControl.h"
 
 #ifdef DEV_CONFIGURATION
-
-#include <imgui/imgui_internal.h>
 
 #include <ScarletMath/Quat.h>
 

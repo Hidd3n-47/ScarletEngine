@@ -1,10 +1,9 @@
-﻿#include "ViewportPanel.h"
+﻿#include "ScarletEditorPch.h"
+#include "ViewportPanel.h"
 
 #ifdef DEV_CONFIGURATION
 
 #include <glew/glew.h>
-
-#include <imgui/imgui.h>
 
 #include <ScarletEngine/Core/Engine.h>
 #include <ScarletEngine/Core/Window/Window.h>

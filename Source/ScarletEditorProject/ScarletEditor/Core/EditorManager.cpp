@@ -1,19 +1,11 @@
+#include "ScarletEditorPch.h"
 #include "EditorManager.h"
 
 #ifdef DEV_CONFIGURATION
 
-#include <string>
 #include <format>
 
 #include <glfw/glfw3.h>
-
-#include <imgui/imgui.h>
-#include <imgui/imgui_internal.h>
-#include <ImGui/imgui_impl_glfw.h>
-#include <ImGui/backends/imgui_impl_opengl3.h>
-
-// This include is needed for the engine window.
-#include <ScarletCore/PrimitiveTypes.h>
 
 #include <ScarletEngine/Core/Engine.h>
 #include <ScarletEngine/Core/Window/Window.h>

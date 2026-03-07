@@ -2,8 +2,6 @@
 
 #ifdef DEV_CONFIGURATION
 
-#include <ScarletCore/PrimitiveTypes.h>
-
 #include "UI/Panel.h"
 
 namespace Scarlet

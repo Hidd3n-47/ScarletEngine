@@ -1,11 +1,5 @@
 #pragma once
 
-#include <memory>
-#include <string>
-
-#include <ScarletCore/Defines.h>
-#include <ScarletCore/unordered_map.h>
-
 #include "UI/Panel.h"
 
 namespace Scarlet::Editor

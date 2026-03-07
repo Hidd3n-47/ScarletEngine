@@ -1,8 +1,7 @@
-﻿#include "EditorView.h"
+﻿#include "ScarletEditorPch.h"
+#include "EditorView.h"
 
 #ifdef DEV_CONFIGURATION
-
-#include <imgui/imgui.h>
 
 #include <ScarletEngine/Core/Engine.h>
 
