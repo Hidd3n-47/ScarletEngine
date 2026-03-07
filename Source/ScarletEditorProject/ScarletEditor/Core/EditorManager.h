@@ -2,15 +2,11 @@
 
 #ifdef DEV_CONFIGURATION
 
-#include <ScarletCore/PrimitiveTypes.h>
-
-namespace Scarlet
-{
-class Framebuffer;
-} // Namespace Scarlet.
-
 namespace Scarlet::Editor
 {
+
+class IView;
+
 /**
  * @class EditorManager: Singleton class that should manage the editor interface. This class will be responsible for setting up dependencies and views.
  */
@@ -29,23 +25,15 @@ public:
     static void Destroy();
 
     /**
-     * @brief Begin render is used to bind the frame buffer that all render commands will be rendered to for the viewport.
-     */
-    void BeingRender() const;
-
-    /**
      * @brief End render unbinds frame buffers and renders it to the viewport, as well as renders the rest of the editor UI.
      */
-    void EndRender();
+    void EndRender() const;
 private:
     EditorManager();
     ~EditorManager();
     inline static EditorManager* mInstance = nullptr;
 
-    uint32 mLastFrameWidth, mLastFrameHeight;
-    uint32 mViewportWidth, mViewportHeight;
-
-    Framebuffer* mFramebuffer;
+    IView* mEditorView;
 };
 
 } // Namespace Scarlet::Editor.

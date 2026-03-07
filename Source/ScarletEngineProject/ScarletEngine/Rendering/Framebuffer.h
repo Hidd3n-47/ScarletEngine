@@ -1,5 +1,7 @@
 #pragma once
 
+#include <ScarletCore/PrimitiveTypes.h>
+
 namespace Scarlet
 {
 

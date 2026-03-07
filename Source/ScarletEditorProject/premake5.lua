@@ -18,6 +18,8 @@ project "ScarletEditor"
     {
         "$(SolutionDir)Deps/Include/",
 
+        "$(SolutionDir)Source/ScarletEditorProject/ScarletEditor",
+
         "$(SolutionDir)Source/ScarlEntProject/",
         "$(SolutionDir)Source/ScarletMathProject/",
         "$(SolutionDir)Source/ScarletCoreProject/",
