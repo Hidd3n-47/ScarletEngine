@@ -50,4 +50,13 @@ void Registry::SetActiveScene(const Scarlet::WeakHandle<Scene> scene)
     mCurrentSceneIndex = static_cast<int32>(scene->GetRegistryIndex());
 }
 
+#ifdef DEV_CONFIGURATION
+void Registry::AddComponentToHandle(const char* componentType, IEntityHandle* handle)
+{
+    SCARLENT_ASSERT(mComponentToAddComponentFunction.contains(componentType) && "Trying to add a component to an entity that hasn't been registered.");
+
+    mComponentToAddComponentFunction[componentType](handle);
+}
+#endif // DEV_CONFIGURATION.
+
 } // Namespace ScarlEnt.

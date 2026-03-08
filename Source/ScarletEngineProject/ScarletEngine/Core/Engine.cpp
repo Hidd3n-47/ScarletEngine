@@ -13,6 +13,10 @@
 #include "Rendering/Mesh.h"
 #include "Rendering/Texture.h"
 
+#ifdef DEV_CONFIGURATION
+#include "Components/Generated/Register.generated.h"
+#endif // DEV_CONFIGURATION.
+
 namespace Scarlet
 {
 
@@ -35,6 +39,8 @@ void Engine::Init() noexcept
     Renderer::InitApi();
 
     ScarlEnt::Registry::Init();
+
+    DEBUG(RegisterComponents());
 
     mUvMapTexture = new Resource::Texture{ "E:/Programming/ScarletEngine/EngineAssets/uvMap.png" };
     mGlockTexture = new Resource::Texture{ "E:/Programming/ScarletEngine/EngineAssets/Glock17_BaseColor.png" };

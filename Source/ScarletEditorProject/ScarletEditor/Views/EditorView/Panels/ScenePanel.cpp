@@ -36,7 +36,8 @@ void ScenePanel::Render()
         ImGui::OpenPopup("AddEntity");
     }
 
-    if (ImGui::BeginPopup("AddEntity")) {
+    if (ImGui::BeginPopup("AddEntity")) 
+    {
         ImGui::Text("Add Entity");
         ImGui::Separator();
 

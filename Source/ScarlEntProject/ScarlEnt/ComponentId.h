@@ -1,7 +1,5 @@
 #pragma once
 
-#include <string_view>
-
 #include <ScarletCore/PrimitiveTypes.h>
 
 namespace ScarlEnt
@@ -13,7 +11,7 @@ struct ComponentId
     uint64 bitmask;
 
 #ifdef DEV_CONFIGURATION
-    std::string_view name;
+    std::string name;
 #endif // DEV_CONFIGURATION.
 };
 

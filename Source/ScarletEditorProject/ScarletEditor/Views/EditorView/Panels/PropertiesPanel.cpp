@@ -2,8 +2,9 @@
 #include "PropertiesPanel.h"
 
 #ifdef DEV_CONFIGURATION
+#include <ScarletLogger/Log.h>
 
-#include <ScarletEngine/RTTI/ReflectType.h>
+#include <ScarlEnt/Registry.h>
 
 #include "Views/EditorView/View/EditorView.h"
 
@@ -55,6 +56,44 @@ void PropertiesPanel::Render()
         }
     }
 
+    ImGui::NewLine();
+
+    const float windowWidth     = ImGui::GetWindowSize().x;
+    constexpr float buttonWidth = 150.0f;
+
+    ImGui::SetCursorPosX((windowWidth - buttonWidth) * 0.5f);
+
+    if (ImGui::Button("Add Component", { buttonWidth, 25.0f }))
+    {
+        ImGui::OpenPopup("AddComponent");
+
+        constexpr float yPadding = 5.0f;
+        const ImVec2 buttonPos   = ImGui::GetItemRectMin();
+        const ImVec2 buttonSize  = ImGui::GetItemRectSize();
+        ImGui::SetNextWindowPos({ buttonPos.x + buttonSize.x * 0.5f, buttonPos.y + buttonSize.y + yPadding }, ImGuiCond_Always, { 0.5f, 0.0f });
+    }
+
+    if (ImGui::BeginPopup("AddComponent", ImGuiWindowFlags_NoMove))
+    {
+        constexpr float popupMinWidth  = 200.0f;
+        constexpr float popupMaxHeight = 200.0f;
+
+        ImGui::BeginChild("PopupItems", { popupMinWidth, popupMaxHeight }, true, ImGuiWindowFlags_HorizontalScrollbar);
+
+        for (const std::string_view componentName : ScarlEnt::Registry::Instance().GetComponentToAddComponentMap() | std::views::keys)
+        {
+            const std::string compName = std::string{ componentName };
+
+            if (ImGui::MenuItem(compName.c_str()))
+            {
+                ScarlEnt::Registry::Instance().AddComponentToHandle(compName.c_str(), selected);
+                ImGui::CloseCurrentPopup();
+            }
+        }
+
+        ImGui::EndChild();
+        ImGui::EndPopup();
+    }
 }
 
 } // Namespace Scarlet::Editor.

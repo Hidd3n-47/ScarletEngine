@@ -1,6 +1,6 @@
 #pragma once
 
-#include <string>
+#include <functional>
 
 #include <ScarletCore/vector.h>
 #include <ScarletCore/unordered_map.h>
@@ -11,10 +11,15 @@
 #include "Defines.h"
 #include "ComponentId.h"
 
+#ifdef DEV_CONFIGURATION
+//#include "MutableEntityHandle.h"
+#endif // DEV_CONFIGURATION.
+
 namespace ScarlEnt
 {
 
 class Scene;
+class IEntityHandle;
 
 /**
  * @class Registry: A singleton class used to deal with the ECS. The registry should be initialised before use and then used to interface with the ECS.
@@ -22,6 +27,8 @@ class Scene;
 class SCARLENT_API Registry
 {
 public:
+    DEBUG(using AddComponentFunc = std::function<void(IEntityHandle*)>);
+
     Registry(const Registry&)            = delete;
     Registry(Registry&&)                 = delete;
     Registry& operator=(Registry&&)      = delete;
@@ -98,6 +105,12 @@ public:
     [[nodiscard]] inline size_t GetNumberOfScenes() const { return mScenes.size(); }
 #endif // SCARLENT_TEST.
 
+#ifdef DEV_CONFIGURATION
+    void RegisterComponent(const std::string& componentName, const AddComponentFunc& addComponentFunction) { mComponentToAddComponentFunction[componentName] = addComponentFunction; }
+    void AddComponentToHandle(const char* componentType, IEntityHandle* handle);
+    [[nodiscard]] inline const unordered_map<std::string, AddComponentFunc>& GetComponentToAddComponentMap() const { return mComponentToAddComponentFunction; }
+#endif // DEV_CONFIGURATION.
+
     static constexpr size_t COMPONENTS_PAGE_SIZE = 10;
     static constexpr size_t COMPONENT_BITSET_PAGE_SIZE = 1000;
 private:
@@ -106,7 +119,9 @@ private:
 
     inline static Registry* mInstance = nullptr;
 
-    unordered_map<const char*, ComponentId> mComponentIdMap;
+    DEBUG(unordered_map<std::string, AddComponentFunc> mComponentToAddComponentFunction);
+
+    unordered_map<std::string, ComponentId> mComponentIdMap;
     unordered_map<uint64, uint32> mComponentBitmaskToId;
     uint32 mNumberOfRegisteredComponents = 0;
 
@@ -120,7 +135,10 @@ template <typename T>
 inline ComponentId Registry::GetOrRegisterComponentId()
 {
     // Map a component to its TypeId name.
-    const char* componentName = GetComponentTypeId<T>();
+    const std::string typeId       = GetComponentTypeId<T>();
+    const size_t lastColonPosition = typeId.find_last_of(':');
+
+    const std::string componentName = typeId.substr(lastColonPosition + 1, typeId.length() - lastColonPosition - 1);
 
     if (mComponentIdMap.contains(componentName))
     {
@@ -132,7 +150,7 @@ inline ComponentId Registry::GetOrRegisterComponentId()
     const uint64 bitmask = 1ull << mNumberOfRegisteredComponents;
 
 #ifdef DEV_CONFIGURATION
-    mComponentIdMap[componentName] = ComponentId{ .id = mNumberOfRegisteredComponents, .bitmask = bitmask, .name = std::string_view{ componentName } };
+    mComponentIdMap[componentName] = ComponentId{ .id = mNumberOfRegisteredComponents, .bitmask = bitmask, .name = componentName };
 #else // DEV_CONFIGURATION.
     mComponentIdMap[componentName] = ComponentId{ .id = mNumberOfRegisteredComponents, .bitmask = bitmask };
 #endif // !DEV_CONFIGURATION.

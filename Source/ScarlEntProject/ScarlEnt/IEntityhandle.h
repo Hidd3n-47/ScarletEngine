@@ -14,7 +14,8 @@ class IEntityHandle
 public:
     virtual ~IEntityHandle() = default;
 
-    [[nodiscard]] inline virtual bool IsMutable() const { return false; }
+    [[nodiscard]] inline virtual bool   IsMutable() const { return false; }
+    [[nodiscard]] inline virtual uint64 GetRuntimeId() const = 0;
 
     [[nodiscard]] inline virtual const vector<ComponentView>& GetComponentViews() = 0;
 };

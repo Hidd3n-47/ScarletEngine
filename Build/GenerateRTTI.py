@@ -16,6 +16,8 @@ types = {
      "Math::Quat"   : "QUAT"    ,
 }
 
+components = []
+
 # Function used to find all files that are considered "Components"
 # These are files that have the C++ macro 'SCARLET_COMPONENT()'
 def get_component_files(path):
@@ -87,6 +89,47 @@ void {struct_name}::GenerateProperties()
 }} // Namespace Scarlet::Component.
 '''.format(struct_name=struct_name))
 
+def register_components():
+    os.makedirs(GENERATED_RTTI_OUTPUT_DIR, exist_ok=True)
+    output_path = os.path.join(GENERATED_RTTI_OUTPUT_DIR, "Register.generated.h")
+
+    with open(output_path, "w+") as f:
+        f.write('''\
+#pragma once
+
+#include <ScarlEnt/Registry.h>
+#include <ScarlEnt/MutableEntityHandle.h>
+
+''')
+        for comp in components:
+            f.write('''\
+#include "Components/{component_name}.h"
+'''.format(component_name = comp))
+
+        f.write('''\
+
+template <typename T>
+static void RegisterComponentTypeAndFunctionPointer(ScarlEnt::Registry& registry)
+{
+    const std::string componentName = registry.GetOrRegisterComponentId<T>().name;
+    registry.RegisterComponent(componentName, [](ScarlEnt::IEntityHandle* handle) {
+            ScarlEnt::MutableEntityHandle* mutableHandle = reinterpret_cast<ScarlEnt::MutableEntityHandle*>(handle);
+            mutableHandle->AddComponent<Scarlet::Component::Transform>();
+        });
+}
+
+inline void RegisterComponents()
+{
+    ScarlEnt::Registry& registry = ScarlEnt::Registry::Instance();
+
+''')
+        for comp in components:
+            f.write('''\
+    RegisterComponentTypeAndFunctionPointer<Scarlet::Component::{component_name}>(registry);
+'''.format(component_name = comp))
+
+        f.write("}\n")
+
 def analyse_components():
     struct_pattern = re.compile(r'\s*struct\s+(\w+)')
     field_pattern  = re.compile(r'^\s*(\w[\w\s*&:<>]*?)\s+(\w+)\b')
@@ -116,6 +159,10 @@ def analyse_components():
                     member_variables.append((member_type, member_name))
                     print("Field: " + member_name + " -> [" + member_type + "]")
 
+        components.append(struct_name)
+
         generate_rtti_for_component(struct_name, member_variables)
 
 analyse_components()
+
+register_components()

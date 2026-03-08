@@ -74,6 +74,7 @@ public:
         return mComponentManagerRef->GetComponent<Component, ArchetypeComponents...>(mEntityId);
     }
 
+    DEBUG([[nodiscard]] inline uint64 GetRuntimeId() const override { return mEntityId; })
     DEBUG([[nodiscard]] inline const vector<ComponentView>& GetComponentViews() override { return mComponentManagerRef->GetEntityComponentView(mEntityId); })
 private:
     Scarlet::Ulid mEntityId;

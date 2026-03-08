@@ -2,6 +2,7 @@
 
 #include <ScarletCore/WeakHandle.h>
 
+#include "IEntityhandle.h"
 #include "ComponentManager.h"
 
 namespace ScarlEnt
@@ -114,8 +115,11 @@ public:
 #endif // SCARLENT_TEST.
     [[nodiscard]] inline uint64 GetComponentBitset() { return mComponentManagerRef->GetMutableEntityComponentBitset(mEntityId.runtimeId); }
 
-    DEBUG([[nodiscard]] inline bool IsMutable() const override { return true; })
-    DEBUG([[nodiscard]] inline const vector<ComponentView>& GetComponentViews() override { return mComponentManagerRef->GetMutableEntityComponentView(mEntityId.runtimeId); })
+#ifdef DEV_CONFIGURATION
+    [[nodiscard]] inline bool IsMutable() const override { return true; }
+    [[nodiscard]] inline uint64 GetRuntimeId() const override { return mEntityId.runtimeId; }
+    [[nodiscard]] inline const vector<ComponentView>& GetComponentViews() override { return mComponentManagerRef->GetMutableEntityComponentView(mEntityId.runtimeId); }
+#endif // DEV_CONFIGURATION.
 private:
     MutableEntityId mEntityId;
     Scarlet::WeakHandle<ComponentManager> mComponentManagerRef;
