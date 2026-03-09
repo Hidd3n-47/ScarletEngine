@@ -1,6 +1,7 @@
 #include "ScarletEnginePch.h"
 #include "Engine.h"
 
+#include <ScarlEnt/Scene.h>
 #include <ScarlEnt/Registry.h>
 
 #include "Events/Event.h"
@@ -36,9 +37,9 @@ void Engine::Init() noexcept
     DEBUG(windowProperties.resizable = true);
     mMainWindow = WindowManager::CreateWindowInternal("Scarlet Engine", std::move(windowProperties));
 
-    Renderer::InitApi();
-
     ScarlEnt::Registry::Init();
+
+    Renderer::InitApi();
 
     DEBUG(RegisterComponents());
 
@@ -58,9 +59,9 @@ void Engine::Destroy() const noexcept
 {
     SCARLET_ASSERT(!mRunning && "Trying to destroy engine whilst Engine::Run is running.");
 
-    ScarlEnt::Registry::Terminate();
-
     Renderer::TerminateApi();
+
+    ScarlEnt::Registry::Terminate();
 
     WindowManager::DestroyWindow(mInstance->mMainWindow);
     WindowManager::TerminateApi();
@@ -109,6 +110,8 @@ void Engine::Run() const
     while (mRunning)
     {
         WindowManager::ApiPoll();
+
+        ScarlEnt::Registry::Instance().GetActiveScene()->Update();
 
         DEBUG(if (mBeginRenderEvent) mBeginRenderEvent());
 

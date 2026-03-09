@@ -23,6 +23,8 @@ class EntityHandle DEBUG(: public IEntityHandle)
 {
     friend class Scene;
 public:
+    EntityHandle() = default;
+
     /**
      * @brief Create an instance of an \ref EntityHandle.
      * @tparam Args The types of the components in the archetype.

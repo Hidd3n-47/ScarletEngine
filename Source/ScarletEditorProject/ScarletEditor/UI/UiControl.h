@@ -21,6 +21,12 @@ class UiControl
 {
 public:
     /**
+     * @brief Add a property control for a float.
+     * @param property The property the control is for.
+     * @param controlProperties The properties of the control.
+     */
+    static void RenderFloatPropertyControl(const ScarlEnt::Property& property, const UiControlProperties& controlProperties = {});
+    /**
      * @brief Add a property control for an angle. This is used to allow for more friendly interaction with quaternions.
      * @param property The property the control is for.
      * @param controlProperties The properties of the control.

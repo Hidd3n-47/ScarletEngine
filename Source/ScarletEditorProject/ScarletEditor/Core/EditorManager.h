@@ -1,6 +1,22 @@
 #pragma once
 
+#include <ScarletCore/WeakHandle.h>
+
+#include <ScarlEnt/EntityHandle.h>
+
 #ifdef DEV_CONFIGURATION
+
+namespace ScarlEnt
+{
+class Scene;
+} // Namespace ScarlEnt.
+
+namespace Scarlet::Component
+{
+struct Camera;
+struct Transform;
+struct DirectionLight;
+} // Namespace Scarlet::Component.
 
 namespace Scarlet::Editor
 {
@@ -28,10 +44,21 @@ public:
      * @brief End render unbinds frame buffers and renders it to the viewport, as well as renders the rest of the editor UI.
      */
     void EndRender() const;
+
+    /**
+     * @brief Get a \ref WeakHandle to the game scene.
+     * @return A \ref WeakHandle to the game scene.
+     */
+    [[nodiscard]] inline WeakHandle<ScarlEnt::Scene> GetGameScene() const { return mGameScene;}
 private:
     EditorManager();
     ~EditorManager();
     inline static EditorManager* mInstance = nullptr;
+
+    WeakHandle<ScarlEnt::Scene> mEditorScene;
+    WeakHandle<ScarlEnt::Scene> mGameScene;
+
+    ScarlEnt::EntityHandle<Component::Transform, Component::Camera, Component::DirectionLight> mCameraEntity;
 
     IView* mEditorView;
 };

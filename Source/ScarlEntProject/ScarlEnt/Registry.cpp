@@ -20,25 +20,22 @@ void Registry::Terminate()
 
 Scarlet::WeakHandle<Scene> Registry::CreateScene(const std::string_view friendlyName)
 {
-    mScenes.emplace_back(new Scene{ friendlyName, mScenes.size() });
+    Scene* scene = new Scene{ friendlyName };
+    mScenes[std::string{ friendlyName }] = scene;
 
-    return Scarlet::WeakHandle{ mScenes.back() };
+    return Scarlet::WeakHandle{ scene };
 }
 
 void Registry::RemoveScene(Scarlet::WeakHandle<Scene>& scene)
 {
     SCARLENT_ASSERT(scene.IsValid());
 
-    const size_t index = scene->GetRegistryIndex();
+    const std::string friendlyName{ scene->GetFriendlyName() };
 
-    delete mScenes[index];
+    SCARLENT_ASSERT(mScenes.contains(friendlyName) && "Trying to remove a scene that isn't in the scene map.");
 
-    for (size_t i{ index + 1 }; i < mScenes.size(); ++i)
-    {
-        --mScenes[i]->mRegistryIndex;
-    }
-
-    mScenes.erase(mScenes.begin() + static_cast<long long>(index));
+    delete mScenes[friendlyName];
+    mScenes.erase(friendlyName);
 
     scene.Invalidate();
 }
@@ -47,7 +44,7 @@ void Registry::SetActiveScene(const Scarlet::WeakHandle<Scene> scene)
 {
     SCARLENT_ASSERT(scene.IsValid());
 
-    mCurrentSceneIndex = static_cast<int32>(scene->GetRegistryIndex());
+    mActiveScene = scene;
 }
 
 #ifdef DEV_CONFIGURATION

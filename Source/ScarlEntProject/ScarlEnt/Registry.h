@@ -85,8 +85,7 @@ public:
      * @brief Get the currently active scene.
      * @return Returns a \ref WeakHandle to the currently active scene. This scene will be invalid if there is no currently active scene.
      */
-    [[nodiscard]] inline Scarlet::WeakHandle<Scene> GetActiveScene() const 
-                        { return mCurrentSceneIndex >=0 ? Scarlet::WeakHandle{ mScenes[mCurrentSceneIndex] } : Scarlet::WeakHandle<Scene>{}; }
+    [[nodiscard]] inline Scarlet::WeakHandle<Scene> GetActiveScene() const { return mActiveScene; }
 
     /**
      * @brief Get the ID for the component type.
@@ -125,8 +124,8 @@ private:
     unordered_map<uint64, uint32> mComponentBitmaskToId;
     uint32 mNumberOfRegisteredComponents = 0;
 
-    int32 mCurrentSceneIndex = -1;
-    vector<Scene*> mScenes;
+    Scarlet::WeakHandle<Scene> mActiveScene;
+    unordered_map<std::string, Scene*> mScenes;
 };
 
 /* ============================================================================================================================== */

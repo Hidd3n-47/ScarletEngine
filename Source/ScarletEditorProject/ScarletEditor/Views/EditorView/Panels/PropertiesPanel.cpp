@@ -36,6 +36,9 @@ void PropertiesPanel::Render()
 
                 switch (property.GetType())
                 {
+                case ScarlEnt::PropertyType::FLOAT:
+                    UiControl::RenderFloatPropertyControl(property, { .propertyName = propertyName, .propertyId = entityName });
+                    break;
                 case ScarlEnt::PropertyType::VEC3:
                     UiControl::RenderVec3PropertyControl(property, { .propertyName = propertyName, .propertyId = entityName });
                     break;

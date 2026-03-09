@@ -22,7 +22,7 @@ public:
         testRegistry->AddTestCase("RegistryTests", "GettingRegisteredComponentReturnsSameId", GettingRegisteredComponentReturnsSameId);
         testRegistry->AddTestCase("RegistryTests", "CanCreateAndDestroyAScene", CanCreateAndDestroyAScene);
         testRegistry->AddTestCase("RegistryTests", "SettingSceneChangesCurrentlyActiveScene", SettingSceneChangesCurrentlyActiveScene);
-        testRegistry->AddTestCase("RegistryTests", "IndexOfSceneUpdatesCorrectlyWhenRemovingAScene", IndexOfSceneUpdatesCorrectlyWhenRemovingAScene);
+        testRegistry->AddTestCase("RegistryTests", "AssertsWhenTryingToRemoveASceneThatIsNotValid", AssertsWhenTryingToRemoveASceneThatIsNotValid);
         testRegistry->AddTestCase("RegistryTests", "AssertWhenTryingToGetComponentIdOfNonRegisteredComponent", AssertWhenTryingToGetComponentIdOfNonRegisteredComponent);
         testRegistry->AddTestCase("RegistryTests", "GetTheCorrectIdFromComponentBitset", GetTheCorrectIdFromComponentBitset);
     }
@@ -105,21 +105,23 @@ public:
         return passed;
     }
 
-    static bool IndexOfSceneUpdatesCorrectlyWhenRemovingAScene()
+    static bool AssertsWhenTryingToRemoveASceneThatIsNotValid()
     {
-        bool passed = true;
+        bool passed = false;
 
-        auto scene1 = ScarlEnt::Registry::Instance().CreateScene("Testing1");
-        auto scene2 = ScarlEnt::Registry::Instance().CreateScene("Testing2");
+        const std::string sceneName{ "Testing" };
 
-        passed &= scene1->GetRegistryIndex() == 0;
-        passed &= scene2->GetRegistryIndex() == 1;
+        auto scene = ScarlEnt::Registry::Instance().CreateScene(sceneName);
+        ScarlEnt::Registry::Instance().RemoveScene(scene);
 
-        ScarlEnt::Registry::Instance().RemoveScene(scene1);
-
-        passed &= scene2->GetRegistryIndex() == 0;
-
-        ScarlEnt::Registry::Instance().RemoveScene(scene2);
+        try
+        {
+            ScarlEnt::Registry::Instance().RemoveScene(scene);
+        }
+        catch (const std::runtime_error&)
+        {
+            passed = true;
+        }
 
         return passed;
     }
@@ -144,7 +146,7 @@ public:
     {
         bool passed = true;
 
-        const ScarlEnt::ComponentId componentId = ScarlEnt::Registry::Instance().GetOrRegisterComponentId<int>();
+        const ScarlEnt::ComponentId componentId = ScarlEnt::Registry::Instance().GetOrRegisterComponentId<Vec2>();
 
         passed &= ScarlEnt::Registry::Instance().GetComponentIdFromBitmask(componentId.bitmask) == componentId.id;
 

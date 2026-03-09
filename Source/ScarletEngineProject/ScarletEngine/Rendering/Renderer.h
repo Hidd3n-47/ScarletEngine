@@ -69,15 +69,12 @@ private:
     Shader mShader;
     Shader mSkyBoxShader;
     InstanceBuffer mInstanceBuffer;
-    Camera mRenderCamera;
 
     VertexArray*  mSkyBoxVao;
     VertexBuffer* mSkyBoxVbo;
     IndexBuffer*  mSkyBoxIbo;
 
     Resource::CubeMapTexture* mCubeMapTexture;
-
-    Math::Vec3 mCameraPosition{ 0.0f, -10.0f, 2.0f };
 
     std::unordered_map<RenderGroup, vector<Math::Mat4>> mCommands;
 };

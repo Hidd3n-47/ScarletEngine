@@ -15,7 +15,6 @@ public:
     {
         testRegistry->AddTestCase("SceneTests", "AddedComponentWithEntityHasCorrectInitialValuesTest1", AddedComponentWithEntityHasCorrectInitialValuesTest1);
         testRegistry->AddTestCase("SceneTests", "AddedComponentWithEntityHasCorrectInitialValuesTest2", AddedComponentWithEntityHasCorrectInitialValuesTest2);
-        testRegistry->AddTestCase("SceneTests", "AddedComponentWithEntityHasCorrectInitialValuesTest3", AddedComponentWithEntityHasCorrectInitialValuesTest3);
         testRegistry->AddTestCase("SceneTests", "AddedComponentWithEntityHasCorrectInitialValuesMultipleTypes", AddedComponentWithEntityHasCorrectInitialValuesMultipleTypes);
         testRegistry->AddTestCase("SceneTests", "AssertsWhenTryingToRemoveAnEntityThatIsNotValid", AssertsWhenTryingToRemoveAnEntityThatIsNotValid);
         testRegistry->AddTestCase("SceneTests", "FirstComponentsCorrectWhenRemovingSecondEntity", FirstComponentsCorrectWhenRemovingSecondEntity);
@@ -59,21 +58,6 @@ public:
 
     static bool AddedComponentWithEntityHasCorrectInitialValuesTest1()
     {
-        constexpr int solution = 47;
-
-        Scarlet::WeakHandle<ScarlEnt::Scene> scene = ScarlEnt::Registry::Instance().CreateScene("Testing");
-
-        ScarlEnt::EntityHandle entity = scene->AddEntity<int>(static_cast<int>(solution));
-
-        const bool passed = entity.GetComponent<int>() == solution;
-
-        ScarlEnt::Registry::Instance().RemoveScene(scene);
-
-        return passed;
-    }
-
-    static bool AddedComponentWithEntityHasCorrectInitialValuesTest2()
-    {
         constexpr int solution    = 47;
         constexpr int solutionSqr = solution * solution;
 
@@ -88,7 +72,7 @@ public:
         return passed;
     }
 
-    static bool AddedComponentWithEntityHasCorrectInitialValuesTest3()
+    static bool AddedComponentWithEntityHasCorrectInitialValuesTest2()
     {
         constexpr int solution    = 47;
         constexpr int solutionSqr = solution * solution;
@@ -115,9 +99,8 @@ public:
 
         Scarlet::WeakHandle<ScarlEnt::Scene> scene = ScarlEnt::Registry::Instance().CreateScene("Testing");
 
-        ScarlEnt::EntityHandle entity = scene->AddEntity<int, Vec2, Vec3>(static_cast<int>(solution), Vec2{ solution, solutionSqr }, Vec3{ solution, solutionSqr, solutionCbd });
+        ScarlEnt::EntityHandle entity = scene->AddEntity<Vec2, Vec3>(Vec2{ solution, solutionSqr }, Vec3{ solution, solutionSqr, solutionCbd });
 
-        passed &= entity.GetComponent<int>()  == solution;
         passed &= entity.GetComponent<Vec2>() == Vec2{ solution, solutionSqr};
         passed &= entity.GetComponent<Vec3>() == Vec3{ solution, solutionSqr, solutionCbd };
 
@@ -132,7 +115,7 @@ public:
 
         Scarlet::WeakHandle<ScarlEnt::Scene> scene = ScarlEnt::Registry::Instance().CreateScene("Testing");
 
-        const ScarlEnt::EntityHandle entity = scene->AddEntity<int>(0);
+        const ScarlEnt::EntityHandle entity = scene->AddEntity<Vec2>(Vec2{ 0, 0 });
         scene->RemoveEntity(entity);
 
         try
@@ -231,14 +214,14 @@ public:
 
         Scarlet::WeakHandle<ScarlEnt::Scene> scene = ScarlEnt::Registry::Instance().CreateScene("Testing");
 
-        ScarlEnt::EntityHandle entity1 = scene->AddEntity<int, Vec2, Vec3>(static_cast<int>(solution), Vec2{ solution, solution }, Vec3{ solution, solution, solution });
-        ScarlEnt::EntityHandle entity2 = scene->AddEntity<int, Vec2, Vec3>(static_cast<int>(solutionSqr), Vec2{ solutionSqr, solutionSqr }, Vec3{ solutionSqr, solutionSqr, solutionSqr });
-        ScarlEnt::EntityHandle entity3 = scene->AddEntity<int, Vec2, Vec3>(static_cast<int>(solutionCbd), Vec2{ solutionCbd, solutionCbd }, Vec3{ solutionCbd, solutionCbd, solutionCbd });
+        ScarlEnt::EntityHandle entity1 = scene->AddEntity<Int, Vec2, Vec3>(Int{ solution    }, Vec2{ solution, solution }, Vec3{ solution, solution, solution });
+        ScarlEnt::EntityHandle entity2 = scene->AddEntity<Int, Vec2, Vec3>(Int{ solutionSqr }, Vec2{ solutionSqr, solutionSqr }, Vec3{ solutionSqr, solutionSqr, solutionSqr });
+        ScarlEnt::EntityHandle entity3 = scene->AddEntity<Int, Vec2, Vec3>(Int{ solutionCbd }, Vec2{ solutionCbd, solutionCbd }, Vec3{ solutionCbd, solutionCbd, solutionCbd });
 
         scene->RemoveEntity(entity1);
         scene->RemoveEntity(entity3);
 
-        passed &= entity2.GetComponent<int>() == solutionSqr;
+        passed &= entity2.GetComponent<Int>() == Int{ solutionSqr };
 
         const Vec2& component = entity2.GetComponent<Vec2>();
         passed &= component.x == solutionSqr;
@@ -458,12 +441,12 @@ public:
 
         ScarlEnt::MutableEntityHandle handle = scene->AddMutableEntity();
 
-        handle.AddComponent<int>(number);
+        handle.AddComponent<Int>(number);
         handle.AddComponent<Vec2>(number, numberSq);
         handle.AddComponent<Vec3>(number, numberSq, numberCb);
 
         // Purposefully testing different order to ensure it's not ordered based.
-        passed &= handle.GetComponent<int>()  == number;
+        passed &= handle.GetComponent<Int>()  == Int{ number };
         passed &= handle.GetComponent<Vec3>() == Vec3{ number, numberSq, numberCb };
         passed &= handle.GetComponent<Vec2>() == Vec2{ number, numberSq };
 
@@ -737,8 +720,8 @@ public:
 
         bool passed = true;
 
-        Scarlet::WeakHandle<ScarlEnt::Scene> scene = ScarlEnt::Registry::Instance().CreateScene("Testing");
-        ScarlEnt::EntityHandle        staticEntity = scene->AddEntity<Vec2, Vec3>(Vec2{ number, number }, Vec3{ number, numberSqr, numberCbd });
+        Scarlet::WeakHandle<ScarlEnt::Scene> scene  = ScarlEnt::Registry::Instance().CreateScene("Testing");
+        ScarlEnt::EntityHandle        staticEntity  = scene->AddEntity<Vec2, Vec3>(Vec2{ number, number }, Vec3{ number, numberSqr, numberCbd });
         ScarlEnt::MutableEntityHandle mutableEntity = scene->AddMutableEntity();
 
         scene->RegisterSystem<Vec2, Vec3>([](Vec2& v2, Vec3& v3) {
@@ -852,7 +835,7 @@ public:
     {
         bool passed = true;
 
-        Scarlet::WeakHandle<ScarlEnt::Scene> scene = ScarlEnt::Registry::Instance().CreateScene("Testing");
+        Scarlet::WeakHandle<ScarlEnt::Scene> scene  = ScarlEnt::Registry::Instance().CreateScene("Testing");
         ScarlEnt::MutableEntityHandle mutableEntity = scene->AddMutableEntity();
 
         auto componentManager = mutableEntity.GetComponentManagerRef();
@@ -877,7 +860,7 @@ public:
     {
         bool passed = false;
 
-        Scarlet::WeakHandle<ScarlEnt::Scene> scene = ScarlEnt::Registry::Instance().CreateScene("Testing");
+        Scarlet::WeakHandle<ScarlEnt::Scene> scene  = ScarlEnt::Registry::Instance().CreateScene("Testing");
         ScarlEnt::MutableEntityHandle mutableEntity = scene->AddMutableEntity();
 
         mutableEntity.DestroyEntity();

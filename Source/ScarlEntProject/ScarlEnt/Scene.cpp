@@ -3,9 +3,8 @@
 namespace ScarlEnt
 {
 
-Scene::Scene(const std::string_view friendlyName, const size_t index)
+Scene::Scene(const std::string_view friendlyName)
     : mFriendlyName(friendlyName)
-    , mRegistryIndex(index)
 {
     // Empty.
 }

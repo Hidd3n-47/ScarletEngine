@@ -7,9 +7,16 @@
 
 #include <glfw/glfw3.h>
 
+#include <ScarlEnt/Registry.h>
+
 #include <ScarletEngine/Core/Engine.h>
 #include <ScarletEngine/Core/Window/Window.h>
 
+#include <ScarletEngine/Components/Camera.h>
+#include <ScarletEngine/Components/Transform.h>
+#include <ScarletEngine/Components/DirectionLight.h>
+
+#include "ScarlEnt/Scene.h"
 #include "Views/EditorView/View/EditorView.h"
 
 namespace Scarlet::Editor
@@ -150,6 +157,16 @@ EditorManager::EditorManager()
     mEditorView = new EditorView();
 
     engineInstance.SetEndRenderEvent([&] { EndRender(); });
+
+    mEditorScene = ScarlEnt::Registry::Instance().CreateScene("EditorScene");
+    mGameScene   = ScarlEnt::Registry::Instance().CreateScene("GameScene");
+
+    Component::Transform cameraTransform{ };
+    cameraTransform.position = Math::Vec3{ 0.0f, -10.0f, 2.0f };
+    mCameraEntity = mEditorScene->AddEntity<Component::Transform, Component::Camera, Component::DirectionLight>(std::move(cameraTransform), Component::Camera{}, Component::DirectionLight{ });
+    mEditorScene->SetCameraEntityHandle(&mCameraEntity);
+
+    ScarlEnt::Registry::Instance().SetActiveScene(mEditorScene);
 }
 
 EditorManager::~EditorManager()

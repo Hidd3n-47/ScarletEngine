@@ -1,5 +1,17 @@
 #pragma once
 
+struct Int
+{
+    int x = 0;
+
+    bool operator==(const Int& other) const
+    {
+        return x == other.x;
+    }
+
+    inline unordered_map<std::string, ScarlEnt::Property>* GetProperties() const { return nullptr; }
+};
+
 struct Vec2
 {
     int x = 0;
@@ -17,6 +29,8 @@ struct Vec2
     {
         return x == other.x && y == other.y;
     }
+
+    inline unordered_map<std::string, ScarlEnt::Property>* GetProperties() const { return nullptr; }
 };
 
 struct Vec3
@@ -29,4 +43,6 @@ struct Vec3
     {
         return x == other.x && y == other.y && z == other.z;
     }
+
+    inline unordered_map<std::string, ScarlEnt::Property>* GetProperties() const { return nullptr; }
 };

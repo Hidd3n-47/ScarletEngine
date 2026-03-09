@@ -16,7 +16,6 @@ class SCARLENT_API Scene
 {
     friend class Registry;
 public:
-
     /**
      * @brief Update the scene. This will update all the registered systems.
      */
@@ -57,19 +56,29 @@ public:
     /** @brief Get the friendly name of the scene */
     [[nodiscard]] inline std::string_view GetFriendlyName() const { return mFriendlyName; }
 
-    /** @brief Get the index of the scene in the registry. */
-    [[nodiscard]] inline size_t GetRegistryIndex() const { return mRegistryIndex; }
+    /**
+     * @brief Set the handle to the camera entity. Each scene needs this to allow for the renderer to show through the main camera.
+     * @param handle The handle to the immutable entity that contains the camera, transform and direction light.
+     */
+    inline void SetCameraEntityHandle(IEntityHandle* handle) { mCameraEntity = handle; }
+    /**
+     * @brief Get the handle to the camera entity. The entity can be cast to the correct format to be used by the renderer.
+     * @remark The entity is immutable and contains the camera, transform and direction light.
+     * @return A pointer to the handle of the entity that contains the camera, transform and direction light used in the rendering.
+     */
+    [[nodiscard]] inline IEntityHandle* GetCameraEntityHandle() const { return mCameraEntity; }
 
     DEBUG([[nodiscard]] inline const vector<IEntityHandle*>& GetEntityHandles()        const { return mEntityHandles; })
     DEBUG([[nodiscard]] inline const vector<IEntityHandle*>& GetMutableEntityHandles() const { return mMutableEntityHandles; })
 private:
-    Scene(const std::string_view friendlyName, const size_t index);
+    Scene(const std::string_view friendlyName);
     DEBUG(~Scene());
 
     std::string mFriendlyName;
-    size_t      mRegistryIndex;
 
     ComponentManager mComponentManager;
+
+    IEntityHandle* mCameraEntity;
 
     DEBUG(vector<IEntityHandle*> mEntityHandles;)
     DEBUG(vector<IEntityHandle*> mMutableEntityHandles;)

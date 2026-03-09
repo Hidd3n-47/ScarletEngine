@@ -6,10 +6,10 @@
 #include <format>
 
 #include <ScarlEnt/Scene.h>
-#include <ScarlEnt/Registry.h>
 
 #include <ScarletEngine/Components/Transform.h>
 
+#include "Core/EditorManager.h"
 #include "Views/EditorView/View/EditorView.h"
 
 namespace Scarlet::Editor
@@ -20,7 +20,7 @@ void ScenePanel::Render()
     EditorView* editorView             = dynamic_cast<EditorView*>(mView);
     SelectionManager& selectionManager = editorView->GetSelectionManager();
 
-    auto scene = ScarlEnt::Registry::Instance().GetActiveScene();
+    WeakHandle<ScarlEnt::Scene> scene = EditorManager::Instance().GetGameScene();
 
     // ----------- Title Bar ----------------
     ImGui::BeginGroup();

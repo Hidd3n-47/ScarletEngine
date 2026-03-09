@@ -15,6 +15,43 @@
 namespace Scarlet::Editor
 {
 
+void UiControl::RenderFloatPropertyControl(const ScarlEnt::Property& property, const UiControlProperties& controlProperties /* = {} */)
+{
+    float value;
+    ReflectType::SetValueFromString(value, property.GetPropertyValue());
+
+    std::string propertyName = controlProperties.propertyName;
+    if (controlProperties.firstLetterUppercase)
+    {
+        propertyName[0] = static_cast<char>(std::toupper(propertyName[0]));
+    }
+
+    const std::string propertyId = controlProperties.propertyName + controlProperties.propertyId;
+    const float lineHeight       = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
+
+    ImGui::Columns(2, propertyName.c_str());
+
+    // Todo Christian: Let this width be draggable/adjustable.
+    ImGui::SetColumnWidth(0, 100.0f);
+
+    ImGui::SetCursorPosY(ImGui::GetCursorPosY() + lineHeight - ImGui::CalcTextSize(propertyName.c_str()).y - ImGui::GetScrollX() - 2 * ImGui::GetStyle().ItemSpacing.y + 5.0f);
+    ImGui::Text("%s", propertyName.c_str());
+
+    ImGui::NextColumn();
+
+    ImGui::PushMultiItemsWidths(3, ImGui::CalcItemWidth());
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0.0f, 4.0f });
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 4);
+
+    ImGui::DragFloat(("##Value" + propertyId).c_str(), &value, controlProperties.dragSpeed);
+
+    ImGui::PopStyleVar(2);
+    ImGui::PopItemWidth();
+    ImGui::Columns(1);
+
+    property.SetPropertyValue(ReflectType::GetStringFromValue(value));
+}
+
 void UiControl::RenderAngle(const ScarlEnt::Property& property, const UiControlProperties& controlProperties)
 {
     Math::Quat value;
@@ -26,7 +63,7 @@ void UiControl::RenderAngle(const ScarlEnt::Property& property, const UiControlP
     Math::Vec3 angle{ Math::Degrees(roll), Math::Degrees(pitch), Math::Degrees(yaw) };
 
     const std::string propertyId = controlProperties.propertyName + controlProperties.propertyId;
-    const float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
+    const float lineHeight       = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
 
     ImGui::Columns(2, controlProperties.propertyName.c_str());
 
@@ -75,7 +112,7 @@ void UiControl::RenderVec3PropertyControl(const ScarlEnt::Property& property, co
     }
 
     const std::string propertyId = controlProperties.propertyName + controlProperties.propertyId;
-    const float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
+    const float lineHeight       = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
 
     ImGui::Columns(2, propertyName.c_str());
 
@@ -126,7 +163,7 @@ void UiControl::RenderVec4PropertyControl(const ScarlEnt::Property& property, co
     }
 
     const std::string propertyId = controlProperties.propertyName + controlProperties.propertyId;
-    const float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
+    const float lineHeight       = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
 
     ImGui::Columns(2, propertyName.c_str());
 

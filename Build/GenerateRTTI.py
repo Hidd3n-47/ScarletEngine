@@ -114,7 +114,7 @@ static void RegisterComponentTypeAndFunctionPointer(ScarlEnt::Registry& registry
     const std::string componentName = registry.GetOrRegisterComponentId<T>().name;
     registry.RegisterComponent(componentName, [](ScarlEnt::IEntityHandle* handle) {
             ScarlEnt::MutableEntityHandle* mutableHandle = reinterpret_cast<ScarlEnt::MutableEntityHandle*>(handle);
-            mutableHandle->AddComponent<Scarlet::Component::Transform>();
+            mutableHandle->AddComponent<T>();
         });
 }
 

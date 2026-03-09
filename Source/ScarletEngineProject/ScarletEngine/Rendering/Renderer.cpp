@@ -6,6 +6,9 @@
 
 #include <algorithm>
 
+#include <ScarlEnt/Scene.h>
+#include <ScarlEnt/Registry.h>
+
 #include "Mesh.h"
 #include "Texture.h"
 #include "VertexArray.h"
@@ -14,10 +17,14 @@
 #include "VertexBuffer.h"
 #include "CubeMapTexture.h"
 
+#include "Components/Camera.h"
+#include "Components/Transform.h"
+#include "Components/DirectionLight.h"
+
 namespace
 {
 
-static constexpr float SKY_BOX_VERTICES[] =
+constexpr float SKY_BOX_VERTICES[] =
 {
     -1.0f, -1.0f,  1.0f,
      1.0f, -1.0f,  1.0f,
@@ -29,9 +36,9 @@ static constexpr float SKY_BOX_VERTICES[] =
     -1.0f,  1.0f, -1.0f
 };
 
-static constexpr int SKY_BOX_INDEX_COUNT = 36;
+constexpr int SKY_BOX_INDEX_COUNT = 36;
 
-static constexpr uint32 SKY_BOX_INDICES[SKY_BOX_INDEX_COUNT] =
+constexpr uint32 SKY_BOX_INDICES[SKY_BOX_INDEX_COUNT] =
 {
     1, 2, 6,
     6, 5, 1,
@@ -99,11 +106,9 @@ void Renderer::InitApi()
     const uint32 glewOkay = glewInit();
     SCARLET_ASSERT(glewOkay == GLEW_OK && "Failed to initialise glew!");
 
-    // Depth testing.
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
 
-    // Back Face culling.
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
     glFrontFace(GL_CW);
@@ -122,7 +127,6 @@ Renderer::Renderer()
     , mSkyBoxShader("E:/Programming/ScarletEngine/EngineAssets/Shaders/skybox.vert", "E:/Programming/ScarletEngine/EngineAssets/Shaders/skybox.frag")
     , mInstanceBuffer(MAX_INSTANCE_COUNT * sizeof(Math::Mat4))
 {
-
     mSkyBoxVao = new VertexArray();
     mSkyBoxVbo = new VertexBuffer(SKY_BOX_VERTICES, sizeof(SKY_BOX_VERTICES) * sizeof(float));
     mSkyBoxIbo = new IndexBuffer(SKY_BOX_INDICES, sizeof(SKY_BOX_INDICES) / sizeof(uint32));
@@ -152,26 +156,26 @@ void Renderer::AddRenderCommand(const WeakHandle<Resource::Material> material, c
 
 void Renderer::Render()
 {
-    static float ambientIntensity = 0.190f;
-    static float diffuseIntensity = 0.960f;
-    static float direction[3] = { -1.0f, 1.0f, -1.0f };
-    static float rimPower = 3.4f;
+    auto* cameraEntity = reinterpret_cast<ScarlEnt::EntityHandle<Component::Transform, Component::Camera, Component::DirectionLight>*>(ScarlEnt::Registry::Instance().GetActiveScene()->GetCameraEntityHandle());
+    const auto cameraPosition = cameraEntity->GetComponent<Component::Transform>().position;
+    const auto cameraDirectionLight = cameraEntity->GetComponent<Component::DirectionLight>();
 
-    mRenderCamera.UpdateViewAndProjectionMatrix(mCameraPosition);
+    Component::Camera& camera = cameraEntity->GetComponent<Component::Camera>();
+    camera.UpdateViewAndProjectionMatrix(cameraPosition);
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     mShader.Bind();
-    mShader.UploadUniform("uViewMatrix", mRenderCamera.GetViewMatrix());
-    mShader.UploadUniform("uProjectionMatrix", mRenderCamera.GetProjectionMatrix());
+    mShader.UploadUniform("uViewMatrix", camera.viewMatrix);
+    mShader.UploadUniform("uProjectionMatrix", camera.projectionMatrix);
     mShader.UploadUniform("uTexture", 0);
 
-    mShader.UploadUniform("uCameraPosition", mCameraPosition);
-    mShader.UploadUniform("uLight.color", Math::Vec3{ 1.0f, 1.0f, 1.0f });
-    mShader.UploadUniform("uLight.ambientIntensity", ambientIntensity);
-    mShader.UploadUniform("uLight.diffuseIntensity", diffuseIntensity);
-    mShader.UploadUniform("uLight.direction", Math::Normalize(Math::Vec3{ direction[0], direction[1], direction[2] }));
-    mShader.UploadUniform("uRimLightPower", rimPower);
+    mShader.UploadUniform("uCameraPosition", cameraPosition);
+    mShader.UploadUniform("uLight.color", cameraDirectionLight.lightColor);
+    mShader.UploadUniform("uLight.ambientIntensity", cameraDirectionLight.ambientIntensity);
+    mShader.UploadUniform("uLight.diffuseIntensity", cameraDirectionLight.diffuseIntensity);
+    mShader.UploadUniform("uLight.direction", Math::Normalize(cameraDirectionLight.direction));
+    mShader.UploadUniform("uRimLightPower", cameraDirectionLight.rimPower);
 
     mInstanceBuffer.Bind();
     for (auto& [group, commands] : mCommands)
@@ -198,10 +202,11 @@ void Renderer::Render()
     glDisable(GL_CULL_FACE);
 
     mSkyBoxShader.Bind();
-    
+
     mSkyBoxShader.UploadUniform("uSkyBox", 0);
-    mSkyBoxShader.UploadUniform("uViewMatrix", Math::Mat4(Math::Mat3(mRenderCamera.GetViewMatrix())));
-    mSkyBoxShader.UploadUniform("uProjectionMatrix", mRenderCamera.GetProjectionMatrix());
+    // Convert to a Mat3 to remove the translation as this shouldn't affect skymaps.
+    mSkyBoxShader.UploadUniform("uViewMatrix", Math::Mat4(Math::Mat3(camera.viewMatrix)));
+    mSkyBoxShader.UploadUniform("uProjectionMatrix", camera.projectionMatrix);
 
     mSkyBoxVao->Bind();
     mSkyBoxVbo->Bind();

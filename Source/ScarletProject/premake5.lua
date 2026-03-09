@@ -25,6 +25,7 @@ project "Scarlet"
         "$(SolutionDir)Source/ScarletLoggerProject/",
         "$(SolutionDir)Source/ScarletCoreProject/",
         "$(SolutionDir)Source/ScarletEngineProject/",
+        "$(SolutionDir)Source/ScarlEntProject/",
     }
 
     libdirs
