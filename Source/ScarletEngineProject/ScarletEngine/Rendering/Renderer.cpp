@@ -157,11 +157,11 @@ void Renderer::AddRenderCommand(const WeakHandle<Resource::Material> material, c
 void Renderer::Render()
 {
     auto* cameraEntity = reinterpret_cast<ScarlEnt::EntityHandle<Component::Transform, Component::Camera, Component::DirectionLight>*>(ScarlEnt::Registry::Instance().GetActiveScene()->GetCameraEntityHandle());
-    const auto cameraPosition = cameraEntity->GetComponent<Component::Transform>().position;
+    const auto cameraTransform = cameraEntity->GetComponent<Component::Transform>();
     const auto cameraDirectionLight = cameraEntity->GetComponent<Component::DirectionLight>();
 
     Component::Camera& camera = cameraEntity->GetComponent<Component::Camera>();
-    camera.UpdateViewAndProjectionMatrix(cameraPosition);
+    camera.UpdateViewAndProjectionMatrix(cameraTransform.translation);
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -170,7 +170,7 @@ void Renderer::Render()
     mShader.UploadUniform("uProjectionMatrix", camera.projectionMatrix);
     mShader.UploadUniform("uTexture", 0);
 
-    mShader.UploadUniform("uCameraPosition", cameraPosition);
+    mShader.UploadUniform("uCameraPosition", cameraTransform.translation);
     mShader.UploadUniform("uLight.color", cameraDirectionLight.lightColor);
     mShader.UploadUniform("uLight.ambientIntensity", cameraDirectionLight.ambientIntensity);
     mShader.UploadUniform("uLight.diffuseIntensity", cameraDirectionLight.diffuseIntensity);

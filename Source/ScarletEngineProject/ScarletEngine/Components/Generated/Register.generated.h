@@ -5,7 +5,6 @@
 
 #include "Components/Camera.h"
 #include "Components/DirectionLight.h"
-#include "Components/Testing.h"
 #include "Components/Transform.h"
 
 template <typename T>
@@ -24,6 +23,5 @@ inline void RegisterComponents()
 
     RegisterComponentTypeAndFunctionPointer<Scarlet::Component::Camera>(registry);
     RegisterComponentTypeAndFunctionPointer<Scarlet::Component::DirectionLight>(registry);
-    RegisterComponentTypeAndFunctionPointer<Scarlet::Component::Testing>(registry);
     RegisterComponentTypeAndFunctionPointer<Scarlet::Component::Transform>(registry);
 }

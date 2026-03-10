@@ -7,17 +7,23 @@
 
 #include <glfw/glfw3.h>
 
+#include <ScarlEnt/Scene.h>
 #include <ScarlEnt/Registry.h>
+
+#include <ScarletMath/Quat.h>
 
 #include <ScarletEngine/Core/Engine.h>
 #include <ScarletEngine/Core/Window/Window.h>
+
+#include <ScarletEngine/Core/Input/KeyCodes.h>
+#include <ScarletEngine/Core/Input/InputManager.h>
 
 #include <ScarletEngine/Components/Camera.h>
 #include <ScarletEngine/Components/Transform.h>
 #include <ScarletEngine/Components/DirectionLight.h>
 
-#include "ScarlEnt/Scene.h"
 #include "Views/EditorView/View/EditorView.h"
+#include "Views/EditorView/Panels/ViewportPanel.h"
 
 namespace Scarlet::Editor
 {
@@ -162,11 +168,62 @@ EditorManager::EditorManager()
     mGameScene   = ScarlEnt::Registry::Instance().CreateScene("GameScene");
 
     Component::Transform cameraTransform{ };
-    cameraTransform.position = Math::Vec3{ 0.0f, -10.0f, 2.0f };
+    cameraTransform.translation = Math::Vec3{ 0.0f, -10.0f, 2.0f };
     mCameraEntity = mEditorScene->AddEntity<Component::Transform, Component::Camera, Component::DirectionLight>(std::move(cameraTransform), Component::Camera{}, Component::DirectionLight{ });
     mEditorScene->SetCameraEntityHandle(&mCameraEntity);
 
     ScarlEnt::Registry::Instance().SetActiveScene(mEditorScene);
+
+    auto cameraMovementFunction = [&](Component::Transform& transform, const Component::Camera& viewportCamera) {
+        if (const std::shared_ptr<Panel> viewportPanel = mEditorView->GetPanel<ViewportPanel>(); !viewportPanel->IsHovered())
+        {
+            return;
+        }
+
+        if (!InputManager::IsMouseButtonDown(KeyCode::MOUSE_BUTTON_2))
+        {
+            return;
+        }
+
+        Math::Vec3 cameraHorizontalDirection = { }, cameraVerticalDirection = { }, cameraForwardDirection = { };
+
+        if (InputManager::IsKeyDown(KeyCode::KEY_W))
+        {
+            cameraForwardDirection += -1.0f;
+        }
+        if (InputManager::IsKeyDown(KeyCode::KEY_S))
+        {
+            cameraForwardDirection += 1.0f;
+        }
+        if (InputManager::IsKeyDown(KeyCode::KEY_A))
+        {
+            cameraHorizontalDirection += 1.0f;
+        }
+        if (InputManager::IsKeyDown(KeyCode::KEY_D))
+        {
+            cameraHorizontalDirection += -1.0f;
+        }
+        if (InputManager::IsKeyDown(KeyCode::KEY_E))
+        {
+            cameraVerticalDirection += 1.0f;
+        }
+        if (InputManager::IsKeyDown(KeyCode::KEY_Q))
+        {
+            cameraVerticalDirection += -1.0f;
+        }
+
+        constexpr float SPEED_SCALING_FACTOR       = 0.1f;
+        constexpr float SHIFT_KEY_SPEED_MULTIPLIER = 2.5f;
+
+        const float shiftKeySpeedBoost   = InputManager::IsKeyDown(KeyCode::KEY_LEFT_SHIFT) ? SHIFT_KEY_SPEED_MULTIPLIER : 1.0f;
+        const float totalSpeedMultiplier = SPEED_SCALING_FACTOR * shiftKeySpeedBoost;
+
+        transform.translation += viewportCamera.rightVector   * cameraHorizontalDirection * totalSpeedMultiplier
+                              -  viewportCamera.forwardVector * cameraForwardDirection    * totalSpeedMultiplier
+                              +  viewportCamera.upVector      * cameraVerticalDirection   * totalSpeedMultiplier;
+        };
+
+    mEditorScene->RegisterSystem<Component::Transform, Component::Camera>(cameraMovementFunction);
 }
 
 EditorManager::~EditorManager()

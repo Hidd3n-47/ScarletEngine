@@ -7,6 +7,8 @@
 #include "Events/Event.h"
 #include "Events/ApplicationEvents.h"
 
+#include "Input/InputManager.h"
+
 #include "Window/WindowManager.h"
 
 #include "Rendering/Renderer.h"
@@ -133,6 +135,8 @@ void Engine::OnEvent(Event& event)
 {
     EventDispatcher dispatcher(event);
     dispatcher.Dispatch<WindowClosedEvent>([&](const WindowClosedEvent&) { mRunning = false; return true; });
+
+    InputManager::OnEvent(event);
 }
 
 } // Namespace Scarlet.

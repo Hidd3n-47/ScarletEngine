@@ -24,6 +24,7 @@ project "Scarlet"
 
         "$(SolutionDir)Source/ScarletLoggerProject/",
         "$(SolutionDir)Source/ScarletCoreProject/",
+        "$(SolutionDir)Source/ScarletMathProject/",
         "$(SolutionDir)Source/ScarletEngineProject/",
         "$(SolutionDir)Source/ScarlEntProject/",
     }

@@ -53,7 +53,7 @@ private:
 
     WeakHandle<Window> mMainWindow;
 
-    void OnEvent(Event& e);
+    void OnEvent(Event& event);
 
     Resource::Texture* mUvMapTexture;
     Resource::Texture* mGlockTexture;

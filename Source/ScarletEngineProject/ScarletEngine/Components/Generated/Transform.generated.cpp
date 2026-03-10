@@ -13,11 +13,18 @@ void Transform::GenerateProperties()
 {
     mProperties.clear();
 
-    mProperties["position"] = ScarlEnt::Property {
+    mProperties["translation"] = ScarlEnt::Property {
         ScarlEnt::PropertyType::VEC3,
         ScarlEnt::Registry::Instance().GetOrRegisterComponentId<Transform>(),
-        [this] { return ReflectType::GetStringFromValue(this->position); },
-        [this](const std::string_view& stringValue) { ReflectType::SetValueFromString(this->position, stringValue); }
+        [this] { return ReflectType::GetStringFromValue(this->translation); },
+        [this](const std::string_view& stringValue) { ReflectType::SetValueFromString(this->translation, stringValue); }
+    };
+
+    mProperties["rotation"] = ScarlEnt::Property {
+        ScarlEnt::PropertyType::QUAT,
+        ScarlEnt::Registry::Instance().GetOrRegisterComponentId<Transform>(),
+        [this] { return ReflectType::GetStringFromValue(this->rotation); },
+        [this](const std::string_view& stringValue) { ReflectType::SetValueFromString(this->rotation, stringValue); }
     };
 
     mProperties["scale"] = ScarlEnt::Property {
