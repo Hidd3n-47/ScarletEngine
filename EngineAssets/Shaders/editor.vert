@@ -21,17 +21,15 @@ uniform mat4 uProjectionMatrix;
 void main()
 {
     mat4 modelMatrix = mat4(modelMatrixCol1, modelMatrixCol2, modelMatrixCol3, modelMatrixCol4);
-	
-	vec3 pos = vec3(-position.x, position.y, position.z);
-	
-	vertexPosition = pos;
-	
-	mat4 viewProj = uProjectionMatrix * uViewMatrix;
 
-    gl_Position = viewProj * modelMatrix  * vec4(pos, 1.0f);
+    vertexPosition = position;
+
+    mat4 viewProj = uProjectionMatrix * uViewMatrix;
+
+    gl_Position = viewProj * modelMatrix  * vec4(position, 1.0f);
 
     textureUv = uv;
-	
+
     mat3 normalMatrix = transpose(inverse(mat3(modelMatrix)));
-	fragNormal = normalize(normalMatrix * normal);
+    fragNormal = normalize(normalMatrix * normal);
 }

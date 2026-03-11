@@ -27,8 +27,8 @@ public:
     /**
      * @brief Construct a quaternion to represent a rotation from the given Yaw, Pitch and Roll rotation.
      * @param yawRadians The angle of rotation (in radians) about the \c z-axis.
-     * @param pitchRadians The angle of rotation (in radians) about the \c y-axis.
-     * @param rollRadians The angle of rotation (in radians) about the \c x-axis.
+     * @param pitchRadians The angle of rotation (in radians) about the \c x-axis.
+     * @param rollRadians The angle of rotation (in radians) about the \c y-axis.
      */
     explicit Quat(const double yawRadians, const double pitchRadians, const double rollRadians);
     /**
@@ -85,8 +85,8 @@ public:
      * @brief Get the Yaw, Pitch and Roll rotations for the quaternion.
      * @remark Angles are return measured in radians.
      * @param yaw The angle representing the rotation in the 'yaw' axis (i.e. \c z-axis).
-     * @param pitch The angle representing the rotation in the 'pitch' axis (i.e. \c y-axis).
-     * @param roll The angle representing the rotation in the 'roll' axis (i.e. \c x-axis).
+     * @param pitch The angle representing the rotation in the 'pitch' axis (i.e. \c x-axis).
+     * @param roll The angle representing the rotation in the 'roll' axis (i.e. \c y-axis).
      */
     //inline void GetYawPitchRoll(double& yaw, double& pitch, double& roll) const { yaw = mYaw; pitch = mPitch; roll = mRoll; }
     void GetYawPitchRoll(double& yaw, double& pitch, double& roll) const;
@@ -95,8 +95,8 @@ public:
      * @brief Set the Yaw, Pitch and Roll rotations for the quaternion.
      * @remark Angles are measured in radians.
      * @param yaw The angle representing the rotation in the 'yaw' axis (i.e. \c z-axis).
-     * @param pitch The angle representing the rotation in the 'pitch' axis (i.e. \c y-axis).
-     * @param roll The angle representing the rotation in the 'roll' axis (i.e. \c x-axis).
+     * @param pitch The angle representing the rotation in the 'pitch' axis (i.e. \c x-axis).
+     * @param roll The angle representing the rotation in the 'roll' axis (i.e. \c y-axis).
      */
     inline void SetYawPitchRoll(const double yaw, const double pitch, const double roll) { *this = Quat { yaw, pitch, roll }; }
 

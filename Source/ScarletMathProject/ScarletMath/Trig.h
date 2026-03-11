@@ -45,6 +45,44 @@ public:
     {
         return glm::mod(angle, 2 * std::numbers::pi);
     }
+
+    [[nodiscard]] inline static Mat4 RotationMatrix(const double yawDegrees, const double pitchDegrees, const double rollDegrees)
+    {
+        return RotationMatrixRadians(Radians(yawDegrees), Radians(pitchDegrees), Radians(rollDegrees));
+    }
+
+    [[nodiscard]] inline static Mat4 RotationMatrixRadians(const double yawRadians, const double pitchRadians, const double rollRadians)
+    {
+        const double sY = Sin(yawRadians);
+        const double cY = Cos(yawRadians);
+        const double sP = Sin(pitchRadians);
+        const double cP = Cos(pitchRadians);
+        const double sR = Sin(rollRadians);
+        const double cR = Cos(rollRadians);
+
+        const Mat4 rotateX = {
+            1.0, 0.0, 0.0, 0.0,
+            0.0,  cP, -sP, 0.0,
+            0.0,  sP,  cP, 0.0,
+            0.0, 0.0, 0.0, 1.0
+        };
+
+        const Mat4 rotateY = {
+              cR, 0.0,   sR, 0.0,
+             0.0, 1.0,  0.0, 0.0,
+             -sR, 0.0,   cR, 0.0,
+             0.0, 0.0,  0.0, 1.0
+        };
+
+        const Mat4 rotateZ = {
+              cY,  -sY, 0.0, 0.0,
+              sY,   cY, 0.0, 0.0,
+             0.0,  0.0, 1.0, 0.0,
+             0.0,  0.0, 0.0, 1.0
+        };
+
+        return rotateX * rotateY * rotateZ;
+    }
 };
 
 } // Namespace Scarlet::Math.

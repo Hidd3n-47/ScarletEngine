@@ -2,6 +2,7 @@
 #include <ScarletTestTemplate/Core/TestRegistry.h>
 
 #include "ScarletMathTests/Tests/QuaternionTests.h"
+#include "ScarletMathTests/Tests/RotationMatrixTests.h"
 #include "ScarletMathTests/Tests/BoundingBoxIntersectionTests.h"
 
 namespace Scarlet
@@ -18,6 +19,7 @@ public:
     inline void RegisterTests() override
     {
         QuaternionTests(this);
+        RotationMatrixTests(this);
         BoundingBoxIntersectionTests(this);
     }
 

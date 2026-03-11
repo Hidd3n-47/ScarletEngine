@@ -3,7 +3,6 @@
 #include <ScarletMath/Math.h>
 
 #include "Shader.h"
-#include "Camera.h"
 #include "Material.h"
 #include "InstanceBuffer.h"
 

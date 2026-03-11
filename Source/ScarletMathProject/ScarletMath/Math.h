@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include <numbers>
+
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/glm.hpp>
 #include <glm/ext/matrix_clip_space.hpp>
@@ -30,7 +32,7 @@ template <typename T>
 template <typename T>
 [[nodiscard]] static inline constexpr T Radians(const T degrees)
 {
-    return glm::radians(degrees);
+    return static_cast<T>(degrees / 180.0 * std::numbers::pi);
 }
 
 [[nodiscard]] static inline float Magnitude(const Vec3 vector)
@@ -65,23 +67,28 @@ template <typename T>
 
 [[nodiscard]] static inline Mat4 LookAt(const Vec3 eye, const Vec3 center, const Vec3 up)
 {
-    const Vec3 f { Normalize(center - eye) };
-    const Vec3 s { Normalize(cross(up, f)) };
-    const Vec3 u { Cross(f, s) };
+    Vec3 f = Normalize(center - eye);
+    Vec3 r = Normalize(Cross(f, up));
+    Vec3 u = Cross(r, f);
 
-    Mat4 result { 1 };
-    result[0][0] =  s.x;
-    result[1][0] =  s.y;
-    result[2][0] =  s.z;
-    result[0][1] =  u.x;
-    result[1][1] =  u.y;
-    result[2][1] =  u.z;
+    Mat4 result{ 1.0f };
+
+    result[0][0] = r.x;
+    result[1][0] = r.y;
+    result[2][0] = r.z;
+
+    result[0][1] = u.x;
+    result[1][1] = u.y;
+    result[2][1] = u.z;
+
     result[0][2] = -f.x;
     result[1][2] = -f.y;
     result[2][2] = -f.z;
-    result[3][0] = -dot(s, eye);
-    result[3][1] = -dot(u, eye);
-    result[3][2] =  dot(f, eye);
+
+    result[3][0] = -Dot(r, eye);
+    result[3][1] = -Dot(u, eye);
+    result[3][2] =  Dot(f, eye);
+
     return result;
 }
 
@@ -104,8 +111,7 @@ template <typename T>
 
 [[nodiscard]] static bool IsEqual(const double lhs, const double rhs)
 {
-    // Todo Christian: this used to be 0.00001f but now is lowered to prevent test from failing for quaternions. Need to try to fix precision as this seems too large for error.
-    constexpr double EPSILON = 0.001;
+    constexpr double EPSILON = 0.0001f;
 
     return (abs(lhs - rhs) < EPSILON);
 }

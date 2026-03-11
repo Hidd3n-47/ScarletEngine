@@ -29,8 +29,8 @@ Quat::Quat(const double angleRadians, const Vec3& axis)
 
 Quat::Quat(const double yawRadians, const double pitchRadians, const double rollRadians)
 {
-    const Quat x { Trig::CorrectAngleTo0To2PiRange(rollRadians)  , { 1.0f, 0.0f, 0.0f } };
-    const Quat y { Trig::CorrectAngleTo0To2PiRange(pitchRadians) , { 0.0f, 1.0f, 0.0f } };
+    const Quat x { Trig::CorrectAngleTo0To2PiRange(pitchRadians) , { 1.0f, 0.0f, 0.0f } };
+    const Quat y { Trig::CorrectAngleTo0To2PiRange(rollRadians)  , { 0.0f, 1.0f, 0.0f } };
     const Quat z { Trig::CorrectAngleTo0To2PiRange(yawRadians)   , { 0.0f, 0.0f, 1.0f } };
 
     const Quat rotation = z * y * x;
@@ -116,24 +116,28 @@ void Quat::GetYawPitchRoll(double& yaw, double& pitch, double& roll) const
     const double wy = mW * mY;
     const double wz = mW * mZ;
 
-    const double m11        = 1. - 2. * (yy + zz);
-    const double m12        = 2. * (xy + wz);
-    const double negM13     = 2. * (wy - xz);
-    const double m23        = 2. * (yz + wx);
-    const double m33        = 1. - 2. * (xx + yy);
+    const double m11 = 1. - 2. * (yy + zz);
 
-    const double sinPitch = negM13;
+    const double m21 = 2. * (xy + wz);
+    const double m22 = 1. - 2. * (xx + zz);
 
-    yaw     = Trig::Atan2(m12, m11);
-    pitch   = Trig::Asin(sinPitch);
-    roll    = Trig::Atan2(m23, m33);
+    const double m31 = 2. * (xz - wy);
+    const double m32 = 2. * (yz + wx);
+    const double m33 = 1. - 2. * (xx + yy);
+
+    const double sinPitch = -m31;
+
+    yaw     = Trig::Atan2(m21, m11);
+    pitch   = Trig::Atan2(m32, m33);
+    roll    = Trig::Asin(sinPitch);
 
     if (IsEqual(abs(sinPitch), 1.0))
     {
-        pitch = std::numbers::pi / 2. * Sign(sinPitch);
+        const double m12 = 2. * (xy - wz);
 
-        yaw     = atan2(m12, m11);
-        roll    = 0;
+        yaw     = atan2(-m12, m22);
+        pitch   = 0;
+        roll    = std::numbers::pi / 2. * Sign(sinPitch);
     }
 }
 
@@ -160,7 +164,7 @@ Quat Quat::GetRotationToRotateVectorToVector(const Vec3& vectorA, const Vec3& ve
             orthogonal = Cross({ 0.0f, 1.0f, 0.0f }, vectorA);
         }
 
-        orthogonal = Scarlet::Math::Normalize(orthogonal);
+        orthogonal = Math::Normalize(orthogonal);
 
         return Quat(std::numbers::pi, orthogonal);
     }
