@@ -21,7 +21,7 @@ void Transform::GenerateProperties()
     };
 
     mProperties["rotation"] = ScarlEnt::Property {
-        ScarlEnt::PropertyType::QUAT,
+        ScarlEnt::PropertyType::VEC3,
         ScarlEnt::Registry::Instance().GetOrRegisterComponentId<Transform>(),
         [this] { return ReflectType::GetStringFromValue(this->rotation); },
         [this](const std::string_view& stringValue) { ReflectType::SetValueFromString(this->rotation, stringValue); }

@@ -9,6 +9,8 @@
 #include <ScarlEnt/Scene.h>
 #include <ScarlEnt/Registry.h>
 
+#include <ScarletMath/Trig.h>
+
 #include "Mesh.h"
 #include "Texture.h"
 #include "VertexArray.h"
@@ -161,7 +163,11 @@ void Renderer::Render()
     const auto cameraDirectionLight = cameraEntity->GetComponent<Component::DirectionLight>();
 
     Component::Camera& camera = cameraEntity->GetComponent<Component::Camera>();
-    camera.UpdateViewAndProjectionMatrix(cameraTransform.translation);
+
+    // Todo [Bug 74]: Quaternion rotation with camera results in roll when only changing pitch and yaw.
+    //camera.UpdateViewAndProjectionMatrix(cameraTransform.translation, cameraTransform.rotation.GetRotationMatrix());
+
+    camera.UpdateViewAndProjectionMatrix(cameraTransform.translation, Math::Trig::RotationMatrix(cameraTransform.rotation.z, cameraTransform.rotation.x, cameraTransform.rotation.y));
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

@@ -74,12 +74,12 @@ public:
         return RotatePointTest({ 0.0f, 0.0f, 1.0f }, { 1.0f, 0.0f, 0.0f }, 0.0f, 0.0f, 90.0f);
     }
 
-    inline static bool RotationMatrixIsInOrderXYZ()
+    inline static bool RotationMatrixIsInOrderZXY()
     {
-        // This is unfortunately a hardcoded test. This is just simply to verify that the matrices retain the order X Y Z.
+        // This is unfortunately a hardcoded test. This is just simply to verify that the matrices retain the order Z X Y.
         // The point was calculated using https://www.mathforengineers.com/math-calculators/3D-point-rotation-calculator.html.
         // This test could be changed to construct the matrices instead, however, this would make the test redundant as that is exactly
         // what Scarlet::Trig::RotateMatrix does. Therefore, to be more of an accurate test, the use of a hardcoded point is better.
-        return RotatePointTest({ 1.0f, 2.0f, 3.0f }, { -0.232051f, 3.616025f, 0.933013f }, 90.0f, 30.0f, 60.0f);
+        return RotatePointTest({ 1.0f, 2.0f, 3.0f }, { 1.683013f, -0.633975f, 3.281089f }, 90.0f, 30.0f, 60.0f);
     }
 };

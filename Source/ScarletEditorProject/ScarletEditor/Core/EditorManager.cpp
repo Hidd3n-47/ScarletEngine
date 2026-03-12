@@ -10,7 +10,7 @@
 #include <ScarlEnt/Scene.h>
 #include <ScarlEnt/Registry.h>
 
-#include <ScarletMath/Quat.h>
+#include <ScarletMath/Trig.h>
 
 #include <ScarletEngine/Core/Engine.h>
 #include <ScarletEngine/Core/Window/Window.h>
@@ -174,7 +174,7 @@ EditorManager::EditorManager()
 
     ScarlEnt::Registry::Instance().SetActiveScene(mEditorScene);
 
-    auto cameraMovementFunction = [&](Component::Transform& transform, const Component::Camera& viewportCamera) {
+    auto cameraMovementFunction = [&](Component::Transform& transform, Component::Camera& viewportCamera) {
         if (const std::shared_ptr<Panel> viewportPanel = mEditorView->GetPanel<ViewportPanel>(); !viewportPanel->IsHovered())
         {
             return;
@@ -197,11 +197,11 @@ EditorManager::EditorManager()
         }
         if (InputManager::IsKeyDown(KeyCode::KEY_A))
         {
-            cameraHorizontalDirection += 1.0f;
+            cameraHorizontalDirection += -1.0f;
         }
         if (InputManager::IsKeyDown(KeyCode::KEY_D))
         {
-            cameraHorizontalDirection += -1.0f;
+            cameraHorizontalDirection += 1.0f;
         }
         if (InputManager::IsKeyDown(KeyCode::KEY_E))
         {
@@ -218,9 +218,40 @@ EditorManager::EditorManager()
         const float shiftKeySpeedBoost   = InputManager::IsKeyDown(KeyCode::KEY_LEFT_SHIFT) ? SHIFT_KEY_SPEED_MULTIPLIER : 1.0f;
         const float totalSpeedMultiplier = SPEED_SCALING_FACTOR * shiftKeySpeedBoost;
 
+        constexpr float SPEED_SCALING_FACTOR_YAW   = 0.60f;
+        constexpr float SPEED_SCALING_FACTOR_PITCH = 0.5f;
+        const Math::Vec2 moveDelta = InputManager::GetMouseDeltaThisFrame();
+
+        transform.rotation.z += -moveDelta.x * SPEED_SCALING_FACTOR_YAW;
+        transform.rotation.x += -moveDelta.y * SPEED_SCALING_FACTOR_PITCH;
+
+        Math::Mat4 rotationMatrix = Math::Trig::RotationMatrix(transform.rotation.z, transform.rotation.x, transform.rotation.y);
+
+        viewportCamera.forwardVector = rotationMatrix[1];
+        viewportCamera.rightVector = rotationMatrix[0];
+        viewportCamera.upVector = rotationMatrix[2];
+
+
         transform.translation += viewportCamera.rightVector   * cameraHorizontalDirection * totalSpeedMultiplier
                               -  viewportCamera.forwardVector * cameraForwardDirection    * totalSpeedMultiplier
                               +  viewportCamera.upVector      * cameraVerticalDirection   * totalSpeedMultiplier;
+
+        // Todo [Bug 74]: Quaternion rotation with camera results in roll when only changing pitch and yaw.
+        //constexpr float SPEED_SCALING_FACTOR_YAW   = 0.0040f;
+        //constexpr float SPEED_SCALING_FACTOR_PITCH = 0.0025f;
+        //const Math::Vec2 moveDelta = InputManager::GetMouseDeltaThisFrame();
+
+        //const double yawDelta   = -moveDelta.x * SPEED_SCALING_FACTOR_YAW;
+        //const double pitchDelta = -moveDelta.y * SPEED_SCALING_FACTOR_PITCH;
+
+        //double yaw, pitch, roll;
+        //transform.rotation.GetYawPitchRoll(yaw, pitch, roll);
+        //yaw += yawDelta;
+        //pitch += pitchDelta;
+        //Math::Quat qYaw{ yaw, {0, 0, 1} };
+        //Math::Quat qPitch{ pitch, {1, 0, 0} };
+
+        //transform.rotation =  qPitch * qYaw;
         };
 
     mEditorScene->RegisterSystem<Component::Transform, Component::Camera>(cameraMovementFunction);

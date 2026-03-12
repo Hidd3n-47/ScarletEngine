@@ -8,38 +8,50 @@
 namespace Scarlet
 {
 
-unordered_map<uint32, bool> InputManager::mKeyMap         = { };
-unordered_map<uint32, bool> InputManager::mMouseButtonMap = { };
-Math::Vec2                  InputManager::mMousePosition  = { 0.0f, 0.0f };
+InputManager::KeyMap InputManager::mKeysDownThisFrame   = { };
+InputManager::KeyMap InputManager::mKeyMap              = { };
+Math::Vec2           InputManager::mMouseDeltaThisFrame = { 0.0f, 0.0f };
+Math::Vec2           InputManager::mMousePosition       = { 0.0f, 0.0f };
 
 void InputManager::OnEvent(Event& e)
 {
     EventDispatcher dispatcher(e);
 
+
     dispatcher.Dispatch<KeyPressedEvent>([](const KeyPressedEvent& event) {
-            mKeyMap[event.GetKeyCode()] = true;
-            return false;
-        });
+        const uint32 keyCode = event.GetKeyCode();
+        if (!mKeyMap.contains(keyCode)) { mKeysDownThisFrame[keyCode] = true; }
+        mKeyMap[keyCode] = true;
+        return false;
+    });
 
     dispatcher.Dispatch<KeyReleasedEvent>([](const KeyReleasedEvent& event) {
-            mKeyMap[event.GetKeyCode()] = false;
-            return false;
-        });
+        mKeyMap[event.GetKeyCode()] = false;
+        return false;
+    });
 
     dispatcher.Dispatch<MouseButtonPressedEvent>([](const MouseButtonPressedEvent& event) {
-            mMouseButtonMap[event.GetMouseButton()] = true;
-            return false;
-        });
+        mKeyMap[event.GetMouseButton()] = true;
+        return false;
+    });
 
     dispatcher.Dispatch<MouseButtonReleasedEvent>([](const MouseButtonReleasedEvent& event) {
-            mMouseButtonMap[event.GetMouseButton()] = false;
-            return false;
-        });
+        mKeyMap[event.GetMouseButton()] = false;
+        return false;
+    });
 
     dispatcher.Dispatch<MouseMovedEvent>([](const MouseMovedEvent& event) {
-            mMousePosition = { event.GetXPos(), event.GetYPos() };
-            return false;
-        });
+        const Math::Vec2 previousPosition = mMousePosition;
+        mMousePosition     = { event.GetXPos(), event.GetYPos() };
+        mMouseDeltaThisFrame = previousPosition - mMousePosition;
+        return false;
+    });
+}
+
+void InputManager::ResetInput()
+{
+    mKeysDownThisFrame.clear();
+    mMouseDeltaThisFrame = Math::Vec2{};
 }
 
 } // Namespace Scarlet.

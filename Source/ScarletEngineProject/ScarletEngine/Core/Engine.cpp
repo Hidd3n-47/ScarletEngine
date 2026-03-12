@@ -111,6 +111,8 @@ void Engine::Run() const
 
     while (mRunning)
     {
+        InputManager::ResetInput();
+
         WindowManager::ApiPoll();
 
         ScarlEnt::Registry::Instance().GetActiveScene()->Update();

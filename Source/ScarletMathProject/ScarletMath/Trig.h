@@ -81,7 +81,7 @@ public:
              0.0,  0.0, 0.0, 1.0
         };
 
-        return rotateX * rotateY * rotateZ;
+        return rotateZ * rotateX * rotateY;
     }
 };
 

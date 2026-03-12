@@ -9,8 +9,10 @@ namespace Scarlet::Component
 
 struct Camera
 {
-    inline void UpdateViewAndProjectionMatrix(const Math::Vec3& eyePosition)
+    inline void UpdateViewAndProjectionMatrix(const Math::Vec3& eyePosition, const Math::Mat4& rotationMatrix)
     {
+        const Math::Vec3 forwardVector = rotationMatrix[1];
+        const Math::Vec3 upVector      = rotationMatrix[2];
         viewMatrix       = Math::LookAt(eyePosition, eyePosition + forwardVector, upVector);
         projectionMatrix = Math::Perspective(fov, aspectRatio, nearPlane, farPlane);
     }

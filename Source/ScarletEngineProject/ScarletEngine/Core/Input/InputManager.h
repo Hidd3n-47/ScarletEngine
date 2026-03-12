@@ -13,7 +13,14 @@ class Event;
 class InputManager
 {
     friend class Engine;
+    using KeyMap = unordered_map<uint32, bool>;
 public:
+    /**
+     * @brief Get if a key was pressed down this frame.
+     * @param keyCode The \ref KeyCode that is being requested if it's down or not.
+     * @return \c true if the key was pressed down this frame, \c false otherwise.
+     */
+    [[nodiscard]] static inline bool IsKeyPressed(const uint16 keyCode) { return mKeysDownThisFrame[keyCode]; }
     /**
      * @brief Get if a key is pressed down.
      * @param keyCode The \ref KeyCode that is being requested if it's down or not.
@@ -25,16 +32,22 @@ public:
      * @param mouseCode The \ref KeyCode that is being requested if it's down or not.
      * @return \c true if the key is down, \c false otherwise.
      */
-    [[nodiscard]] static inline bool IsMouseButtonDown(const uint16 mouseCode) { return mMouseButtonMap[mouseCode]; }
+    [[nodiscard]] static inline bool IsMouseButtonDown(const uint16 mouseCode) { return mKeyMap[mouseCode]; }
     /**
      * @brief Get the current mouse position in screenspace.
      * @return The mouse position (screenspace).
      */
     [[nodiscard]] static inline Math::Vec2 GetMousePosition() { return mMousePosition; }
+    /**
+     * @brief Get the mouse delta from the previous frame to the current frame.
+     * @return The mouse delta from the previous frame to the current frame.
+     */
+    [[nodiscard]] static inline Math::Vec2 GetMouseDeltaThisFrame() { return mMouseDeltaThisFrame; }
 private:
-    static unordered_map<uint32, bool> mKeyMap;
-    static unordered_map<uint32, bool> mMouseButtonMap;
+    static KeyMap mKeysDownThisFrame;
+    static KeyMap mKeyMap;
 
+    static Math::Vec2 mMouseDeltaThisFrame;
     static Math::Vec2 mMousePosition;
 
     /**
@@ -43,6 +56,10 @@ private:
      * @note This function does not "handle" the events, it is purely taking a look at them to store the keyboard and mouse states.
      */
     static void OnEvent(Event& e);
+    /**
+     * @brief Internal function to reset variables tracking states for single frames.
+     */
+    static void ResetInput();
 };
 
 } // Namespace Scarlet.
