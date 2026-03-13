@@ -8,6 +8,6 @@
 
 #include <ScarletCore/vector.h>
 #include <ScarletCore/unordered_map.h>
+#include <ScarletCore/unordered_set.h>
 
 #include <string>
-#include <unordered_map>

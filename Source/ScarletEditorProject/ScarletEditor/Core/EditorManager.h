@@ -49,7 +49,7 @@ public:
      * @brief Get a \ref WeakHandle to the game scene.
      * @return A \ref WeakHandle to the game scene.
      */
-    [[nodiscard]] inline WeakHandle<ScarlEnt::Scene> GetGameScene() const { return mGameScene;}
+    [[nodiscard]] inline WeakHandle<ScarlEnt::Scene> GetGameScene() const { return mEditorScene;}
 private:
     EditorManager();
     ~EditorManager();

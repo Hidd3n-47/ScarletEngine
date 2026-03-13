@@ -23,6 +23,8 @@
 #include "Components/Transform.h"
 #include "Components/DirectionLight.h"
 
+#include "AssetLoading/ILazyLoadAsset.h"
+
 namespace
 {
 
@@ -60,43 +62,6 @@ constexpr uint32 SKY_BOX_INDICES[SKY_BOX_INDEX_COUNT] =
     3, 7, 6,
     6, 2, 3
 };
-
-Scarlet::Math::Vec3 RotateAroundAxis(const Scarlet::Math::Vec3& v, const Scarlet::Math::Vec3& axis, float angleRad)
-{
-    Scarlet::Math::Vec3 k = Scarlet::Math::Normalize(axis);
-    float cosA = std::cos(angleRad);
-    float sinA = std::sin(angleRad);
-
-    return v * cosA + Scarlet::Math::Cross(k, v) * sinA + k * Scarlet::Math::Dot(k, v) * (1.0f - cosA);
-}
-
-void RotateCamera(Scarlet::Math::Vec3& forward, Scarlet::Math::Vec3& right, Scarlet::Math::Vec3& up,
-    float yawDegrees, float pitchDegrees, float rollDegrees)
-{
-
-    // Convert degrees to radians
-    float yaw   = Scarlet::Math::Radians(yawDegrees);
-    float pitch = Scarlet::Math::Radians(pitchDegrees);
-    float roll  = Scarlet::Math::Radians(rollDegrees);
-
-    // Yaw around global Z (up)
-    forward = RotateAroundAxis(forward, Scarlet::Math::Vec3{ 0,0,1 }, yaw);
-    right = RotateAroundAxis(right, Scarlet::Math::Vec3{ 0,0,1 }, yaw);
-    up = RotateAroundAxis(up, Scarlet::Math::Vec3{ 0,0,1 }, yaw);
-
-    // Pitch around right vector
-    forward = RotateAroundAxis(forward, right, pitch);
-    up = RotateAroundAxis(up, right, pitch);
-
-    // Roll around forward vector
-    right = RotateAroundAxis(right, forward, roll);
-    up = RotateAroundAxis(up, forward, roll);
-
-    // Re-orthonormalize to prevent drift
-    forward = Scarlet::Math::Normalize(forward);
-    right = Scarlet::Math::Normalize(Scarlet::Math::Cross(forward, up));
-    up = Scarlet::Math::Normalize(Scarlet::Math::Cross(right, forward));
-}
 
 } // Anonymous namespace.
 
@@ -149,9 +114,9 @@ Renderer::~Renderer()
     delete mSkyBoxVao;
 }
 
-void Renderer::AddRenderCommand(const WeakHandle<Resource::Material> material, const WeakHandle<Resource::Mesh> meshRef, const Math::Mat4& modelMatrix)
+void Renderer::AddRenderCommand(const WeakHandle<Resource::Material> material, WeakHandle<Resource::ILazyLoadAsset> meshRef, const Math::Mat4& modelMatrix)
 {
-    const RenderGroup group{.material = material, .mesh = meshRef };
+    const RenderGroup group{ .material = material, .mesh = mMeshManager.GetResource(meshRef->GetRuntimeId()) };
 
     mCommands[group].emplace_back(Math::Transpose(modelMatrix));
 }
@@ -159,8 +124,8 @@ void Renderer::AddRenderCommand(const WeakHandle<Resource::Material> material, c
 void Renderer::Render()
 {
     auto* cameraEntity = reinterpret_cast<ScarlEnt::EntityHandle<Component::Transform, Component::Camera, Component::DirectionLight>*>(ScarlEnt::Registry::Instance().GetActiveScene()->GetCameraEntityHandle());
-    const auto cameraTransform = cameraEntity->GetComponent<Component::Transform>();
-    const auto cameraDirectionLight = cameraEntity->GetComponent<Component::DirectionLight>();
+    const auto& cameraTransform      = cameraEntity->GetComponent<Component::Transform>();
+    const auto& cameraDirectionLight = cameraEntity->GetComponent<Component::DirectionLight>();
 
     Component::Camera& camera = cameraEntity->GetComponent<Component::Camera>();
 
@@ -190,7 +155,9 @@ void Renderer::Render()
 
         group.mesh->mVertexArray->Bind();
 
-        group.material->texture->Bind();
+        auto [material, _] = group;
+
+        mTextureManager.GetResource(material->texture->GetRuntimeId())->Bind();
 
         mShader.UploadUniform("uMaterial.ambientColor", group.material->ambientColor);
         mShader.UploadUniform("uMaterial.diffuseColor", group.material->diffuseColor);

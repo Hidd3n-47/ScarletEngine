@@ -15,6 +15,7 @@
 
 #include "Rendering/Mesh.h"
 #include "Rendering/Texture.h"
+#include "AssetLoading/AssetManager.h"
 
 #ifdef DEV_CONFIGURATION
 #include "Components/Generated/Register.generated.h"
@@ -45,13 +46,15 @@ void Engine::Init() noexcept
 
     DEBUG(RegisterComponents());
 
-    mUvMapTexture = new Resource::Texture{ "E:/Programming/ScarletEngine/EngineAssets/uvMap.png" };
-    mGlockTexture = new Resource::Texture{ "E:/Programming/ScarletEngine/EngineAssets/Glock17_BaseColor.png" };
+    mAssetManager = new AssetManager();
 
-    mCube   = new Resource::Mesh{ "E:/Programming/ScarletEngine/EngineAssets/Cube.obj" };
-    mMonkey = new Resource::Mesh{ "E:/Programming/ScarletEngine/EngineAssets/Monkey.obj" };
-    mCone   = new Resource::Mesh{ "E:/Programming/ScarletEngine/EngineAssets/Cone.obj" };
-    mGlock  = new Resource::Mesh{ "E:/Programming/ScarletEngine/EngineAssets/Glock17.obj" };
+    mUvMapTexture = mAssetManager->CreateAsset<Resource::Texture>("E:/Programming/ScarletEngine/EngineAssets/uvMap.png");
+    mGlockTexture = mAssetManager->CreateAsset<Resource::Texture>("E:/Programming/ScarletEngine/EngineAssets/Glock17_BaseColor.png");
+
+    mCube   = mAssetManager->CreateAsset<Resource::Mesh>("E:/Programming/ScarletEngine/EngineAssets/Cube.obj");
+    mMonkey = mAssetManager->CreateAsset<Resource::Mesh>("E:/Programming/ScarletEngine/EngineAssets/Monkey.obj");
+    mCone   = mAssetManager->CreateAsset<Resource::Mesh>("E:/Programming/ScarletEngine/EngineAssets/Cone.obj");
+    mGlock  = mAssetManager->CreateAsset<Resource::Mesh>("E:/Programming/ScarletEngine/EngineAssets/Glock17.obj");
 
     mRunning = true;
     SCARLET_INFO("Engine Initialised!");
@@ -60,6 +63,8 @@ void Engine::Init() noexcept
 void Engine::Destroy() const noexcept
 {
     SCARLET_ASSERT(!mRunning && "Trying to destroy engine whilst Engine::Run is running.");
+
+    delete mAssetManager;
 
     Renderer::TerminateApi();
 
@@ -119,13 +124,13 @@ void Engine::Run() const
 
         DEBUG(if (mBeginRenderEvent) mBeginRenderEvent());
 
-        Renderer::Instance().AddRenderCommand(WeakHandle{ &uvMaterial }   , WeakHandle{ mCube }  , cubeFloor);
-        Renderer::Instance().AddRenderCommand(WeakHandle{ &uvMaterial }   , WeakHandle{ mCube }  , cubePos);
-        Renderer::Instance().AddRenderCommand(WeakHandle{ &uvMaterial }   , WeakHandle{ mCube }  , cubePos1);
-        Renderer::Instance().AddRenderCommand(WeakHandle{ &uvMaterial }   , WeakHandle{ mMonkey }, monkeyPos);
-        Renderer::Instance().AddRenderCommand(WeakHandle{ &uvMaterial }   , WeakHandle{ mMonkey }, monkeyPos1);
-        Renderer::Instance().AddRenderCommand(WeakHandle{ &uvMaterial }   , WeakHandle{ mCone }  , conePos);
-        Renderer::Instance().AddRenderCommand(WeakHandle{ &glockMaterial }, WeakHandle{ mGlock } , glockPos);
+        Renderer::Instance().AddRenderCommand(WeakHandle{ &uvMaterial }   , mCube   , cubeFloor);
+        Renderer::Instance().AddRenderCommand(WeakHandle{ &uvMaterial }   , mCube   , cubePos);
+        Renderer::Instance().AddRenderCommand(WeakHandle{ &uvMaterial }   , mCube   , cubePos1);
+        Renderer::Instance().AddRenderCommand(WeakHandle{ &uvMaterial }   , mMonkey , monkeyPos);
+        Renderer::Instance().AddRenderCommand(WeakHandle{ &uvMaterial }   , mMonkey , monkeyPos1);
+        Renderer::Instance().AddRenderCommand(WeakHandle{ &uvMaterial }   , mCone   , conePos);
+        Renderer::Instance().AddRenderCommand(WeakHandle{ &glockMaterial }, mGlock  , glockPos);
         Renderer::Instance().Render();
         DEBUG(if (mEndRenderEvent) mEndRenderEvent());
 

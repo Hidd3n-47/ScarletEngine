@@ -8,6 +8,8 @@
 
 #include "RenderGroup.h"
 
+#include "AssetLoading/ResourceManager.h"
+
 namespace Scarlet
 {
 
@@ -21,7 +23,9 @@ class IndexBuffer;
 namespace Resource
 {
 class Mesh;
+class Texture;
 class CubeMapTexture;
+class ILazyLoadAsset;
 }  // Namespace Resource.
 
 /**
@@ -45,7 +49,7 @@ public:
      * @param meshRef A reference to the mesh being rendered.
      * @param modelMatrix The model matrix (i.e. world transform) for the instance.
      */
-    void AddRenderCommand(const WeakHandle<Resource::Material>, const WeakHandle<Resource::Mesh> meshRef, const Math::Mat4& modelMatrix);
+    void AddRenderCommand(const WeakHandle<Resource::Material>, WeakHandle<Resource::ILazyLoadAsset> meshRef, const Math::Mat4& modelMatrix);
 
     /**
      * @brief A function to go through all commands and execute the draw calls.
@@ -59,6 +63,9 @@ public:
     InstanceBuffer& GetInstanceBuffer() { return mInstanceBuffer; }
 
     inline static constexpr uint32 MAX_INSTANCE_COUNT{ 100 };
+
+    [[nodiscard]] ResourceManager<Resource::Mesh>&    GetMeshManager()    { return mMeshManager; }
+    [[nodiscard]] ResourceManager<Resource::Texture>& GetTextureManager() { return mTextureManager; }
 private:
     Renderer();
     ~Renderer();
@@ -76,6 +83,9 @@ private:
     Resource::CubeMapTexture* mCubeMapTexture;
 
     std::unordered_map<RenderGroup, vector<Math::Mat4>> mCommands;
+
+    ResourceManager<Resource::Mesh> mMeshManager;
+    ResourceManager<Resource::Texture> mTextureManager;
 };
 
 } // Namespace Scarlet.

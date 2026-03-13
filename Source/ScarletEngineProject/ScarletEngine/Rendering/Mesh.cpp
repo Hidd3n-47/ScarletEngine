@@ -34,7 +34,7 @@ Mesh::Mesh(const char* filepath)
 Mesh::~Mesh()
 {
     delete mIndexBuffer;
-    delete mIndexBuffer;
+    delete mVertexBuffer;
 }
 
 void Mesh::Bind() const

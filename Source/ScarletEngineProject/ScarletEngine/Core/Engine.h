@@ -11,11 +11,13 @@ namespace Resource
 {
 class Mesh;
 class Texture;
+class ILazyLoadAsset;
 } // Namespace Resource.
 
 class Event;
 class Window;
 class Renderer;
+class AssetManager;
 
 class Engine
 {
@@ -53,15 +55,15 @@ private:
 
     WeakHandle<Window> mMainWindow;
 
-    void OnEvent(Event& event);
+    AssetManager* mAssetManager;
 
-    Resource::Texture* mUvMapTexture;
-    Resource::Texture* mGlockTexture;
+    WeakHandle<Resource::ILazyLoadAsset> mUvMapTexture;
+    WeakHandle<Resource::ILazyLoadAsset> mGlockTexture;
 
-    Resource::Mesh* mCube;
-    Resource::Mesh* mMonkey;
-    Resource::Mesh* mCone;
-    Resource::Mesh* mGlock;
+    WeakHandle<Resource::ILazyLoadAsset> mCube;
+    WeakHandle<Resource::ILazyLoadAsset> mMonkey;
+    WeakHandle<Resource::ILazyLoadAsset> mCone;
+    WeakHandle<Resource::ILazyLoadAsset> mGlock;
 
     bool mRunning = false;
 
@@ -71,6 +73,8 @@ private:
 #ifdef DEV_CONFIGURATION
     std::function<void()> mEndRenderEvent;
 #endif // DEV_CONFIGURATION.
+
+    void OnEvent(Event& event);
 };
 
 } // Namespace Scarlet.
