@@ -3,15 +3,23 @@
 #include <ScarletMath/Math.h>
 
 #include "Shader.h"
-#include "Material.h"
 #include "InstanceBuffer.h"
 
-#include "RenderGroup.h"
+#include "ScarletEngine/Rendering/RenderGroup.h"
 
-#include "AssetLoading/ResourceManager.h"
+#include "ScarletEngine/AssetLoading/ResourceManager.h"
 
 namespace Scarlet
 {
+
+namespace Resource
+{
+class Mesh;
+class Texture;
+class Material;
+class CubeMapTexture;
+class ILazyLoadAsset;
+}  // Namespace Resource.
 
 class Window;
 class Framebuffer;
@@ -19,14 +27,6 @@ class Framebuffer;
 class VertexArray;
 class VertexBuffer;
 class IndexBuffer;
-
-namespace Resource
-{
-class Mesh;
-class Texture;
-class CubeMapTexture;
-class ILazyLoadAsset;
-}  // Namespace Resource.
 
 /**
  * @class Renderer: A singleton class responsible for the rendering pipeline of the application. Add a rendering command to render an instance to the screen.
@@ -49,7 +49,7 @@ public:
      * @param meshRef A reference to the mesh being rendered.
      * @param modelMatrix The model matrix (i.e. world transform) for the instance.
      */
-    void AddRenderCommand(const WeakHandle<Resource::Material>, WeakHandle<Resource::ILazyLoadAsset> meshRef, const Math::Mat4& modelMatrix);
+    void AddRenderCommand(WeakHandle<Resource::ILazyLoadAsset> material, WeakHandle<Resource::ILazyLoadAsset> meshRef, const Math::Mat4& modelMatrix);
 
     /**
      * @brief A function to go through all commands and execute the draw calls.
@@ -64,8 +64,21 @@ public:
 
     inline static constexpr uint32 MAX_INSTANCE_COUNT{ 100 };
 
-    [[nodiscard]] ResourceManager<Resource::Mesh>&    GetMeshManager()    { return mMeshManager; }
-    [[nodiscard]] ResourceManager<Resource::Texture>& GetTextureManager() { return mTextureManager; }
+    /**
+     * @brief Get the \ref ResourceManager responsible for loading in the \ref Resource::Mesh.
+     * @return The \ref ResourceManager responsible for loading in meshes (i.e. the \ref Resource::Mesh).
+     */
+    [[nodiscard]] ResourceManager<Resource::Mesh>&     GetMeshManager()    { return mMeshManager; }
+    /**
+     * @brief Get the \ref ResourceManager responsible for loading in the \ref Resource::Texture.
+     * @return The \ref ResourceManager responsible for loading in textures (i.e. the \ref Resource::Texture).
+     */
+    [[nodiscard]] ResourceManager<Resource::Texture>&  GetTextureManager() { return mTextureManager; }
+    /**
+     * @brief Get the \ref ResourceManager responsible for loading in the \ref Resource::Material.
+     * @return The \ref ResourceManager responsible for loading in materials (i.e. the \ref Resource::Material).
+     */
+    [[nodiscard]] ResourceManager<Resource::Material>& GetMaterialManager() { return mMaterialManager; }
 private:
     Renderer();
     ~Renderer();
@@ -84,8 +97,9 @@ private:
 
     std::unordered_map<RenderGroup, vector<Math::Mat4>> mCommands;
 
-    ResourceManager<Resource::Mesh> mMeshManager;
-    ResourceManager<Resource::Texture> mTextureManager;
+    ResourceManager<Resource::Mesh>     mMeshManager;
+    ResourceManager<Resource::Texture>  mTextureManager;
+    ResourceManager<Resource::Material> mMaterialManager;
 };
 
 } // Namespace Scarlet.

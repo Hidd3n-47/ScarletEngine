@@ -13,6 +13,7 @@ enum class PropertyType : unsigned char
     VEC3,
     VEC4,
     QUAT,
+    ASSET
 };
 
 } // Namespace ScarlEnt.

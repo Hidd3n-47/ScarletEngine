@@ -7,13 +7,6 @@
 namespace Scarlet
 {
 
-namespace Resource
-{
-class Mesh;
-class Texture;
-class ILazyLoadAsset;
-} // Namespace Resource.
-
 class Event;
 class Window;
 class Renderer;
@@ -43,6 +36,7 @@ public:
 
     [[nodiscard]] inline WeakHandle<Window> GetMainWindow() const { return mMainWindow; }
 
+    [[nodiscard]] inline AssetManager& GetAssetManager() const { return *mAssetManager; }
 #ifdef DEV_CONFIGURATION
     inline void SetBeginRenderEvent(const std::function<void()>& beginRenderEvent) { mBeginRenderEvent = beginRenderEvent; }
     inline void SetEndRenderEvent(const std::function<void()>& endRenderEvent)     { mEndRenderEvent = endRenderEvent; }
@@ -56,14 +50,6 @@ private:
     WeakHandle<Window> mMainWindow;
 
     AssetManager* mAssetManager;
-
-    WeakHandle<Resource::ILazyLoadAsset> mUvMapTexture;
-    WeakHandle<Resource::ILazyLoadAsset> mGlockTexture;
-
-    WeakHandle<Resource::ILazyLoadAsset> mCube;
-    WeakHandle<Resource::ILazyLoadAsset> mMonkey;
-    WeakHandle<Resource::ILazyLoadAsset> mCone;
-    WeakHandle<Resource::ILazyLoadAsset> mGlock;
 
     bool mRunning = false;
 

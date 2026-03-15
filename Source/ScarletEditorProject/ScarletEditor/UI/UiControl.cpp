@@ -20,24 +20,9 @@ void UiControl::RenderFloatPropertyControl(const ScarlEnt::Property& property, c
     float value;
     ReflectType::SetValueFromString(value, property.GetPropertyValue());
 
-    std::string propertyName = controlProperties.propertyName;
-    if (controlProperties.firstLetterUppercase)
-    {
-        propertyName[0] = static_cast<char>(std::toupper(propertyName[0]));
-    }
-
-    const std::string propertyId = controlProperties.propertyName + controlProperties.propertyId;
-    const float lineHeight       = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
-
-    ImGui::Columns(2, propertyName.c_str());
-
-    // Todo Christian: Let this width be draggable/adjustable.
-    ImGui::SetColumnWidth(0, 100.0f);
-
-    ImGui::SetCursorPosY(ImGui::GetCursorPosY() + lineHeight - ImGui::CalcTextSize(propertyName.c_str()).y - ImGui::GetScrollX() - 2 * ImGui::GetStyle().ItemSpacing.y + 5.0f);
-    ImGui::Text("%s", propertyName.c_str());
-
-    ImGui::NextColumn();
+    float lineHeight;
+    std::string propertyId;
+    RenderTwoColumnPropertyControl(lineHeight, propertyId, controlProperties);
 
     ImGui::PushMultiItemsWidths(3, ImGui::CalcItemWidth());
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0.0f, 4.0f });
@@ -62,18 +47,9 @@ void UiControl::RenderAngle(const ScarlEnt::Property& property, const UiControlP
 
     Math::Vec3 angle{ Math::Degrees(roll), Math::Degrees(pitch), Math::Degrees(yaw) };
 
-    const std::string propertyId = controlProperties.propertyName + controlProperties.propertyId;
-    const float lineHeight       = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
-
-    ImGui::Columns(2, controlProperties.propertyName.c_str());
-
-    // Todo: Let this width be draggable/adjustable.
-    ImGui::SetColumnWidth(0, 100.0f);
-
-    ImGui::SetCursorPosY(ImGui::GetCursorPosY() + lineHeight - ImGui::CalcTextSize(controlProperties.propertyName.c_str()).y - ImGui::GetScrollX() - 2 * ImGui::GetStyle().ItemSpacing.y + 5.0f);
-    ImGui::Text("%s", controlProperties.propertyName.c_str());
-
-    ImGui::NextColumn();
+    float lineHeight;
+    std::string propertyId;
+    RenderTwoColumnPropertyControl(lineHeight, propertyId, controlProperties);
 
     ImGui::PushMultiItemsWidths(3, ImGui::CalcItemWidth());
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0.0f, 4.0f });
@@ -105,24 +81,9 @@ void UiControl::RenderVec3PropertyControl(const ScarlEnt::Property& property, co
     Math::Vec3 value;
     ReflectType::SetValueFromString(value, property.GetPropertyValue());
 
-    std::string propertyName = controlProperties.propertyName;
-    if (controlProperties.firstLetterUppercase)
-    {
-        propertyName[0] = static_cast<char>(std::toupper(propertyName[0]));
-    }
-
-    const std::string propertyId = controlProperties.propertyName + controlProperties.propertyId;
-    const float lineHeight       = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
-
-    ImGui::Columns(2, propertyName.c_str());
-
-    // Todo Christian: Let this width be draggable/adjustable.
-    ImGui::SetColumnWidth(0, 100.0f);
-
-    ImGui::SetCursorPosY(ImGui::GetCursorPosY() + lineHeight - ImGui::CalcTextSize(propertyName.c_str()).y - ImGui::GetScrollX() - 2 * ImGui::GetStyle().ItemSpacing.y + 5.0f);
-    ImGui::Text("%s", propertyName.c_str());
-
-    ImGui::NextColumn();
+    float lineHeight;
+    std::string propertyId;
+    RenderTwoColumnPropertyControl(lineHeight, propertyId, controlProperties);
 
     ImGui::PushMultiItemsWidths(3, ImGui::CalcItemWidth());
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0.0f, 4.0f });
@@ -156,24 +117,9 @@ void UiControl::RenderVec4PropertyControl(const ScarlEnt::Property& property, co
     Math::Vec4 value;
     ReflectType::SetValueFromString(value, property.GetPropertyValue());
 
-    std::string propertyName = controlProperties.propertyName;
-    if (controlProperties.firstLetterUppercase)
-    {
-        propertyName[0] = static_cast<char>(std::toupper(propertyName[0]));
-    }
-
-    const std::string propertyId = controlProperties.propertyName + controlProperties.propertyId;
-    const float lineHeight       = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
-
-    ImGui::Columns(2, propertyName.c_str());
-
-    // Todo Christian: Let this width be draggable/adjustable.
-    ImGui::SetColumnWidth(0, 100.0f);
-
-    ImGui::SetCursorPosY(ImGui::GetCursorPosY() + lineHeight - ImGui::CalcTextSize(propertyName.c_str()).y - ImGui::GetScrollX() - 2 * ImGui::GetStyle().ItemSpacing.y + 5.0f);
-    ImGui::Text("%s", propertyName.c_str());
-
-    ImGui::NextColumn();
+    float lineHeight;
+    std::string propertyId;
+    RenderTwoColumnPropertyControl(lineHeight, propertyId, controlProperties);
 
     ImGui::PushMultiItemsWidths(4, ImGui::CalcItemWidth());
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0.0f, 4.0f });
@@ -206,6 +152,58 @@ void UiControl::RenderVec4PropertyControl(const ScarlEnt::Property& property, co
     property.SetPropertyValue(ReflectType::GetStringFromValue(value));
 }
 
+void UiControl::RenderAssetPropertyControl(const ScarlEnt::Property& property, const UiControlProperties& controlProperties)
+{
+    WeakHandle<Resource::ILazyLoadAsset> value;
+    ReflectType::SetValueFromString(value, property.GetPropertyValue());
+
+    float lineHeight;
+    std::string propertyId;
+    RenderTwoColumnPropertyControl(lineHeight, propertyId, controlProperties);
+
+    const auto& loadedAssets = Engine::Instance().GetAssetManager().GetLoadedAssets(value->GetAssetType());
+
+    const float windowWidth     = ImGui::GetWindowSize().x;
+    constexpr float buttonWidth = 350.0f;
+
+    ImGui::SetCursorPosX((windowWidth - buttonWidth) * 0.5f);
+
+    if (ImGui::Button((value->GetAssetPath() + "##" + propertyId).c_str(), { buttonWidth, 25.0f }))
+    {
+        ImGui::OpenPopup(std::string{ "AssetSelector" + propertyId}.c_str());
+
+        constexpr float yPadding = 5.0f;
+        const ImVec2 buttonPos   = ImGui::GetItemRectMin();
+        const ImVec2 buttonSize  = ImGui::GetItemRectSize();
+        ImGui::SetNextWindowPos({ buttonPos.x + buttonSize.x * 0.5f, buttonPos.y + buttonSize.y + yPadding }, ImGuiCond_Always, { 0.5f, 0.0f });
+    }
+
+    if (ImGui::BeginPopup(std::string{ "AssetSelector" + propertyId }.c_str(), ImGuiWindowFlags_NoMove))
+    {
+        constexpr float popupMinWidth  = 400.0f;
+        constexpr float popupMaxHeight = 200.0f;
+
+        ImGui::BeginChild("PopupItems", { popupMinWidth, popupMaxHeight }, true, ImGuiWindowFlags_HorizontalScrollbar);
+
+        for (auto& [ulid, asset] : loadedAssets)
+        {
+            const std::string compName = std::string{ asset->GetAssetPath() };
+
+            if (ImGui::MenuItem(compName.c_str()))
+            {
+                value = WeakHandle{ asset };
+                property.SetPropertyValue(ReflectType::GetStringFromValue(value));
+                ImGui::CloseCurrentPopup();
+            }
+        }
+
+        ImGui::EndChild();
+        ImGui::EndPopup();
+    }
+
+    ImGui::Columns(1);
+}
+
 void UiControl::RenderFloatPropertyControl(const std::string& label, const std::string& propertyId, float& value, const UiControlProperties& controlProperties, const UiControlButtonProperties& buttonProperties)
 {
     ImGui::PushStyleColor(ImGuiCol_Button, buttonProperties.buttonColor);
@@ -219,6 +217,29 @@ void UiControl::RenderFloatPropertyControl(const std::string& label, const std::
 
     ImGui::SameLine();
     ImGui::DragFloat(("##" + label + propertyId).c_str(), &value, controlProperties.dragSpeed);
+}
+
+void UiControl::RenderTwoColumnPropertyControl(float& outLineHeight, std::string& outPropertyId, const UiControlProperties& controlProperties)
+{
+    std::string propertyName = controlProperties.propertyName;
+    if (controlProperties.firstLetterUppercase)
+    {
+        propertyName[0] = static_cast<char>(std::toupper(propertyName[0]));
+    }
+
+    outPropertyId = controlProperties.propertyName + controlProperties.propertyId;
+    outLineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
+
+    ImGui::Columns(2, propertyName.c_str());
+
+    // Todo Christian: Let this width be draggable/adjustable.
+    ImGui::SetColumnWidth(0, 100.0f);
+
+    ImGui::SetCursorPosY(ImGui::GetCursorPosY() + outLineHeight - ImGui::CalcTextSize(propertyName.c_str()).y - ImGui::GetScrollX() - 2 * ImGui::GetStyle().ItemSpacing.y + 5.0f);
+    ImGui::Text("%s", propertyName.c_str());
+
+    ImGui::NextColumn();
+
 }
 
 } // Namespace Scarlet::Editor.

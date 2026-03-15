@@ -13,8 +13,6 @@
 
 #include "Rendering/Renderer.h"
 
-#include "Rendering/Mesh.h"
-#include "Rendering/Texture.h"
 #include "AssetLoading/AssetManager.h"
 
 #ifdef DEV_CONFIGURATION
@@ -47,14 +45,7 @@ void Engine::Init() noexcept
     DEBUG(RegisterComponents());
 
     mAssetManager = new AssetManager();
-
-    mUvMapTexture = mAssetManager->CreateAsset<Resource::Texture>("E:/Programming/ScarletEngine/EngineAssets/uvMap.png");
-    mGlockTexture = mAssetManager->CreateAsset<Resource::Texture>("E:/Programming/ScarletEngine/EngineAssets/Glock17_BaseColor.png");
-
-    mCube   = mAssetManager->CreateAsset<Resource::Mesh>("E:/Programming/ScarletEngine/EngineAssets/Cube.obj");
-    mMonkey = mAssetManager->CreateAsset<Resource::Mesh>("E:/Programming/ScarletEngine/EngineAssets/Monkey.obj");
-    mCone   = mAssetManager->CreateAsset<Resource::Mesh>("E:/Programming/ScarletEngine/EngineAssets/Cone.obj");
-    mGlock  = mAssetManager->CreateAsset<Resource::Mesh>("E:/Programming/ScarletEngine/EngineAssets/Glock17.obj");
+    mAssetManager->LoadScarletAssets();
 
     mRunning = true;
     SCARLET_INFO("Engine Initialised!");
@@ -111,9 +102,6 @@ void Engine::Run() const
     glockPos[2][2] = 20.0f;
     glockPos[2][3] = 2.0f;
 
-    Resource::Material uvMaterial{ WeakHandle{ mUvMapTexture }, { 1.0f, 1.0f, 1.0f } };
-    Resource::Material glockMaterial{ WeakHandle{ mGlockTexture }, { 1.0f, 1.0f, 1.0f } };
-
     while (mRunning)
     {
         InputManager::ResetInput();
@@ -124,13 +112,6 @@ void Engine::Run() const
 
         DEBUG(if (mBeginRenderEvent) mBeginRenderEvent());
 
-        Renderer::Instance().AddRenderCommand(WeakHandle{ &uvMaterial }   , mCube   , cubeFloor);
-        Renderer::Instance().AddRenderCommand(WeakHandle{ &uvMaterial }   , mCube   , cubePos);
-        Renderer::Instance().AddRenderCommand(WeakHandle{ &uvMaterial }   , mCube   , cubePos1);
-        Renderer::Instance().AddRenderCommand(WeakHandle{ &uvMaterial }   , mMonkey , monkeyPos);
-        Renderer::Instance().AddRenderCommand(WeakHandle{ &uvMaterial }   , mMonkey , monkeyPos1);
-        Renderer::Instance().AddRenderCommand(WeakHandle{ &uvMaterial }   , mCone   , conePos);
-        Renderer::Instance().AddRenderCommand(WeakHandle{ &glockMaterial }, mGlock  , glockPos);
         Renderer::Instance().Render();
         DEBUG(if (mEndRenderEvent) mEndRenderEvent());
 

@@ -13,6 +13,7 @@
 
 #include "Mesh.h"
 #include "Texture.h"
+#include "Material.h"
 #include "VertexArray.h"
 
 #include "IndexBuffer.h"
@@ -114,11 +115,11 @@ Renderer::~Renderer()
     delete mSkyBoxVao;
 }
 
-void Renderer::AddRenderCommand(const WeakHandle<Resource::Material> material, WeakHandle<Resource::ILazyLoadAsset> meshRef, const Math::Mat4& modelMatrix)
+void Renderer::AddRenderCommand(WeakHandle<Resource::ILazyLoadAsset> material, WeakHandle<Resource::ILazyLoadAsset> meshRef, const Math::Mat4& modelMatrix)
 {
-    const RenderGroup group{ .material = material, .mesh = mMeshManager.GetResource(meshRef->GetRuntimeId()) };
+    const RenderGroup group{ .material = mMaterialManager.GetResource(material->GetRuntimeId()), .mesh = mMeshManager.GetResource(meshRef->GetRuntimeId()) };
 
-    mCommands[group].emplace_back(Math::Transpose(modelMatrix));
+    mCommands[group].emplace_back(modelMatrix);
 }
 
 void Renderer::Render()
@@ -155,7 +156,10 @@ void Renderer::Render()
 
         group.mesh->mVertexArray->Bind();
 
-        auto [material, _] = group;
+        // Since unordered maps store a pair where the key is const, copy the render group to ensure that the material is loaded.
+        // This is a trivial copy as it's only a pointer copy. This is also safe since the unordered map is only temporary and on a frame-by-frame basis,
+        // so changes in the key are fine.
+        WeakHandle<Resource::Material> material = group.material;
 
         mTextureManager.GetResource(material->texture->GetRuntimeId())->Bind();
 

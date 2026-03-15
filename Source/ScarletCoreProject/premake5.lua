@@ -16,6 +16,8 @@ project "ScarletCore"
 
     includedirs
     {
+        "$(SolutionDir)Source/ScarletCoreProject/",
+
         "$(SolutionDir)Source/ScarletLoggerProject/",
     }
 

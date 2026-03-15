@@ -1,13 +1,13 @@
 #pragma once
 
-#include "Material.h"
-
 namespace Scarlet
 {
+
 
 namespace Resource
 {
 class Mesh;
+class Material;
 } // Namespace Resource.
 
 /**

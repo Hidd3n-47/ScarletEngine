@@ -6,6 +6,9 @@
 
 #include <ScarletMath/Quat.h>
 
+#include "ScarletEngine/Core/Engine.h"
+#include "ScarletEngine/AssetLoading/AssetManager.h"
+
 namespace Scarlet
 {
 /**
@@ -74,6 +77,12 @@ inline std::string ReflectType::GetStringFromValue<Math::Quat>(const Math::Quat 
     return GetStringFromValue<Math::Vec4>(value.ToVector4());
 }
 
+template <>
+inline std::string ReflectType::GetStringFromValue<WeakHandle<Resource::ILazyLoadAsset>>(const WeakHandle<Resource::ILazyLoadAsset> value)
+{
+    return std::to_string(static_cast<int>(value->GetAssetType())) + "," + std::to_string(value->GetUlid());
+}
+
 // --------- Sets. ---------
 template <typename T>
 inline void ReflectType::SetValueFromString(T& value, const std::string_view& stringValue)
@@ -133,6 +142,16 @@ inline void ReflectType::SetValueFromString<Math::Quat>(Math::Quat& value, const
     value = Math::Quat{ quatAsVec4 };
 }
 
+template <>
+inline void ReflectType::SetValueFromString<WeakHandle<Resource::ILazyLoadAsset>>(WeakHandle<Resource::ILazyLoadAsset>& value, const std::string_view& stringValue)
+{
+    const size_t firstCommaPosition = stringValue.find_first_of(',');
+
+    const AssetType type = static_cast<AssetType>(std::stoi(std::string{ stringValue.substr(0, firstCommaPosition) }));
+    const Ulid ulid{ std::stoull(std::string{ stringValue.substr(firstCommaPosition + 1) }) };
+
+    value = Engine::Instance().GetAssetManager().GetAsset(type, ulid);
+}
 
 } // Namespace Scarlet.
 

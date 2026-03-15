@@ -26,6 +26,7 @@ project "ScarletEngine"
         "$(SolutionDir)Source/ScarletCoreProject/",
         "$(SolutionDir)Source/ScarletMathProject/",
         "$(SolutionDir)Source/ScarletLoggerProject/",
+        "$(SolutionDir)Source/ScarletEngineProject/",
         "$(SolutionDir)Source/ScarlEntProject/",
 
         "$(SolutionDir)Deps/Include/",

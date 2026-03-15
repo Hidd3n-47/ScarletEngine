@@ -141,10 +141,10 @@ template <typename T>
 
 [[nodiscard]] static Mat4 ScaleMatrix(const Vec3 scale)
 {
-    return { scale.x,    0.0f,    0.0f, 0.0f,
-                0.0f, scale.y,    0.0f, 0.0f,
-                0.0f,    0.0f, scale.z, 0.0f,
-                0.0f,    0.0f,    0.0f, 1.0f };
+    return Mat4{ scale.x,    0.0f,    0.0f, 0.0f,
+                    0.0f, scale.y,    0.0f, 0.0f,
+                    0.0f,    0.0f, scale.z, 0.0f,
+                    0.0f,    0.0f,    0.0f, 1.0f };
 }
 
 [[nodiscard]] static Mat4 TranslateMatrix(const Vec3 translation)
@@ -159,6 +159,11 @@ template <typename T>
 [[nodiscard]] static Mat4 Transpose(const Mat4& matrix)
 {
     return glm::transpose(matrix);
+}
+
+[[nodiscard]] static Mat4 TransformAsMatrix(const Vec3 translation, const Mat4& rotation, const Vec3 scale)
+{
+    return TranslateMatrix(translation) * rotation * ScaleMatrix(scale);
 }
 
 } // Namespace Scarlet::Math.

@@ -44,6 +44,8 @@ public:
      * @param controlProperties The properties of the control.
      */
     static void RenderVec4PropertyControl(const ScarlEnt::Property& property, const UiControlProperties& controlProperties = {});
+
+    static void RenderAssetPropertyControl(const ScarlEnt::Property& property, const UiControlProperties& controlProperties = {});
 private:
     /**
      * @brief An internal helper function to render a property control for a float.
@@ -54,6 +56,14 @@ private:
      * @param buttonProperties The properties of the button (button rendered to the left of the float normally used to reset value to default).
      */
     static void RenderFloatPropertyControl(const std::string& label, const std::string& propertyId, float& value, const UiControlProperties& controlProperties, const UiControlButtonProperties& buttonProperties);
+
+    /**
+     * @brief Render the Property Control in 2 Columns in the form: Name | [property]. This will set up the columns and add the text on the left.
+     * @param outLineHeight A reference to a float to get the line height out the function. The function calculates the line height as a part of the two column setup.
+     * @param outPropertyId A reference to a string to get the property ID out the function. The function creates the property ID as a part of the two column setup.
+     * @param controlProperties The properties of the control
+     */
+    static void RenderTwoColumnPropertyControl(float& outLineHeight, std::string& outPropertyId, const UiControlProperties& controlProperties);
 };
 
 } // Namespace Scarlet::Editor.

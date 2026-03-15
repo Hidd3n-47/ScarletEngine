@@ -15,9 +15,12 @@
 #include <ScarletEngine/Core/Engine.h>
 #include <ScarletEngine/Core/Window/Window.h>
 
+#include <ScarletEngine/Rendering/Renderer.h>
+
 #include <ScarletEngine/Core/Input/KeyCodes.h>
 #include <ScarletEngine/Core/Input/InputManager.h>
 
+#include <ScarletEngine/Components/Mesh.h>
 #include <ScarletEngine/Components/Camera.h>
 #include <ScarletEngine/Components/Transform.h>
 #include <ScarletEngine/Components/DirectionLight.h>
@@ -255,6 +258,12 @@ EditorManager::EditorManager()
         };
 
     mEditorScene->RegisterSystem<Component::Transform, Component::Camera>(cameraMovementFunction);
+
+    mEditorScene->RegisterSystem<Component::Transform, Component::Mesh>([](Component::Transform& transform, Component::Mesh& mesh) {
+            Renderer::Instance().AddRenderCommand(mesh.material, mesh.mesh, 
+                Math::TransformAsMatrix(transform.translation, 
+                    Math::Trig::RotationMatrix(transform.rotation.z, transform.rotation.x, transform.rotation.y), transform.scale));
+        });
 }
 
 EditorManager::~EditorManager()

@@ -51,6 +51,9 @@ void PropertiesPanel::Render()
                     UiControl::RenderAngle(property, { .propertyName = propertyName, .propertyId = entityName });
                     break;
                 }
+                case ScarlEnt::PropertyType::ASSET:
+                    UiControl::RenderAssetPropertyControl(property, { .propertyName = propertyName, .propertyId = entityName });
+                    break;
                 default:
                     SCARLET_ERROR("Failed to create a UI Control for the reflected type: {} on component {}", property.GetTypeAsString(), componentName);
                     break;

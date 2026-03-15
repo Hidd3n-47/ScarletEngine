@@ -2,10 +2,11 @@
 
 #include "ILazyLoadAsset.h"
 
-#include "Rendering/Renderer.h"
+#include "ScarletEngine/Rendering/Renderer.h"
 
-#include "Rendering/Mesh.h"
-#include "Rendering/Texture.h"
+#include "ScarletEngine/Rendering/Mesh.h"
+#include "ScarletEngine/Rendering/Texture.h"
+#include "ScarletEngine/Rendering/Material.h"
 
 namespace Scarlet::Resource
 {
@@ -19,7 +20,7 @@ template <typename Asset>
 class LazyLoadAsset final : public ILazyLoadAsset
 {
 public:
-    LazyLoadAsset(const std::string& filepath) : ILazyLoadAsset(std::move(filepath)) { }
+    LazyLoadAsset(const AssetType type, const Ulid ulid, const std::string& filepath) : ILazyLoadAsset(type, ulid, std::move(filepath)) { }
 
     /**
      * @brief Set the runtime identifier of the asset. This should only be used by the managers (\ref ResourceManager) when loading the asset.
@@ -55,6 +56,14 @@ inline void LazyLoadAsset<Texture>::LoadAsset()
     SCARLET_ASSERT(mRuntimeId == INVALID_ID && "Trying to load in the asset multiple times.");
 
     Renderer::Instance().GetTextureManager().Load(this, mAssetPath);
+}
+
+template<>
+inline void LazyLoadAsset<Material>::LoadAsset()
+{
+    SCARLET_ASSERT(mRuntimeId == INVALID_ID && "Trying to load in the asset multiple times.");
+
+    Renderer::Instance().GetMaterialManager().Load(this, mAssetPath);
 }
 
 } // Namespace Scarlet::Resource.

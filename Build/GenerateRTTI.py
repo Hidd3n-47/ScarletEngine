@@ -14,6 +14,7 @@ types = {
      "Math::Vec3"   : "VEC3"    ,
      "Math::Vec4"   : "VEC4"    ,
      "Math::Quat"   : "QUAT"    ,
+     "WeakHandle<Resource::ILazyLoadAsset>" : "ASSET",
 }
 
 components = []
