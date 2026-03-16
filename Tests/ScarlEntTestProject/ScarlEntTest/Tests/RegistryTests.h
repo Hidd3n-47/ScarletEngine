@@ -25,6 +25,7 @@ public:
         testRegistry->AddTestCase("RegistryTests", "AssertsWhenTryingToRemoveASceneThatIsNotValid", AssertsWhenTryingToRemoveASceneThatIsNotValid);
         testRegistry->AddTestCase("RegistryTests", "AssertWhenTryingToGetComponentIdOfNonRegisteredComponent", AssertWhenTryingToGetComponentIdOfNonRegisteredComponent);
         testRegistry->AddTestCase("RegistryTests", "GetTheCorrectIdFromComponentBitset", GetTheCorrectIdFromComponentBitset);
+        testRegistry->AddTestCase("RegistryTests", "AssertsWhenTryingToChangeSceneAtRuntimeThroughSetActiveScene", AssertsWhenTryingToChangeSceneAtRuntimeThroughSetActiveScene);
     }
 
     static bool DoubleInitCausesAssert()
@@ -149,6 +150,27 @@ public:
         const ScarlEnt::ComponentId componentId = ScarlEnt::Registry::Instance().GetOrRegisterComponentId<Vec2>();
 
         passed &= ScarlEnt::Registry::Instance().GetComponentIdFromBitmask(componentId.bitmask) == componentId.id;
+
+        return passed;
+    }
+
+    static bool AssertsWhenTryingToChangeSceneAtRuntimeThroughSetActiveScene()
+    {
+        bool passed = false;
+
+        Scarlet::WeakHandle<ScarlEnt::Scene> test1 = ScarlEnt::Registry::Instance().CreateScene("Test1");
+        Scarlet::WeakHandle<ScarlEnt::Scene> test2 = ScarlEnt::Registry::Instance().CreateScene("Test2");
+
+        ScarlEnt::Registry::Instance().SetActiveScene(test1);
+
+        try
+        {
+            ScarlEnt::Registry::Instance().SetActiveScene(test2);
+        }
+        catch (const std::runtime_error&)
+        {
+            passed = true;
+        }
 
         return passed;
     }

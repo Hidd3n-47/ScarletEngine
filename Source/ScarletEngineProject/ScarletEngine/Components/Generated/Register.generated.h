@@ -15,6 +15,7 @@ static void RegisterComponentTypeAndFunctionPointer(ScarlEnt::Registry& registry
     registry.RegisterComponent(componentName, [](ScarlEnt::IEntityHandle* handle) {
             ScarlEnt::MutableEntityHandle* mutableHandle = reinterpret_cast<ScarlEnt::MutableEntityHandle*>(handle);
             mutableHandle->AddComponent<T>();
+            return mutableHandle->GetComponent<T>().GetProperties();
         });
 }
 

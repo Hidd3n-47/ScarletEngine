@@ -125,6 +125,12 @@ void Renderer::AddRenderCommand(WeakHandle<Resource::ILazyLoadAsset> material, W
 void Renderer::Render()
 {
     auto* cameraEntity = reinterpret_cast<ScarlEnt::EntityHandle<Component::Transform, Component::Camera, Component::DirectionLight>*>(ScarlEnt::Registry::Instance().GetActiveScene()->GetCameraEntityHandle());
+
+    if (cameraEntity == nullptr) [[unlikely]]
+    {
+        return;
+    }
+
     const auto& cameraTransform      = cameraEntity->GetComponent<Component::Transform>();
     const auto& cameraDirectionLight = cameraEntity->GetComponent<Component::DirectionLight>();
 

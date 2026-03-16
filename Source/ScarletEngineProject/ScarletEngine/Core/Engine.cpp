@@ -71,37 +71,6 @@ void Engine::Destroy() const noexcept
 
 void Engine::Run() const
 {
-    Math::Mat4 cubeFloor{ 1.0f };
-    cubeFloor[2][3] = -2.0f;
-    cubeFloor[0][0] =  8.0f;
-    cubeFloor[1][1] =  8.0f;
-    cubeFloor[2][2] =  1.0f;
-
-    Math::Mat4 cubePos  { 1.0f };
-    cubePos[0][3] = 5.0f;
-    cubePos[1][3] = 0.0f;
-    cubePos[2][3] = 2.0f;
-
-    Math::Mat4 cubePos1 { 1.0f };
-    cubePos1[0][3] = -2.5f;
-    cubePos1[2][3] =  2.5f;
-
-    Math::Mat4 monkeyPos{ 1.0f };
-    monkeyPos[0][3] = -2.5f;
-
-    Math::Mat4 monkeyPos1{ 1.0f };
-    monkeyPos1[0][3] = 2.5f;
-    monkeyPos1[2][3] = 5.5f;
-
-    Math::Mat4 conePos{ 1.0f };
-    conePos[0][3] = 6.0f;
-
-    Math::Mat4 glockPos{ 1.0f };
-    glockPos[0][0] = 20.0f;
-    glockPos[1][1] = 20.0f;
-    glockPos[2][2] = 20.0f;
-    glockPos[2][3] = 2.0f;
-
     while (mRunning)
     {
         InputManager::ResetInput();
@@ -116,6 +85,8 @@ void Engine::Run() const
         DEBUG(if (mEndRenderEvent) mEndRenderEvent());
 
         mMainWindow->Update();
+
+        ScarlEnt::Registry::Instance().PostUpdate();
     }
 }
 

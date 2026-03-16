@@ -13,21 +13,21 @@ namespace ScarlEnt
 class ComponentView
 {
 public:
-    inline explicit ComponentView(const ComponentId& componentTypeId, const std::function<unordered_map<std::string, Property>* ()>& getPropertyFunction)
-        : mComponentId(componentTypeId), mGetPropertyFunction(getPropertyFunction)
+    inline explicit ComponentView(ComponentId componentTypeId, const std::function<unordered_map<std::string, Property>* ()>& getPropertyFunction)
+        : mComponentId(std::move(componentTypeId)), mGetPropertyFunction(getPropertyFunction)
     { /* Empty. */ }
 
     /**
      * @brief Get the component ID of the component that the view is of.
      * @return The component ID of the component that the view is of.
      */
-    inline const ComponentId& GetComponentId() const { return mComponentId; }
+    [[nodiscard]] inline const ComponentId& GetComponentId() const { return mComponentId; }
 
     /**
      * @brief Get the properties of the component that the view is of.
      * @return The properties of the component that the view is of.
      */
-    inline unordered_map<std::string, Property>* GetProperties() const { return mGetPropertyFunction(); }
+    [[nodiscard]] inline unordered_map<std::string, Property>* GetProperties() const { return mGetPropertyFunction(); }
 private:
     ComponentId mComponentId;
     std::function<unordered_map<std::string, Property>* ()> mGetPropertyFunction;

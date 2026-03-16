@@ -3,14 +3,14 @@
 
 #ifdef DEV_CONFIGURATION
 
-#include <format>
-
 #include <glfw/glfw3.h>
 
 #include <ScarlEnt/Scene.h>
 #include <ScarlEnt/Registry.h>
 
 #include <ScarletMath/Trig.h>
+
+#include <ScarletCore/Xml/XmlSerializer.h>
 
 #include <ScarletEngine/Core/Engine.h>
 #include <ScarletEngine/Core/Window/Window.h>
@@ -167,103 +167,7 @@ EditorManager::EditorManager()
 
     engineInstance.SetEndRenderEvent([&] { EndRender(); });
 
-    mEditorScene = ScarlEnt::Registry::Instance().CreateScene("EditorScene");
-    mGameScene   = ScarlEnt::Registry::Instance().CreateScene("GameScene");
-
-    Component::Transform cameraTransform{ };
-    cameraTransform.translation = Math::Vec3{ 0.0f, -10.0f, 2.0f };
-    mCameraEntity = mEditorScene->AddEntity<Component::Transform, Component::Camera, Component::DirectionLight>(std::move(cameraTransform), Component::Camera{}, Component::DirectionLight{ });
-    mEditorScene->SetCameraEntityHandle(&mCameraEntity);
-
-    ScarlEnt::Registry::Instance().SetActiveScene(mEditorScene);
-
-    auto cameraMovementFunction = [&](Component::Transform& transform, Component::Camera& viewportCamera) {
-        if (const std::shared_ptr<Panel> viewportPanel = mEditorView->GetPanel<ViewportPanel>(); !viewportPanel->IsHovered())
-        {
-            return;
-        }
-
-        if (!InputManager::IsMouseButtonDown(KeyCode::MOUSE_BUTTON_2))
-        {
-            return;
-        }
-
-        Math::Vec3 cameraHorizontalDirection = { }, cameraVerticalDirection = { }, cameraForwardDirection = { };
-
-        if (InputManager::IsKeyDown(KeyCode::KEY_W))
-        {
-            cameraForwardDirection += -1.0f;
-        }
-        if (InputManager::IsKeyDown(KeyCode::KEY_S))
-        {
-            cameraForwardDirection += 1.0f;
-        }
-        if (InputManager::IsKeyDown(KeyCode::KEY_A))
-        {
-            cameraHorizontalDirection += -1.0f;
-        }
-        if (InputManager::IsKeyDown(KeyCode::KEY_D))
-        {
-            cameraHorizontalDirection += 1.0f;
-        }
-        if (InputManager::IsKeyDown(KeyCode::KEY_E))
-        {
-            cameraVerticalDirection += 1.0f;
-        }
-        if (InputManager::IsKeyDown(KeyCode::KEY_Q))
-        {
-            cameraVerticalDirection += -1.0f;
-        }
-
-        constexpr float SPEED_SCALING_FACTOR       = 0.1f;
-        constexpr float SHIFT_KEY_SPEED_MULTIPLIER = 2.5f;
-
-        const float shiftKeySpeedBoost   = InputManager::IsKeyDown(KeyCode::KEY_LEFT_SHIFT) ? SHIFT_KEY_SPEED_MULTIPLIER : 1.0f;
-        const float totalSpeedMultiplier = SPEED_SCALING_FACTOR * shiftKeySpeedBoost;
-
-        constexpr float SPEED_SCALING_FACTOR_YAW   = 0.60f;
-        constexpr float SPEED_SCALING_FACTOR_PITCH = 0.5f;
-        const Math::Vec2 moveDelta = InputManager::GetMouseDeltaThisFrame();
-
-        transform.rotation.z += -moveDelta.x * SPEED_SCALING_FACTOR_YAW;
-        transform.rotation.x += -moveDelta.y * SPEED_SCALING_FACTOR_PITCH;
-
-        Math::Mat4 rotationMatrix = Math::Trig::RotationMatrix(transform.rotation.z, transform.rotation.x, transform.rotation.y);
-
-        viewportCamera.forwardVector = rotationMatrix[1];
-        viewportCamera.rightVector = rotationMatrix[0];
-        viewportCamera.upVector = rotationMatrix[2];
-
-
-        transform.translation += viewportCamera.rightVector   * cameraHorizontalDirection * totalSpeedMultiplier
-                              -  viewportCamera.forwardVector * cameraForwardDirection    * totalSpeedMultiplier
-                              +  viewportCamera.upVector      * cameraVerticalDirection   * totalSpeedMultiplier;
-
-        // Todo [Bug 74]: Quaternion rotation with camera results in roll when only changing pitch and yaw.
-        //constexpr float SPEED_SCALING_FACTOR_YAW   = 0.0040f;
-        //constexpr float SPEED_SCALING_FACTOR_PITCH = 0.0025f;
-        //const Math::Vec2 moveDelta = InputManager::GetMouseDeltaThisFrame();
-
-        //const double yawDelta   = -moveDelta.x * SPEED_SCALING_FACTOR_YAW;
-        //const double pitchDelta = -moveDelta.y * SPEED_SCALING_FACTOR_PITCH;
-
-        //double yaw, pitch, roll;
-        //transform.rotation.GetYawPitchRoll(yaw, pitch, roll);
-        //yaw += yawDelta;
-        //pitch += pitchDelta;
-        //Math::Quat qYaw{ yaw, {0, 0, 1} };
-        //Math::Quat qPitch{ pitch, {1, 0, 0} };
-
-        //transform.rotation =  qPitch * qYaw;
-        };
-
-    mEditorScene->RegisterSystem<Component::Transform, Component::Camera>(cameraMovementFunction);
-
-    mEditorScene->RegisterSystem<Component::Transform, Component::Mesh>([](Component::Transform& transform, Component::Mesh& mesh) {
-            Renderer::Instance().AddRenderCommand(mesh.material, mesh.mesh, 
-                Math::TransformAsMatrix(transform.translation, 
-                    Math::Trig::RotationMatrix(transform.rotation.z, transform.rotation.x, transform.rotation.y), transform.scale));
-        });
+    OpenScene(Filepath{ FilepathDirectory::ENGINE, "EngineAssets/Scenes/DefaultScene.scarlet_scene" }.GetAbsolutePath() );
 }
 
 EditorManager::~EditorManager()
@@ -309,6 +213,189 @@ void EditorManager::Destroy()
 
     delete mInstance;
     mInstance = nullptr;
+}
+
+
+void EditorManager::OpenScene(const std::string& filepath)
+{
+    const XmlDocument document = XmlSerializer::Deserialize(filepath);
+
+    const std::string newSceneFriendlyName = std::filesystem::path{ filepath }.stem().string();
+
+    if (const auto activeScene = ScarlEnt::Registry::Instance().GetActiveScene();
+        activeScene.IsValid() && activeScene->GetFriendlyName() == newSceneFriendlyName)
+    {
+        SCARLET_ERROR("Failed to open scene as this scene is already currently open.");
+        return;
+    }
+
+    EditorView* view = dynamic_cast<EditorView*>(mEditorView);
+    view->GetSelectionManager().SetSelectedEntity(nullptr);
+
+    mEditorScene = ScarlEnt::Registry::Instance().CreateScene(newSceneFriendlyName);
+
+    for (const XmlElement& entityNode : document.GetRootElement()->GetChildElements())
+    {
+        if (entityNode.GetTagName() == "ProjectPath") continue;
+
+        if (entityNode.GetAttributeValue("Mutable") == "true")
+        {
+            ScarlEnt::MutableEntityHandle entity = mEditorScene->AddMutableEntity();
+
+            for (const XmlElement& component : entityNode.GetChildElements())
+            {
+                auto* componentProperties = ScarlEnt::Registry::Instance().AddComponentToHandle(component.GetAttributeValue("typeId").c_str(), &entity);
+
+                for (auto& [propertyName, property] : *componentProperties)
+                {
+                    for (const XmlElement& componentProperty : component.GetChildElements())
+                    {
+                        if (componentProperty.GetTagName() == propertyName)
+                        {
+                            property.SetPropertyValue(componentProperty.GetValue());
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    Component::Transform cameraTransform{ };
+    cameraTransform.translation = Math::Vec3{ 0.0f, -10.0f, 2.0f };
+    mCameraEntity = mEditorScene->AddEntity<Component::Transform, Component::Camera, Component::DirectionLight>(std::move(cameraTransform), Component::Camera{}, Component::DirectionLight{ });
+    mEditorScene->SetCameraEntityHandle(&mCameraEntity);
+
+    auto cameraMovementFunction = [&](Component::Transform& transform, Component::Camera& viewportCamera) {
+        if (const std::shared_ptr<Panel> viewportPanel = mEditorView->GetPanel<ViewportPanel>(); !viewportPanel->IsHovered())
+        {
+            return;
+        }
+
+        if (!InputManager::IsMouseButtonDown(KeyCode::MOUSE_BUTTON_2))
+        {
+            return;
+        }
+
+        Math::Vec3 cameraHorizontalDirection = { }, cameraVerticalDirection = { }, cameraForwardDirection = { };
+
+        if (InputManager::IsKeyDown(KeyCode::KEY_W))
+        {
+            cameraForwardDirection += -1.0f;
+        }
+        if (InputManager::IsKeyDown(KeyCode::KEY_S))
+        {
+            cameraForwardDirection += 1.0f;
+        }
+        if (InputManager::IsKeyDown(KeyCode::KEY_A))
+        {
+            cameraHorizontalDirection += -1.0f;
+        }
+        if (InputManager::IsKeyDown(KeyCode::KEY_D))
+        {
+            cameraHorizontalDirection += 1.0f;
+        }
+        if (InputManager::IsKeyDown(KeyCode::KEY_E))
+        {
+            cameraVerticalDirection += 1.0f;
+        }
+        if (InputManager::IsKeyDown(KeyCode::KEY_Q))
+        {
+            cameraVerticalDirection += -1.0f;
+        }
+
+        constexpr float SPEED_SCALING_FACTOR       = 0.05f;
+        constexpr float SHIFT_KEY_SPEED_MULTIPLIER = 2.5f;
+
+        const float shiftKeySpeedBoost   = InputManager::IsKeyDown(KeyCode::KEY_LEFT_SHIFT) ? SHIFT_KEY_SPEED_MULTIPLIER : 1.0f;
+        const float totalSpeedMultiplier = SPEED_SCALING_FACTOR * shiftKeySpeedBoost;
+
+        constexpr float SPEED_SCALING_FACTOR_YAW   = 0.45f;
+        constexpr float SPEED_SCALING_FACTOR_PITCH = 0.35f;
+        const Math::Vec2 moveDelta = InputManager::GetMouseDeltaThisFrame();
+
+        transform.rotation.z += -moveDelta.x * SPEED_SCALING_FACTOR_YAW;
+        transform.rotation.x += -moveDelta.y * SPEED_SCALING_FACTOR_PITCH;
+
+        Math::Mat4 rotationMatrix = Math::Trig::RotationMatrix(transform.rotation.z, transform.rotation.x, transform.rotation.y);
+
+        viewportCamera.forwardVector = rotationMatrix[1];
+        viewportCamera.rightVector   = rotationMatrix[0];
+        viewportCamera.upVector      = rotationMatrix[2];
+
+
+        transform.translation += viewportCamera.rightVector   * cameraHorizontalDirection * totalSpeedMultiplier
+                              -  viewportCamera.forwardVector * cameraForwardDirection    * totalSpeedMultiplier
+                              +  viewportCamera.upVector      * cameraVerticalDirection   * totalSpeedMultiplier;
+
+        // Todo [Bug 74]: Quaternion rotation with camera results in roll when only changing pitch and yaw.
+        //constexpr float SPEED_SCALING_FACTOR_YAW   = 0.0040f;
+        //constexpr float SPEED_SCALING_FACTOR_PITCH = 0.0025f;
+        //const Math::Vec2 moveDelta = InputManager::GetMouseDeltaThisFrame();
+
+        //const double yawDelta   = -moveDelta.x * SPEED_SCALING_FACTOR_YAW;
+        //const double pitchDelta = -moveDelta.y * SPEED_SCALING_FACTOR_PITCH;
+
+        //double yaw, pitch, roll;
+        //transform.rotation.GetYawPitchRoll(yaw, pitch, roll);
+        //yaw += yawDelta;
+        //pitch += pitchDelta;
+        //Math::Quat qYaw{ yaw, {0, 0, 1} };
+        //Math::Quat qPitch{ pitch, {1, 0, 0} };
+
+        //transform.rotation =  qPitch * qYaw;
+        };
+
+    mEditorScene->RegisterSystem<Component::Transform, Component::Camera>(cameraMovementFunction);
+
+    mEditorScene->RegisterSystem<Component::Transform, Component::Mesh>([](Component::Transform& transform, Component::Mesh& mesh) {
+        Renderer::Instance().AddRenderCommand(mesh.material, mesh.mesh,
+            Math::TransformAsMatrix(transform.translation,
+                Math::Trig::RotationMatrix(transform.rotation.z, transform.rotation.x, transform.rotation.y), transform.scale));
+        });
+
+    if (!ScarlEnt::Registry::Instance().GetActiveScene().IsValid()) [[unlikely]]
+    {
+        ScarlEnt::Registry::Instance().SetActiveScene(mEditorScene);
+    }
+    else [[likely]]
+    {
+        ScarlEnt::Registry::Instance().ChangeScene(mEditorScene, true);
+    }
+}
+
+void EditorManager::SaveScene(const std::string& filepath)
+{
+    const std::string fileExtension         = ".scarlet_scene";
+    const std::string filepathWithExtension = filepath.ends_with(fileExtension) ? filepath : filepath + fileExtension;
+
+    XmlElement* sceneNode = new XmlElement("ScarletScene", "FriendlyName=\"" + std::string{ mEditorScene->GetFriendlyName() } + "\"");
+
+    const vector<ScarlEnt::IEntityHandle*>& entities = mEditorScene->GetMutableEntityHandles();
+
+    for (ScarlEnt::IEntityHandle* handle : entities)
+    {
+        XmlElement entityNode{ "Entity", "Mutable=\"true\"" };
+
+        for (auto& component : handle->GetComponentViews())
+        {
+            std::string componentAttributeString = "typeId=\"" + component.GetComponentId().name + "\"";
+            XmlElement  componentNode{ "Component", componentAttributeString };
+
+            for (auto& [componentTag, componentProperty] : *component.GetProperties())
+            {
+                const std::string propertyValue   = componentProperty.GetPropertyValue();
+                const std::string attributeString = "type=\"" + componentProperty.GetTypeAsString() + "\"";
+
+                componentNode.AddChild(componentTag, attributeString, propertyValue);
+            }
+
+            entityNode.AddChild(componentNode);
+        }
+
+        sceneNode->AddChild(entityNode);
+    }
+
+    XmlSerializer::Serialize(XmlDocument{ sceneNode }, filepathWithExtension);
 }
 
 void EditorManager::EndRender() const

@@ -41,6 +41,18 @@ public:
     static void Destroy();
 
     /**
+     * @brief Open a given scene at the passed in filepath.
+     * @param filepath The filepath of the scene being opened and loaded into the editor.
+     */
+    void OpenScene(const std::string& filepath);
+
+    /**
+     * @brief Save the currently active editor scene to the given filepath.
+     * @param filepath The filepath where the editor scene is being saved to.
+     */
+    void SaveScene(const std::string& filepath);
+
+    /**
      * @brief End render unbinds frame buffers and renders it to the viewport, as well as renders the rest of the editor UI.
      */
     void EndRender() const;
@@ -56,7 +68,6 @@ private:
     inline static EditorManager* mInstance = nullptr;
 
     WeakHandle<ScarlEnt::Scene> mEditorScene;
-    WeakHandle<ScarlEnt::Scene> mGameScene;
 
     ScarlEnt::EntityHandle<Component::Transform, Component::Camera, Component::DirectionLight> mCameraEntity;
 

@@ -78,7 +78,7 @@ private:
 
     ComponentManager mComponentManager;
 
-    IEntityHandle* mCameraEntity;
+    IEntityHandle* mCameraEntity = nullptr;
 
     DEBUG(vector<IEntityHandle*> mEntityHandles;)
     DEBUG(vector<IEntityHandle*> mMutableEntityHandles;)

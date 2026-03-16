@@ -12,7 +12,7 @@
 #include "ComponentId.h"
 
 #ifdef DEV_CONFIGURATION
-//#include "MutableEntityHandle.h"
+#include "RTTI/Property.h"
 #endif // DEV_CONFIGURATION.
 
 namespace ScarlEnt
@@ -27,7 +27,7 @@ class IEntityHandle;
 class SCARLENT_API Registry
 {
 public:
-    DEBUG(using AddComponentFunc = std::function<void(IEntityHandle*)>);
+    DEBUG(using AddComponentFunc = std::function<unordered_map<std::string, Property>* (IEntityHandle*)>);
 
     Registry(const Registry&)            = delete;
     Registry(Registry&&)                 = delete;
@@ -46,6 +46,11 @@ public:
     static void Terminate();
 
     /**
+     * @brief Used to perform operations after the updates have completed, this ensures safe removal of entities/scenes as no system or entity is currently in use/referenced whist destroying.
+     */
+    void PostUpdate();
+
+    /**
      * @brief Create a new \ref Scene.
      * @param friendlyName The friendly name of the scene.
      * @return A \ref WeakHandle to the created scene.
@@ -58,7 +63,15 @@ public:
     void RemoveScene(Scarlet::WeakHandle<Scene>& scene);
 
     /**
+     * @brief A function used to change from an active scene to a new scene. This is the safe way to prevent issues with executing systems and lifetime.
+     * @param newScene The new scene that will become active once all systems have been changed.
+     * @param destroySceneOnChange \c true to destroy the scene after successfully changing the active scene to the \c newScene, \c false otherwise.
+     */
+    void ChangeScene(const Scarlet::WeakHandle<Scene> newScene, const bool destroySceneOnChange = false);
+
+    /**
      * @brief Set the currently active scene.
+     * @remark This is unsafe to do in the middle of scene updates as the active entities or systems of the scene could be referenced. At runtime rather use \ref Registry::ChangeScene.
      * @param scene The scene that will be set to the active scene.
      */
     void SetActiveScene(const Scarlet::WeakHandle<Scene> scene);
@@ -106,7 +119,7 @@ public:
 
 #ifdef DEV_CONFIGURATION
     void RegisterComponent(const std::string& componentName, const AddComponentFunc& addComponentFunction) { mComponentToAddComponentFunction[componentName] = addComponentFunction; }
-    void AddComponentToHandle(const char* componentType, IEntityHandle* handle);
+    unordered_map<std::string, Property>* AddComponentToHandle(const char* componentType, IEntityHandle* handle);
     [[nodiscard]] inline const unordered_map<std::string, AddComponentFunc>& GetComponentToAddComponentMap() const { return mComponentToAddComponentFunction; }
 #endif // DEV_CONFIGURATION.
 
@@ -117,6 +130,9 @@ private:
     ~Registry() = default;
 
     inline static Registry* mInstance = nullptr;
+
+    Scarlet::WeakHandle<Scene> mSceneToChangeTo;
+    bool mDestroySceneOnChange;
 
     DEBUG(unordered_map<std::string, AddComponentFunc> mComponentToAddComponentFunction);
 

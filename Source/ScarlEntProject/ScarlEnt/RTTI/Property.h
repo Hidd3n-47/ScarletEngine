@@ -57,6 +57,7 @@ public:
         if (mType == PropertyType::VEC3)     return "vec3";
         if (mType == PropertyType::VEC4)     return "vec4";
         if (mType == PropertyType::QUAT)     return "quat";
+        if (mType == PropertyType::ASSET)    return "asset";
 
         return "UNKNOWN";
     }
