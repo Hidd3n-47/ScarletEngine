@@ -11,3 +11,5 @@
 #include <ScarletCore/unordered_set.h>
 
 #include <string>
+
+#include "Core/Filepath.h"

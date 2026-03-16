@@ -14,7 +14,7 @@ class ILazyLoadAsset;
 class Material
 {
 public:
-    Material(const char* filepath);
+    Material(const Filepath& filepath);
 
     WeakHandle<ILazyLoadAsset> texture;
     Math::Vec3 ambientColor{ 1.0f };

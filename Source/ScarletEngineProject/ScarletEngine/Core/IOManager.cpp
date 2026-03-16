@@ -7,13 +7,15 @@
 namespace Scarlet
 {
 
-void IOManager::LoadTextFile(const char* filePath, std::string& result)
+void IOManager::LoadTextFile(const Filepath& filepath, std::string& result)
 {
-    std::ifstream file(filePath, std::ios::in);
+    SCARLET_ASSERT(filepath.DoesPathExist() && "Trying to load file that doesn't exist on disk.");
+
+    std::ifstream file(filepath.GetAbsolutePath(), std::ios::in);
 
     if (file.fail())
     {
-        SCARLET_WARN("Failed to open file: {}", filePath);
+        SCARLET_WARN("Failed to open file: {}", filepath.GetAbsolutePath());
         return;
     }
 

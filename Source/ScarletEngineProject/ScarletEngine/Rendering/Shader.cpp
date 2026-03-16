@@ -10,15 +10,15 @@
 namespace Scarlet
 {
 
-Shader::Shader(const char* vertexShaderFilePath, const char* fragmentShaderFilePath)
+Shader::Shader(const Filepath& vertexShaderFilepath, const Filepath& fragmentShaderFilepath)
 {
     mId = glCreateProgram();
 
     std::string vertexShaderCode;
-    IOManager::LoadTextFile(vertexShaderFilePath, vertexShaderCode);
+    IOManager::LoadTextFile(vertexShaderFilepath, vertexShaderCode);
 
     std::string fragmentShaderCode;
-    IOManager::LoadTextFile(fragmentShaderFilePath, fragmentShaderCode);
+    IOManager::LoadTextFile(fragmentShaderFilepath, fragmentShaderCode);
 
     CreateShaders(vertexShaderCode, fragmentShaderCode);
 }

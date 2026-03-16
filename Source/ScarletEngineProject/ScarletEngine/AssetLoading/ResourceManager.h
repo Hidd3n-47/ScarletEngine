@@ -37,7 +37,7 @@ public:
      * meaning the runtime identifier will be changed due to using a vector. This is preferred over using maps to prevent the lookup cost.
      * @param filepath The filepath of the asset.
      */
-    void Load(Resource::LazyLoadAsset<Asset>* lazyAsset, const std::string& filepath)
+    void Load(Resource::LazyLoadAsset<Asset>* lazyAsset, const Filepath& filepath)
     {
         if (mAssetPathToLoadedAssetIndex.contains(filepath))
         {
@@ -47,7 +47,7 @@ public:
 
         lazyAsset->SetRuntimeId(static_cast<uint32>(mLoadedAsset.size()));
 
-        mLoadedAsset.emplace_back(new Asset{ filepath.c_str() });
+        mLoadedAsset.emplace_back(new Asset{ filepath });
         mLazyLoadAsset.emplace_back(lazyAsset);
 
         mAssetPathToLoadedAssetIndex[filepath] = lazyAsset->GetRuntimeId();
@@ -55,7 +55,7 @@ public:
 private:
     vector<Asset*> mLoadedAsset;
     vector<Resource::LazyLoadAsset<Asset>*> mLazyLoadAsset;
-    unordered_map<std::string, size_t>      mAssetPathToLoadedAssetIndex;
+    unordered_map<Filepath, size_t>         mAssetPathToLoadedAssetIndex;
 
     /**
      * @brief Internal function to get a \ref WeakHandle to the resource.

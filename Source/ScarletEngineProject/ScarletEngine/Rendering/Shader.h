@@ -12,10 +12,10 @@ class Shader
 public:
     /**
      * @brief Construct the shader object by creating the identifier. Load and compile the code for the vertex and fragment shaders.
-     * @param vertexShaderFilePath The filepath to the vertex shader code.
-     * @param fragmentShaderFilePath The filepath to the fragment shader code.
+     * @param vertexShaderFilepath The filepath to the vertex shader code.
+     * @param fragmentShaderFilepath The filepath to the fragment shader code.
      */
-    Shader(const char* vertexShaderFilePath, const char* fragmentShaderFilePath);
+    Shader(const Filepath& vertexShaderFilepath, const Filepath& fragmentShaderFilepath);
     ~Shader();
 
     Shader(const Shader&)            = delete;

@@ -9,16 +9,17 @@
 namespace Scarlet::Resource
 {
 
-Texture::Texture(const char* filepath)
+Texture::Texture(const Filepath& filepath)
 {
+    SCARLET_ASSERT(filepath.DoesPathExist() && "Trying to load texture at invalid filepath.");
     int width, height, channels = 0;
 
     stbi_set_flip_vertically_on_load(1);
 
-    stbi_uc* data = stbi_load(filepath, &width, &height, &channels, 0);
+    stbi_uc* data = stbi_load(filepath.GetAbsolutePath().c_str(), &width, &height, &channels, 0);
 
-    SCARLET_ASSERT(data && "Failed to load image at the given path: {}", filepath);
-    SCARLET_ASSERT(channels == 4 && "Incorrect number of channels for the image at the given path: {}", filepath);
+    SCARLET_ASSERT(data && "Failed to load image at the given path.");
+    SCARLET_ASSERT(channels == 4 && "Incorrect number of channels for the image at the given path.");
 
     mWidth  = width;
     mHeight = height;

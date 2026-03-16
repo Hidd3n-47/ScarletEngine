@@ -20,7 +20,7 @@ template <typename Asset>
 class LazyLoadAsset final : public ILazyLoadAsset
 {
 public:
-    LazyLoadAsset(const AssetType type, const Ulid ulid, const std::string& filepath) : ILazyLoadAsset(type, ulid, std::move(filepath)) { }
+    LazyLoadAsset(const AssetType type, const Ulid ulid, const Filepath& filepath) : ILazyLoadAsset(type, ulid, std::move(filepath)) { }
 
     /**
      * @brief Set the runtime identifier of the asset. This should only be used by the managers (\ref ResourceManager) when loading the asset.

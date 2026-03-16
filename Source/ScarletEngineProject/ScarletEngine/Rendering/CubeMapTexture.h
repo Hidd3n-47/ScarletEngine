@@ -8,7 +8,7 @@ namespace Scarlet::Resource
 class CubeMapTexture
 {
 public:
-    CubeMapTexture(const char* filepath);
+    CubeMapTexture(const Filepath& filepath);
     ~CubeMapTexture();
 
     /**

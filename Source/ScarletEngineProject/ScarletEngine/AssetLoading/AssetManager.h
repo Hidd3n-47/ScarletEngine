@@ -23,8 +23,9 @@ public:
 
     /**
      * @brief Iterate through the assets directory and load in the scarlet assets.
+     * @param assetPath: The starting path to directory iterate through, loading in any scarlet assets found.
      */
-    void LoadScarletAssets();
+    void LoadScarletAssets(const Filepath& assetPath);
 
     /**
      * @brief Get an asset based off the \ref AssetType and unique identifier.
@@ -38,11 +39,11 @@ public:
      * @brief Create an asset at the given filepath.
      * @tparam Asset The type of asset being created.
      * @param type: The \ref AssetType of the asset.
-     * @param filepath The filepath the asset is on disk.
+     * @param filepath The \ref Filepath the asset is on disk.
      * @return A \ref WeakHandle to \ref ILazyLoadAsset for the created asset.
      */
     template <typename Asset>
-    WeakHandle<Resource::ILazyLoadAsset> CreateAsset(const AssetType type, const std::string& filepath, const Ulid ulid = {});
+    WeakHandle<Resource::ILazyLoadAsset> CreateAsset(const AssetType type, const Filepath& filepath, const Ulid ulid = {});
 
     /**
      * @brief Destroy and remove a created asset.
@@ -66,7 +67,7 @@ private:
 /* ============================================================================================================================== */
 
 template <typename Asset>
-WeakHandle<Resource::ILazyLoadAsset> AssetManager::CreateAsset(const AssetType type, const std::string& filepath, const Ulid ulid /* = {} */)
+WeakHandle<Resource::ILazyLoadAsset> AssetManager::CreateAsset(const AssetType type, const Filepath& filepath, const Ulid ulid /* = {} */)
 {
     Resource::ILazyLoadAsset* asset = new Resource::LazyLoadAsset<Asset>(type, ulid, std::move(filepath));
     mTypeArrayForUlidToAssets[static_cast<int>(type)][ulid] = asset;

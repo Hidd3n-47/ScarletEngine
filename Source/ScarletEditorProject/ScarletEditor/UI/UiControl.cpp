@@ -164,11 +164,11 @@ void UiControl::RenderAssetPropertyControl(const ScarlEnt::Property& property, c
     const auto& loadedAssets = Engine::Instance().GetAssetManager().GetLoadedAssets(value->GetAssetType());
 
     const float windowWidth     = ImGui::GetWindowSize().x;
-    constexpr float buttonWidth = 350.0f;
+    constexpr float buttonWidth = 200.0f;
 
     ImGui::SetCursorPosX((windowWidth - buttonWidth) * 0.5f);
 
-    if (ImGui::Button((value->GetAssetPath() + "##" + propertyId).c_str(), { buttonWidth, 25.0f }))
+    if (ImGui::Button((value->GetAssetPath().GetFileName() + "##" + propertyId).c_str(), { buttonWidth, 25.0f }))
     {
         ImGui::OpenPopup(std::string{ "AssetSelector" + propertyId}.c_str());
 
@@ -180,14 +180,14 @@ void UiControl::RenderAssetPropertyControl(const ScarlEnt::Property& property, c
 
     if (ImGui::BeginPopup(std::string{ "AssetSelector" + propertyId }.c_str(), ImGuiWindowFlags_NoMove))
     {
-        constexpr float popupMinWidth  = 400.0f;
+        constexpr float popupMinWidth  = 250.0f;
         constexpr float popupMaxHeight = 200.0f;
 
         ImGui::BeginChild("PopupItems", { popupMinWidth, popupMaxHeight }, true, ImGuiWindowFlags_HorizontalScrollbar);
 
         for (auto& [ulid, asset] : loadedAssets)
         {
-            const std::string compName = std::string{ asset->GetAssetPath() };
+            const std::string compName = std::string{ asset->GetAssetPath().GetFileName() };
 
             if (ImGui::MenuItem(compName.c_str()))
             {

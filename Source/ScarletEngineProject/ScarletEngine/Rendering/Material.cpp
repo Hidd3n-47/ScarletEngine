@@ -11,9 +11,9 @@
 namespace Scarlet::Resource
 {
 
-Material::Material(const char* filepath)
+Material::Material(const Filepath& filepath)
 {
-    const XmlDocument document = XmlSerializer::Deserialize(filepath);
+    const XmlDocument document = XmlSerializer::Deserialize(filepath.GetAbsolutePath());
 
     for (const XmlElement& element : document.GetRootElement()->GetChildElements())
     {

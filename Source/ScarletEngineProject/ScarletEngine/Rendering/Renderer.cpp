@@ -91,8 +91,8 @@ void Renderer::TerminateApi()
 }
 
 Renderer::Renderer()
-    : mShader("E:/Programming/ScarletEngine/EngineAssets/Shaders/editor.vert", "E:/Programming/ScarletEngine/EngineAssets/Shaders/editor.frag")
-    , mSkyBoxShader("E:/Programming/ScarletEngine/EngineAssets/Shaders/skybox.vert", "E:/Programming/ScarletEngine/EngineAssets/Shaders/skybox.frag")
+    : mShader(Filepath{ FilepathDirectory::ENGINE, "EngineAssets/Shaders/editor.vert" }, Filepath{ FilepathDirectory::ENGINE, "EngineAssets/Shaders/editor.frag" })
+    , mSkyBoxShader(Filepath{ FilepathDirectory::ENGINE, "EngineAssets/Shaders/skybox.vert" }, Filepath{ FilepathDirectory::ENGINE, "EngineAssets/Shaders/skybox.frag" })
     , mInstanceBuffer(MAX_INSTANCE_COUNT * sizeof(Math::Mat4))
 {
     mSkyBoxVao = new VertexArray();
@@ -103,7 +103,7 @@ Renderer::Renderer()
 
     mSkyBoxVao->AddBuffer(*mSkyBoxVbo, false);
 
-    mCubeMapTexture = new Resource::CubeMapTexture("E:/Programming/ScarletEngine/EngineAssets/CubeMap/");
+    mCubeMapTexture = new Resource::CubeMapTexture(Filepath{ FilepathDirectory::ENGINE, "EngineAssets/CubeMap/" });
 }
 
 Renderer::~Renderer()

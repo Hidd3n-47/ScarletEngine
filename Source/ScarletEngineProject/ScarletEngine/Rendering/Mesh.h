@@ -18,7 +18,7 @@ class Mesh
 {
     friend class Renderer;
 public:
-    Mesh(const char* filepath);
+    Mesh(const Filepath& filepath);
     ~Mesh();
 
     /**

@@ -45,7 +45,7 @@ void Engine::Init() noexcept
     DEBUG(RegisterComponents());
 
     mAssetManager = new AssetManager();
-    mAssetManager->LoadScarletAssets();
+    mAssetManager->LoadScarletAssets(Filepath{ FilepathDirectory::ENGINE, "EngineAssets/" });
 
     mRunning = true;
     SCARLET_INFO("Engine Initialised!");

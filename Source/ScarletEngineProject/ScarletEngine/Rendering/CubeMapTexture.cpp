@@ -8,18 +8,20 @@
 namespace Scarlet::Resource
 {
 
-CubeMapTexture::CubeMapTexture(const char* filepath)
+CubeMapTexture::CubeMapTexture(const Filepath& filepath)
 {
+    const std::string cubeMapDirectory = filepath.GetAbsolutePath();
+
     const std::string filepaths[] =
     {
-        std::string{ filepath } + "px.png",
-        std::string{ filepath } + "nx.png",
+        cubeMapDirectory + "px.png",
+        cubeMapDirectory + "nx.png",
 
-        std::string{ filepath } + "pz.png",
-        std::string{ filepath } + "nz.png",
+        cubeMapDirectory + "pz.png",
+        cubeMapDirectory + "nz.png",
 
-        std::string{ filepath } + "py.png",
-        std::string{ filepath } + "ny.png",
+        cubeMapDirectory + "py.png",
+        cubeMapDirectory + "ny.png",
 
     };
 

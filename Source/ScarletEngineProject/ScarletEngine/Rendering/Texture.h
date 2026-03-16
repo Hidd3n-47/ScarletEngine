@@ -8,7 +8,7 @@ namespace Scarlet::Resource
 class Texture
 {
 public:
-    Texture(const char* filepath);
+    Texture(const Filepath& filepath);
     ~Texture();
 
     /**

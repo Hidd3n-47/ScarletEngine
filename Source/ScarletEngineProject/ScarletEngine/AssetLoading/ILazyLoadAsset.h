@@ -14,7 +14,7 @@ namespace Scarlet::Resource
 class ILazyLoadAsset
 {
 public:
-    ILazyLoadAsset(const AssetType type, const Ulid ulid, std::string asset) : mAssetType(type), mUlid(ulid), mAssetPath(std::move(asset)){ }
+    ILazyLoadAsset(const AssetType type, const Ulid ulid, const Filepath& assetPath) : mAssetType(type), mUlid(ulid), mAssetPath(std::move(assetPath)){ }
     virtual ~ILazyLoadAsset() = default;
 
     /**
@@ -37,7 +37,7 @@ public:
      * @brief Get the path for the asset.
      * @return The path for the asset.
      */
-    [[nodiscard]] std::string GetAssetPath() const { return mAssetPath; }
+    [[nodiscard]] const Filepath& GetAssetPath() const { return mAssetPath; }
 
     /**
      * @brief Load in the asset.
@@ -49,7 +49,7 @@ protected:
     AssetType   mAssetType;
     Ulid        mUlid{};
     uint32      mRuntimeId{ INVALID_ID };
-    std::string mAssetPath;
+    Filepath    mAssetPath;
 
 };
 

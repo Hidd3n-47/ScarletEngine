@@ -17,3 +17,5 @@
 
 #include <ScarletCore/vector.h>
 #include <ScarletCore/unordered_map.h>
+
+#include <ScarletEngine/Core/Filepath.h>

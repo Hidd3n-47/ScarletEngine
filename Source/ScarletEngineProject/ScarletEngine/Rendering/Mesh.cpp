@@ -10,9 +10,9 @@
 namespace Scarlet::Resource
 {
 
-Mesh::Mesh(const char* filepath)
+Mesh::Mesh(const Filepath& filepath)
 {
-    MeshLoader::LoadMesh(filepath, mMeshData);
+    MeshLoader::LoadMesh(filepath.GetAbsolutePath().c_str(), mMeshData);
 
     mVertexBuffer = new VertexBuffer(mMeshData.vertices.data(), mMeshData.vertices.size() * sizeof(Vertex));
     mIndexBuffer  = new IndexBuffer(mMeshData.indices.data(), mMeshData.indices.size());

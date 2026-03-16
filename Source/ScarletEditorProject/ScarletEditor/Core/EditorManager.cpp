@@ -295,7 +295,8 @@ void EditorManager::Init()
         style.Colors[ImGuiCol_WindowBg].w = 1.0f;
     }
 
-    io.FontDefault = io.Fonts->AddFontFromFileTTF("E:/Programming/ScarletEngine/EngineAssets/Fonts/JetBrainsMono-Bold.ttf", 16.0f);
+    const Filepath fontPath{ FilepathDirectory::ENGINE, "EngineAssets/Fonts/JetBrainsMono-Bold.ttf" };
+    io.FontDefault = io.Fonts->AddFontFromFileTTF(fontPath.GetAbsolutePath().c_str(), 16.0f);
 
     SetScarletDarkTheme();
 }

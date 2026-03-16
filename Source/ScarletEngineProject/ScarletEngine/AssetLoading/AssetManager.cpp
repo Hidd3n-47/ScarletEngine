@@ -20,32 +20,35 @@ AssetManager::~AssetManager()
     }
 }
 
-void AssetManager::LoadScarletAssets()
+void AssetManager::LoadScarletAssets(const Filepath& assetPath)
 {
-    const std::string engineAssetPath = "E:/Programming/ScarletEngine/EngineAssets/";
-
-    for (const auto& entry : std::filesystem::recursive_directory_iterator(engineAssetPath))
+    const std::filesystem::path startingPath{ assetPath.GetAbsolutePath() };
+    for (const auto& entry : std::filesystem::recursive_directory_iterator(startingPath))
     {
         if (entry.path().extension() == ".scarlet")
         {
             XmlDocument assetXml = XmlSerializer::Deserialize(entry.path().string());
+
+            // Relative path to the directory walk, this would be subdirectories from the parameter asset path.
+            const Filepath relativePath = assetPath / std::filesystem::relative(std::filesystem::absolute(entry.path()).remove_filename(), startingPath);
 
             const AssetType type{ static_cast<AssetType>(std::stoi(assetXml.GetRootElement()->GetAttributeValue("AssetType"))) };
             const Ulid      ulid{ std::stoull(assetXml.GetRootElement()->GetAttributeValue("ulid")) };
 
             if (type == AssetType::MESH)
             {
-                const std::string& filepath = engineAssetPath + assetXml.GetRootElement()->GetChildElements()[0].GetValue();
+                const Filepath filepath = relativePath / assetXml.GetRootElement()->GetChildElements()[0].GetValue();
                 (void)CreateAsset<Resource::Mesh>(AssetType::MESH, filepath, ulid);
             }
             else if (type == AssetType::TEXTURE)
             {
-                const std::string& filepath = engineAssetPath + assetXml.GetRootElement()->GetChildElements()[0].GetValue();
+                const Filepath filepath = relativePath / assetXml.GetRootElement()->GetChildElements()[0].GetValue();
                 (void)CreateAsset<Resource::Texture>(AssetType::TEXTURE, filepath, ulid);
             }
             else if (type == AssetType::MATERIAL)
             {
-                (void)CreateAsset<Resource::Material>(AssetType::MATERIAL, entry.path().string(), ulid);
+                const Filepath filepath = assetPath / std::filesystem::relative(entry.path(), startingPath);
+                (void)CreateAsset<Resource::Material>(AssetType::MATERIAL, filepath, ulid);
             }
         }
     }
