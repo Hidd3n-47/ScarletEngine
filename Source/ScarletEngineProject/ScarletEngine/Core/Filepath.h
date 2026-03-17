@@ -25,6 +25,7 @@ public:
 
     explicit Filepath(FilepathDirectory directory, const char* path)        : mRelativePath{ path }, mDirectory{ directory } { /* Empty. */ }
     explicit Filepath(FilepathDirectory directory, const std::string& path) : mRelativePath{ path }, mDirectory{ directory } { /* Empty. */ }
+    explicit Filepath(FilepathDirectory directory, const std::filesystem::path& path) : mRelativePath{ path }, mDirectory{ directory } { /* Empty. */ }
 
     Filepath(const Filepath&)            = default;
     Filepath(Filepath&&)                 = default;
@@ -46,6 +47,24 @@ public:
         return ((mDirectory == FilepathDirectory::ENGINE ?
                 SCARLET_ENGINE_DIRECTORY : SCARLET_PROJECT_DIRECTORY) / mRelativePath).string();
     }
+
+    /**
+     * @brief Get the relative path from the root directory (determined from \ref FilepathDirectory).
+     * @return Get the relative path from the root directory (determined from \ref FilepathDirectory).
+     */
+    [[nodiscard]] inline std::string GetRelativePath() const { return mRelativePath.string(); }
+
+    /**
+     * @brief Set the relative path of the \ref Filepath from the root directory (determined from \ref FilepathDirectory).
+     * @param relativePath The relative of the filepath from the root directory (determined from \ref FilepathDirectory).
+     */
+    inline void SetRelativePath(const std::filesystem::path& relativePath)
+    {
+        SCARLET_ASSERT(relativePath.is_relative() && "Cannot set the relative equal to a non-relative path.");
+
+        mRelativePath = relativePath;
+    }
+
     /**
      * Get the extension of the file.
      * @return The extension of the file.
@@ -59,16 +78,7 @@ public:
 
     [[nodiscard]] inline bool operator==(const Filepath& other) const { return mRelativePath == other.mRelativePath; }
 
-    inline Filepath operator/(const std::string& path) const
-    {
-        return *this / std::filesystem::path{ path };
-
-        Filepath newPath{};
-        newPath.mDirectory    = mDirectory;
-        newPath.mRelativePath = mRelativePath / path;
-
-        return newPath;
-    }
+    inline Filepath operator/(const std::string& path) const { return *this / std::filesystem::path{ path }; }
 
     inline Filepath operator/(const std::filesystem::path& path) const
     {

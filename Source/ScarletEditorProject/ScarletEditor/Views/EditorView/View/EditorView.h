@@ -41,10 +41,11 @@ public:
 private:
     SelectionManager mSelectionManager;
 
-    bool mPropertiesPanel = true;
-    bool mScenePanel      = true;
-    bool mViewportPanel   = true;
-    bool mConsolePanel    = true;
+    bool mPropertiesPanel   = true;
+    bool mScenePanel        = true;
+    bool mViewportPanel     = true;
+    bool mConsolePanel      = true;
+    bool mAssetBrowserPanel = true;
 };
 
 } // Namespace Scarlet::Editor.

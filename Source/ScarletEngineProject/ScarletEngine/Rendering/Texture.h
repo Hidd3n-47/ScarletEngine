@@ -16,6 +16,11 @@ public:
      * @param slot The slot the texture is loaded into.
      */
     void Bind(const uint32 slot = 0) const;
+    /**
+     * @brief Get the identifier of the texture.
+     * @return The identifier of the texture.
+     */
+    [[nodiscard]] inline uint32 GetId() const { return mId; }
 private:
     uint32 mId;
     uint32 mWidth, mHeight;

@@ -52,10 +52,6 @@ public:
 
         mAssetPathToLoadedAssetIndex[filepath] = lazyAsset->GetRuntimeId();
     }
-private:
-    vector<Asset*> mLoadedAsset;
-    vector<Resource::LazyLoadAsset<Asset>*> mLazyLoadAsset;
-    unordered_map<Filepath, size_t>         mAssetPathToLoadedAssetIndex;
 
     /**
      * @brief Internal function to get a \ref WeakHandle to the resource.
@@ -66,6 +62,11 @@ private:
     {
         return WeakHandle{ mLoadedAsset[runtimeIndex] };
     }
+
+private:
+    vector<Asset*> mLoadedAsset;
+    vector<Resource::LazyLoadAsset<Asset>*> mLazyLoadAsset;
+    unordered_map<Filepath, size_t>         mAssetPathToLoadedAssetIndex;
 };
 
 } // Namespace Scarlet.

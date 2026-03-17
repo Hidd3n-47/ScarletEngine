@@ -33,130 +33,129 @@ namespace Scarlet::Editor
 
 static void SetScarletDarkTheme()
 {
-    ImGuiStyle& style = ImGui::GetStyle();
-    ImVec4* colors = style.Colors;
+    ImGuiStyle& style  = ImGui::GetStyle();
+    ImVec4*     colors = style.Colors;
 
-    // ------------------------------------------------------------
+    // -------------------
     // Layout & Structure
-    // ------------------------------------------------------------
-    style.WindowRounding = 4.0f;
-    style.ChildRounding = 4.0f;
-    style.FrameRounding = 3.0f;
-    style.PopupRounding = 4.0f;
+    // -------------------
+    style.WindowRounding    = 4.0f;
+    style.ChildRounding     = 4.0f;
+    style.FrameRounding     = 3.0f;
+    style.PopupRounding     = 4.0f;
     style.ScrollbarRounding = 4.0f;
-    style.GrabRounding = 3.0f;
-    style.TabRounding = 3.0f;
+    style.GrabRounding      = 3.0f;
+    style.TabRounding       = 3.0f;
 
-    style.WindowBorderSize = 1.0f;
-    style.ChildBorderSize = 1.0f;
-    style.PopupBorderSize = 1.0f;
-    style.FrameBorderSize = 0.0f;
-    style.TabBorderSize = 0.0f;
+    style.WindowBorderSize  = 1.0f;
+    style.ChildBorderSize   = 1.0f;
+    style.PopupBorderSize   = 1.0f;
+    style.FrameBorderSize   = 0.0f;
+    style.TabBorderSize     = 0.0f;
 
-    style.WindowPadding = ImVec2(10, 8);
-    style.FramePadding = ImVec2(6, 4);
-    style.ItemSpacing = ImVec2(8, 6);
-    style.ItemInnerSpacing = ImVec2(6, 4);
-    style.IndentSpacing = 18.0f;
+    style.WindowPadding     = ImVec2{ 10.0f, 8.0f };
+    style.FramePadding      = ImVec2{  6.0f, 4.0f };
+    style.ItemSpacing       = ImVec2{  8.0f, 6.0f };
+    style.ItemInnerSpacing  = ImVec2{  6.0f, 4.0f };
+    style.IndentSpacing     = 18.0f;
 
-    // ------------------------------------------------------------
+    // -------------------------
     // Neutral Structure Colors
-    // ------------------------------------------------------------
-
-    ImVec4 topBar = ImColor(15, 15, 17);   // Menu bar (darkest)
-    ImVec4 sidePanel = ImColor(18, 18, 20);   // Hierarchy / Properties / Console
-    ImVec4 mainDock = ImColor(22, 22, 24);   // Central dock bg
-    ImVec4 surface = ImColor(35, 35, 40);   // Headers / frames
-    ImVec4 surfaceHover = ImColor(55, 55, 62);   // Hover state
-    ImVec4 border = ImColor(60, 60, 66);
+    // -------------------------
+    const ImVec4 topBar       = ImColor{ 15, 15, 17 }; // Menu bar (darkest)
+    const ImVec4 sidePanel    = ImColor{ 18, 18, 20 }; // Hierarchy / Properties / Console
+    const ImVec4 mainDock     = ImColor{ 22, 22, 24 }; // Central dock bg
+    const ImVec4 surface      = ImColor{ 35, 35, 40 }; // Headers / frames
+    const ImVec4 surfaceHover = ImColor{ 55, 55, 62 }; // Hover state
+    const ImVec4 border       = ImColor{ 60, 60, 66 }; 
 
     // Scarlet Accent (interaction only)
-    ImVec4 scarlet = ImColor(220, 20, 90);
-    ImVec4 scarletHover = ImColor(240, 45, 110);
-    ImVec4 scarletActive = ImColor(180, 15, 70);
+    const ImVec4 scarlet       = ImColor{ 220, 20,  90 };
+    const ImVec4 scarletHover  = ImColor{ 240, 45, 110 };
+    const ImVec4 scarletActive = ImColor{ 180, 15,  70 };
 
-    // ------------------------------------------------------------
+    // -----
     // Text
-    // ------------------------------------------------------------
-    colors[ImGuiCol_Text] = ImColor(225, 225, 230);
-    colors[ImGuiCol_TextDisabled] = ImColor(120, 120, 130);
+    // -----
+    colors[ImGuiCol_Text]         = ImColor{ 225, 225, 230 };
+    colors[ImGuiCol_TextDisabled] = ImColor{ 120, 120, 130 };
 
-    // ------------------------------------------------------------
+    // ----------
     // Windowing
-    // ------------------------------------------------------------
-    colors[ImGuiCol_WindowBg] = mainDock;
-    colors[ImGuiCol_ChildBg] = sidePanel;
-    colors[ImGuiCol_PopupBg] = sidePanel;
-    colors[ImGuiCol_Border] = border;
+    // ----------
+    colors[ImGuiCol_WindowBg]  = mainDock;
+    colors[ImGuiCol_ChildBg]   = sidePanel;
+    colors[ImGuiCol_PopupBg]   = sidePanel;
+    colors[ImGuiCol_Border]    = border;
     colors[ImGuiCol_MenuBarBg] = topBar;
 
     // Title
-    colors[ImGuiCol_TitleBg] = topBar;
-    colors[ImGuiCol_TitleBgActive] = mainDock;
+    colors[ImGuiCol_TitleBg]          = topBar;
+    colors[ImGuiCol_TitleBgActive]    = mainDock;
     colors[ImGuiCol_TitleBgCollapsed] = topBar;
 
-    // ------------------------------------------------------------
+    // ----------------------------------
     // Headers (Tree / CollapsingHeader)
-    // ------------------------------------------------------------
-    colors[ImGuiCol_Header] = surface;
-    colors[ImGuiCol_HeaderHovered] = surfaceHover;
-    colors[ImGuiCol_HeaderActive] = ImColor(70, 70, 80);
+    // ----------------------------------
+    colors[ImGuiCol_Header]         = surface;
+    colors[ImGuiCol_HeaderHovered]  = surfaceHover;
+    colors[ImGuiCol_HeaderActive] = ImColor{ 70, 70, 80 };
 
-    // ------------------------------------------------------------
+    // -----
     // Tabs
-    // ------------------------------------------------------------
-    colors[ImGuiCol_Tab] = ImColor(25, 25, 28);
-    colors[ImGuiCol_TabActive] = ImColor(40, 40, 45);
-    colors[ImGuiCol_TabHovered] = surfaceHover;
-    colors[ImGuiCol_TabUnfocused] = mainDock;
-    colors[ImGuiCol_TabUnfocusedActive] = ImColor(30, 30, 35);
+    // -----
+    colors[ImGuiCol_Tab]                       = ImColor{ 25, 25, 28 };
+    colors[ImGuiCol_TabActive]                 = ImColor{ 40, 40, 45 };
+    colors[ImGuiCol_TabHovered]                = surfaceHover;
+    colors[ImGuiCol_TabUnfocused]              = mainDock;
+    colors[ImGuiCol_TabUnfocusedActive]        = ImColor{ 30, 30, 35 };
     style.Colors[ImGuiCol_TabSelectedOverline] = scarlet;
 
-    // ------------------------------------------------------------
+    // --------------------------------------
     // Frames (inputs, viewport frame, etc.)
-    // ------------------------------------------------------------
-    colors[ImGuiCol_FrameBg] = surface;
-    colors[ImGuiCol_FrameBgHovered] = surfaceHover;
-    colors[ImGuiCol_FrameBgActive] = ImColor(70, 70, 80);
+    // --------------------------------------
+    colors[ImGuiCol_FrameBg]         = surface;
+    colors[ImGuiCol_FrameBgHovered]  = surfaceHover;
+    colors[ImGuiCol_FrameBgActive] = ImColor{ 70, 70, 80 };
 
-    // ------------------------------------------------------------
+    // --------
     // Buttons
-    // ------------------------------------------------------------
-    colors[ImGuiCol_Button] = surface;
+    // --------
+    colors[ImGuiCol_Button]        = mainDock;
     colors[ImGuiCol_ButtonHovered] = scarlet;
-    colors[ImGuiCol_ButtonActive] = scarletActive;
+    colors[ImGuiCol_ButtonActive]  = scarletActive;
 
-    // ------------------------------------------------------------
-    // Sliders 
-    // ------------------------------------------------------------
-    colors[ImGuiCol_SliderGrab] = scarlet;
+    // --------
+    // Sliders
+    // --------
+    colors[ImGuiCol_SliderGrab]       = scarlet;
     colors[ImGuiCol_SliderGrabActive] = scarletHover;
 
-    // ------------------------------------------------------------
+    // -------------------
     // Checkboxes / Radio
-    // ------------------------------------------------------------
+    // -------------------
     colors[ImGuiCol_CheckMark] = scarlet;
 
-    // ------------------------------------------------------------
+    // -----------
     // Scrollbars
-    // ------------------------------------------------------------
-    colors[ImGuiCol_ScrollbarBg] = sidePanel;
-    colors[ImGuiCol_ScrollbarGrab] = surface;
+    // -----------
+    colors[ImGuiCol_ScrollbarBg]          = sidePanel;
+    colors[ImGuiCol_ScrollbarGrab]        = surface;
     colors[ImGuiCol_ScrollbarGrabHovered] = surfaceHover;
-    colors[ImGuiCol_ScrollbarGrabActive] = scarlet;
+    colors[ImGuiCol_ScrollbarGrabActive]  = scarlet;
 
-    // ------------------------------------------------------------
+    // ------------
     // Resize grip
-    // ------------------------------------------------------------
-    colors[ImGuiCol_ResizeGrip] = surface;
+    // ------------
+    colors[ImGuiCol_ResizeGrip]        = surface;
     colors[ImGuiCol_ResizeGripHovered] = scarlet;
-    colors[ImGuiCol_ResizeGripActive] = scarletActive;
+    colors[ImGuiCol_ResizeGripActive]  = scarletActive;
 
-    // ------------------------------------------------------------
+    // --------
     // Docking
-    // ------------------------------------------------------------
+    // --------
     colors[ImGuiCol_DockingPreview] = scarlet;
-    colors[ImGuiCol_DockingEmptyBg] = ImColor(12, 12, 14);
+    colors[ImGuiCol_DockingEmptyBg] = ImColor{ 12, 12, 14 };
 }
 
 EditorManager::EditorManager()
@@ -166,6 +165,7 @@ EditorManager::EditorManager()
     mEditorView = new EditorView();
 
     engineInstance.SetEndRenderEvent([&] { EndRender(); });
+    engineInstance.GetAssetManager().LoadScarletAssets(Filepath{ FilepathDirectory::PROJECT, "" });
 
     OpenScene(Filepath{ FilepathDirectory::ENGINE, "EngineAssets/Scenes/DefaultScene.scarlet_scene" }.GetAbsolutePath() );
 }
@@ -173,6 +173,8 @@ EditorManager::EditorManager()
 EditorManager::~EditorManager()
 {
     Engine::Instance().SetEndRenderEvent(nullptr);
+
+    SaveCurrentScene();
 
     delete mEditorView;
 }
@@ -233,6 +235,7 @@ void EditorManager::OpenScene(const std::string& filepath)
     view->GetSelectionManager().SetSelectedEntity(nullptr);
 
     mEditorScene = ScarlEnt::Registry::Instance().CreateScene(newSceneFriendlyName);
+    mCurrentSceneFilepath = filepath;
 
     for (const XmlElement& entityNode : document.GetRootElement()->GetChildElements())
     {
@@ -363,12 +366,12 @@ void EditorManager::OpenScene(const std::string& filepath)
     }
 }
 
-void EditorManager::SaveScene(const std::string& filepath)
+void EditorManager::SaveSceneAs(const std::string& filepath)
 {
     const std::string fileExtension         = ".scarlet_scene";
     const std::string filepathWithExtension = filepath.ends_with(fileExtension) ? filepath : filepath + fileExtension;
 
-    XmlElement* sceneNode = new XmlElement("ScarletScene", "FriendlyName=\"" + std::string{ mEditorScene->GetFriendlyName() } + "\"");
+    XmlElement* sceneNode = new XmlElement("ScarletScene");
 
     const vector<ScarlEnt::IEntityHandle*>& entities = mEditorScene->GetMutableEntityHandles();
 
@@ -396,6 +399,18 @@ void EditorManager::SaveScene(const std::string& filepath)
     }
 
     XmlSerializer::Serialize(XmlDocument{ sceneNode }, filepathWithExtension);
+}
+
+void EditorManager::SaveCurrentScene()
+{
+    if (mCurrentSceneFilepath.ends_with("DefaultScene.scarlet_scene"))
+    {
+        // Don't save default scene.
+        // Todo Christian: There should be prompt to see if the user would like to save the scene.
+        return;
+    }
+
+    SaveSceneAs(mCurrentSceneFilepath);
 }
 
 void EditorManager::EndRender() const

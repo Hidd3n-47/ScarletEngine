@@ -50,7 +50,13 @@ public:
      * @brief Save the currently active editor scene to the given filepath.
      * @param filepath The filepath where the editor scene is being saved to.
      */
-    void SaveScene(const std::string& filepath);
+    void SaveSceneAs(const std::string& filepath);
+
+    /**
+     * @brief Save the currently active editor scene to the same path it was loaded from.
+     * @remark If the engine default scene is open, the save will preform no operation.
+     */
+    void SaveCurrentScene();
 
     /**
      * @brief End render unbinds frame buffers and renders it to the viewport, as well as renders the rest of the editor UI.
@@ -62,12 +68,19 @@ public:
      * @return A \ref WeakHandle to the game scene.
      */
     [[nodiscard]] inline WeakHandle<ScarlEnt::Scene> GetGameScene() const { return mEditorScene;}
+
+    inline static constexpr Ulid BACK_ICON_ULID      { 1 };
+    inline static constexpr Ulid DIRECTORY_ICON_ULID { 2 };
+    inline static constexpr Ulid ASSET_ICON_ULID     { 3 };
+    inline static constexpr Ulid SCENE_ICON_ULID     { 4 };
+    inline static constexpr Ulid COMPONENT_ICON_ULID { 5 };
 private:
     EditorManager();
     ~EditorManager();
     inline static EditorManager* mInstance = nullptr;
 
     WeakHandle<ScarlEnt::Scene> mEditorScene;
+    std::string mCurrentSceneFilepath{};
 
     ScarlEnt::EntityHandle<Component::Transform, Component::Camera, Component::DirectionLight> mCameraEntity;
 

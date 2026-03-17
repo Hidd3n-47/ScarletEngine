@@ -11,6 +11,7 @@
 #include "Views/EditorView/Panels/ConsolePanel.h"
 #include "Views/EditorView/Panels/ViewportPanel.h"
 #include "Views/EditorView/Panels/PropertiesPanel.h"
+#include "Views/EditorView/Panels/AssetBrowserPanel.h"
 
 namespace
 {
@@ -44,6 +45,7 @@ EditorView::EditorView()
     AddPanel<ConsolePanel>();
     AddPanel<ViewportPanel>();
     AddPanel<PropertiesPanel>();
+    AddPanel<AssetBrowserPanel>();
 }
 
 void EditorView::RenderMenuBar()
@@ -62,13 +64,18 @@ void EditorView::RenderMenuBar()
                 }
             }
 
+            if (ImGui::MenuItem("Save"))
+            {
+                EditorManager::Instance().SaveCurrentScene();
+            }
+
             if (ImGui::MenuItem("Save as..."))
             {
                 const std::string filepath = FileDialog::SaveAsFile("Scarlet Scene (*.scarlet_scene)\0*.scarlet_scene\0");
 
                 if (!filepath.empty())
                 {
-                    EditorManager::Instance().SaveScene(filepath);
+                    EditorManager::Instance().SaveSceneAs(filepath);
                 }
             }
 
@@ -82,6 +89,7 @@ void EditorView::RenderMenuBar()
 
         if (ImGui::BeginMenu("Window"))
         {
+            AddMenuItemOption<AssetBrowserPanel>(this, "AssetBrowser", mAssetBrowserPanel);
             AddMenuItemOption<ConsolePanel>(this, "Console", mConsolePanel);
             AddMenuItemOption<PropertiesPanel>(this, "Properties", mPropertiesPanel);
             AddMenuItemOption<ScenePanel>(this, "Scene", mScenePanel);

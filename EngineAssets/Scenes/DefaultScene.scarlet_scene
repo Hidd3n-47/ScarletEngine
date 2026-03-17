@@ -1,4 +1,4 @@
-<ScarletScene FriendlyName="Default">
+<ScarletScene>
 	<Entity Mutable="true">
 		<Component typeId="Transform">
 			<translation type="vec3">0.000000,0.000000,0.000000</translation>
