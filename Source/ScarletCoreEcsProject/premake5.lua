@@ -1,15 +1,12 @@
--- ---------------------------- ScarletEditor Project.
-project "ScarletEditor"
-    kind "StaticLib"
+-- ---------------------------- ScarletCoreEcs Project.
+project "ScarletCoreEcs"
+    kind "SharedLib"
     language "C++"
     staticruntime "Off"
     cppdialect "C++20"
 
     targetdir(path.join(outputPath, "%{prj.name}"))
     objdir(path.join(outputIntPath, "%{prj.name}"))
-
-    pchheader "ScarletEditorPch.h"
-    pchsource "%{prj.name}/Src/ScarletEditorPch.cpp"
 
     files
     {
@@ -19,20 +16,18 @@ project "ScarletEditor"
 
     includedirs
     {
+        "",
         "%{prj.name}",
         "%{prj.name}/Src/",
 
-        "$(SolutionDir)Deps/Include/",
+        "$(SolutionDir)/Deps/Include",
+
 
         "$(SolutionDir)Source/ScarlEntProject/",
         "$(SolutionDir)Source/ScarletMathProject/",
         "$(SolutionDir)Source/ScarletCoreProject/",
-        "$(SolutionDir)Source/ScarletEngineProject/",
         "$(SolutionDir)Source/ScarletReflectProject/",
-        "$(SolutionDir)Source/ScarletCoreEcsProject/",
         "$(SolutionDir)Source/ScarletLoggerProject/",
-
-        "$(SolutionDir)Deps/ImGui/",
     }
 
     libdirs
@@ -45,20 +40,14 @@ project "ScarletEditor"
         "ScarlEnt",
         "ScarletMath",
         "ScarletCore",
-        "ScarletEngine",
         "ScarletReflect",
-        "ScarletCoreEcs",
         "ScarletLogger",
-
-        "ImGui",
-
-        "glfw3_mt.lib",
-        "glew32s.lib",
-        "opengl32.lib"
     }
 
     postbuildcommands
     {
+        '{MKDIR} "' .. outputPath .. '/Scarlet/"',
+        '{COPYFILE} "%{cfg.buildtarget.abspath}" "' .. outputPath .. '/Scarlet/"'
     }
 
     filter "system:windows"
@@ -66,9 +55,10 @@ project "ScarletEditor"
 
     filter "configurations:Dev"
         runtime "Debug"
-        defines "DEV_CONFIGURATION"
+        defines { "COMPONENTS_BUILD", "DEV_CONFIGURATION"}
         symbols "On"
 
     filter "configurations:Release"
         runtime "Release"
+        defines "COMPONENTS_BUILD"
         optimize "On"

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "ScarletCoreEcs/Defines.h"
+
 #include <ScarletMath/Math.h>
 
 #include <ScarlEnt/RTTI/Rtti.h>
@@ -7,7 +9,7 @@
 namespace Scarlet::Component
 {
 
-struct Camera
+struct COMPONENT_API Camera
 {
     inline void UpdateViewAndProjectionMatrix(const Math::Vec3& eyePosition, const Math::Mat4& rotationMatrix)
     {

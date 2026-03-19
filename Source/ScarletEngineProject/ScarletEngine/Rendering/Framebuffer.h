@@ -1,5 +1,7 @@
 #pragma once
 
+#include "ScarletEngine/Core/Defines.h"
+
 #include <ScarletCore/PrimitiveTypes.h>
 
 namespace Scarlet
@@ -9,7 +11,7 @@ namespace Scarlet
  * @class Framebuffer: A class representing a framebuffer of the graphics pipeline. A framebuffer is a rendering destination. \\n
  * Currently the \ref Framebuffer automatically creates a colour attachment texture and depth stencil attachment (24-8).
  */
-class Framebuffer
+class ENGINE_API Framebuffer
 {
 public:
     /**

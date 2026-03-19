@@ -76,7 +76,7 @@ private:
     vector<Scarlet::Ulid> mEntityIds;
     unordered_map<Scarlet::Ulid, size_t> mEntityIdToIndex;
 
-    unordered_map<const char*, size_t> mComponentIdToArrayIndex;
+    unordered_map<std::string, size_t> mComponentIdToArrayIndex;
 
 #ifdef DEV_CONFIGURATION
     uint64 mArchetypeComponentBitmask = 0;
@@ -150,7 +150,7 @@ inline auto Archetype::GetComponentArrays()
 template <typename Component>
 inline ComponentArray<Component>* Archetype::GetComponentArray()
 {
-    const char* const componentTypeId = Registry::GetComponentTypeId<Component>();
+    const std::string componentTypeId = Registry::GetComponentTypeId<Component>();
     SCARLENT_ASSERT(mComponentIdToArrayIndex.contains(componentTypeId) && "Archetype does not contain component type that the array is being requested for.");
 
     return static_cast<ComponentArray<Component>*>(mComponents[mComponentIdToArrayIndex[componentTypeId]]);

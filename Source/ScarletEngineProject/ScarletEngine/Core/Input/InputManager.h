@@ -1,5 +1,7 @@
 #pragma once
 
+#include "ScarletEngine/Core/Defines.h"
+
 #include <ScarletMath/Math.h>
 
 namespace Scarlet
@@ -10,7 +12,7 @@ class Event;
 /**
  * @class InputManager: A static class to store the keyboard and mouse state.
  */
-class InputManager
+class ENGINE_API InputManager
 {
     friend class Engine;
     using KeyMap = unordered_map<uint32, bool>;

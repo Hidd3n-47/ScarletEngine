@@ -1,5 +1,7 @@
 #pragma once
 
+#include "ScarletCoreEcs/Defines.h"
+
 #include <ScarletMath/Quat.h>
 
 #include <ScarlEnt/RTTI/Rtti.h>
@@ -7,7 +9,7 @@
 namespace Scarlet::Component
 {
 
-struct Transform
+struct COMPONENT_API Transform
 {
     Math::Vec3 translation{ };
     Math::Vec3 rotation   { };

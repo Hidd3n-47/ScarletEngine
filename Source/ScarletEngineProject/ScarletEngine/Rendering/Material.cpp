@@ -3,8 +3,9 @@
 
 #include <ScarletCore/Xml/XmlSerializer.h>
 
+#include <ScarletReflect/ReflectType.h>
+
 #include "Core/Engine.h"
-#include "RTTI/ReflectType.h"
 #include "AssetLoading/AssetManager.h"
 
 

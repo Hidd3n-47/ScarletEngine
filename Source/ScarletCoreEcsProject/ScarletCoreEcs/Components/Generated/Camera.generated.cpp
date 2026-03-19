@@ -1,8 +1,8 @@
-#include "ScarletEnginePch.h"
 #include "Components/Camera.h"
 
 #include <ScarlEnt/ComponentManager.h>
-#include "RTTI/ReflectType.h"
+
+#include <ScarletReflect/ReflectType.h>
 
 namespace Scarlet::Component
 {

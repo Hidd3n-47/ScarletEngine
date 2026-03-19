@@ -1,5 +1,7 @@
 #pragma once
 
+#include "ScarletEngine/Core/Defines.h"
+
 #include <ScarletMath/Math.h>
 
 #include "Shader.h"
@@ -31,7 +33,7 @@ class IndexBuffer;
 /**
  * @class Renderer: A singleton class responsible for the rendering pipeline of the application. Add a rendering command to render an instance to the screen.
  */
-class Renderer
+class ENGINE_API Renderer
 {
 public:
     [[nodiscard]] inline static Renderer& Instance() { return *mInstance; }

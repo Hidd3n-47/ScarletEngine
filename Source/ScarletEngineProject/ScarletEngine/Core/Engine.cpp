@@ -16,7 +16,14 @@
 #include "AssetLoading/AssetManager.h"
 
 #ifdef DEV_CONFIGURATION
-#include "Components/Generated/Register.generated.h"
+#include <ScarletCoreEcs/Components/Generated/Register.generated.h>
+
+#include <glfw/glfw3.h>
+
+#include <ImGui/imgui_impl_glfw.h>
+#include <ImGui/backends/imgui_impl_opengl3.h>
+
+#include <Rendering/Framebuffer.h>
 #endif // DEV_CONFIGURATION.
 
 namespace Scarlet
@@ -42,10 +49,22 @@ void Engine::Init() noexcept
 
     Renderer::InitApi();
 
-    DEBUG(RegisterComponents());
+    DEBUG(Register::RegisterComponents());
 
     mAssetManager = new AssetManager();
     mAssetManager->LoadScarletAssets(Filepath{ FilepathDirectory::ENGINE, "EngineAssets/" });
+
+#ifdef DEV_CONFIGURATION
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+    io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+
+    ImGui_ImplGlfw_InitForOpenGL(static_cast<GLFWwindow*>(Engine::Instance().GetMainWindow()->GetNativeWindow()), true);
+    ImGui_ImplOpenGL3_Init("#version 330");
+#endif // DEV_CONFIGURATION.
 
     mRunning = true;
     SCARLET_INFO("Engine Initialised!");
@@ -54,6 +73,12 @@ void Engine::Init() noexcept
 void Engine::Destroy() const noexcept
 {
     SCARLET_ASSERT(!mRunning && "Trying to destroy engine whilst Engine::Run is running.");
+
+#ifdef DEV_CONFIGURATION
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
+#endif // DEV_CONFIGURATION.
 
     delete mAssetManager;
 
@@ -82,13 +107,37 @@ void Engine::Run() const
         DEBUG(if (mBeginRenderEvent) mBeginRenderEvent());
 
         Renderer::Instance().Render();
-        DEBUG(if (mEndRenderEvent) mEndRenderEvent());
+
+#ifdef DEV_CONFIGURATION
+        Framebuffer::Unbind();
+
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+
+        if (mEndRenderEvent) mEndRenderEvent();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+        {
+            GLFWwindow* backupCurrentContext = glfwGetCurrentContext();
+            ImGui::UpdatePlatformWindows();
+            ImGui::RenderPlatformWindowsDefault();
+            glfwMakeContextCurrent(backupCurrentContext);
+        }
+#endif // DEV_CONFIGURATION.
 
         mMainWindow->Update();
 
         ScarlEnt::Registry::Instance().PostUpdate();
     }
 }
+
+#ifdef DEV_CONFIGURATION
+void* Engine::GetImGuiContext()
+{
+    return ImGui::GetCurrentContext();
+}
+#endif // DEV_CONFIGURATION.
 
 void Engine::OnEvent(Event& event)
 {

@@ -3,12 +3,13 @@
 
 #include <algorithm>
 
+#include <ScarletCore/AssetRef.h>
+
 #include <ScarletEngine/Rendering/Texture.h>
 #include <ScarletEngine/Rendering/Renderer.h>
 
 #include <ScarletEngine/Core/Engine.h>
 
-#include <ScarletEngine/AssetLoading/AssetType.h>
 #include <ScarletEngine/AssetLoading/AssetManager.h>
 
 #include "Core/EditorManager.h"

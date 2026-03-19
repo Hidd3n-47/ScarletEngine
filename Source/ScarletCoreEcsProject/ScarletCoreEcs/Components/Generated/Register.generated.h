@@ -3,10 +3,10 @@
 #include <ScarlEnt/Registry.h>
 #include <ScarlEnt/MutableEntityHandle.h>
 
-#include "Components/Camera.h"
-#include "Components/DirectionLight.h"
-#include "Components/Mesh.h"
-#include "Components/Transform.h"
+#include "ScarletCoreEcs/Components/Camera.h"
+#include "ScarletCoreEcs/Components/DirectionLight.h"
+#include "ScarletCoreEcs/Components/Mesh.h"
+#include "ScarletCoreEcs/Components/Transform.h"
 
 template <typename T>
 static void RegisterComponentTypeAndFunctionPointer(ScarlEnt::Registry& registry)
@@ -19,12 +19,7 @@ static void RegisterComponentTypeAndFunctionPointer(ScarlEnt::Registry& registry
         });
 }
 
-inline void RegisterComponents()
+struct COMPONENT_API Register
 {
-    ScarlEnt::Registry& registry = ScarlEnt::Registry::Instance();
-
-    RegisterComponentTypeAndFunctionPointer<Scarlet::Component::Camera>(registry);
-    RegisterComponentTypeAndFunctionPointer<Scarlet::Component::DirectionLight>(registry);
-    RegisterComponentTypeAndFunctionPointer<Scarlet::Component::Mesh>(registry);
-    RegisterComponentTypeAndFunctionPointer<Scarlet::Component::Transform>(registry);
-}
+    static void RegisterComponents();
+};

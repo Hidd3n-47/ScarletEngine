@@ -2,7 +2,6 @@
 
 #include <functional>
 
-#include <ScarletCore/vector.h>
 #include <ScarletCore/unordered_map.h>
 
 #include <ScarletCore/WeakHandle.h>
@@ -106,7 +105,7 @@ public:
      * @return The type ID for the component.
      */
     template <typename ComponentType>
-    [[nodiscard]] inline static const char* GetComponentTypeId() { return typeid(ComponentType).name(); }
+    [[nodiscard]] inline static std::string GetComponentTypeId() { return ComponentType::ComponentTypeName(); return typeid(ComponentType).name(); }
 
 #ifdef SCARLENT_TEST
     /**

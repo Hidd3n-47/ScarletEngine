@@ -1,5 +1,7 @@
 #pragma once
 
+#include "ScarletEngine/Core/Defines.h"
+
 #include <functional>
 
 #include <ScarletCore/WeakHandle.h>
@@ -12,7 +14,7 @@ class Window;
 class Renderer;
 class AssetManager;
 
-class Engine
+class ENGINE_API Engine
 {
 public:
     Engine(const Engine&)            = delete;
@@ -38,6 +40,7 @@ public:
 
     [[nodiscard]] inline AssetManager& GetAssetManager() const { return *mAssetManager; }
 #ifdef DEV_CONFIGURATION
+    static void* GetImGuiContext();
     inline void SetBeginRenderEvent(const std::function<void()>& beginRenderEvent) { mBeginRenderEvent = beginRenderEvent; }
     inline void SetEndRenderEvent(const std::function<void()>& endRenderEvent)     { mEndRenderEvent = endRenderEvent; }
 #endif // DEV_CONFIGURATION.

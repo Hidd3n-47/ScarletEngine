@@ -1,5 +1,5 @@
--- ---------------------------- ScarletEditor Project.
-project "ScarletEditor"
+-- ---------------------------- ScarletReflect Project.
+project "ScarletReflect"
     kind "StaticLib"
     language "C++"
     staticruntime "Off"
@@ -7,9 +7,6 @@ project "ScarletEditor"
 
     targetdir(path.join(outputPath, "%{prj.name}"))
     objdir(path.join(outputIntPath, "%{prj.name}"))
-
-    pchheader "ScarletEditorPch.h"
-    pchsource "%{prj.name}/Src/ScarletEditorPch.cpp"
 
     files
     {
@@ -22,39 +19,20 @@ project "ScarletEditor"
         "%{prj.name}",
         "%{prj.name}/Src/",
 
-        "$(SolutionDir)Deps/Include/",
+        "$(SolutionDir)/Deps/Include",
 
-        "$(SolutionDir)Source/ScarlEntProject/",
         "$(SolutionDir)Source/ScarletMathProject/",
         "$(SolutionDir)Source/ScarletCoreProject/",
-        "$(SolutionDir)Source/ScarletEngineProject/",
-        "$(SolutionDir)Source/ScarletReflectProject/",
-        "$(SolutionDir)Source/ScarletCoreEcsProject/",
-        "$(SolutionDir)Source/ScarletLoggerProject/",
-
-        "$(SolutionDir)Deps/ImGui/",
     }
 
     libdirs
     {
-        "$(SolutionDir)Deps/Lib"
     }
 
     links
     {
-        "ScarlEnt",
         "ScarletMath",
         "ScarletCore",
-        "ScarletEngine",
-        "ScarletReflect",
-        "ScarletCoreEcs",
-        "ScarletLogger",
-
-        "ImGui",
-
-        "glfw3_mt.lib",
-        "glew32s.lib",
-        "opengl32.lib"
     }
 
     postbuildcommands

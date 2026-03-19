@@ -8,6 +8,7 @@
 
 #define SCARLET_COMPONENT(X)                                                         \
 public:                                                                              \
+static std::string ComponentTypeName() { return std::string{ #X }; }                 \
 inline unordered_map<std::string, ScarlEnt::Property>* GetProperties()               \
     { GenerateProperties(); return &mProperties; }                                   \
 private:                                                                             \

@@ -1,8 +1,7 @@
 #pragma once
 
 #include <ScarletCore/Ulid.h>
-
-#include "ScarletEngine/AssetLoading/AssetType.h"
+#include <ScarletCore/AssetRef.h>
 
 namespace Scarlet::Resource
 {

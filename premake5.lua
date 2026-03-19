@@ -22,9 +22,11 @@ include "Source/ScarletProject/"
 include "Source/ScarlEntProject/"
 include "Source/ScarletCoreProject/"
 include "Source/ScarletMathProject/"
+include "Source/ScarletReflectProject/"
 include "Source/ScarletLoggerProject/"
 include "Source/ScarletEngineProject/"
 include "Source/ScarletEditorProject/"
+include "Source/ScarletCoreEcsProject/"
 
 -- Test Projects
 include "Tests/ScarletTestTemplateProject/"

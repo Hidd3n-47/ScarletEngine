@@ -3,8 +3,6 @@
 
 #ifdef DEV_CONFIGURATION
 
-#include <glfw/glfw3.h>
-
 #include <ScarlEnt/Scene.h>
 #include <ScarlEnt/Registry.h>
 
@@ -13,17 +11,18 @@
 #include <ScarletCore/Xml/XmlSerializer.h>
 
 #include <ScarletEngine/Core/Engine.h>
-#include <ScarletEngine/Core/Window/Window.h>
 
 #include <ScarletEngine/Rendering/Renderer.h>
 
 #include <ScarletEngine/Core/Input/KeyCodes.h>
 #include <ScarletEngine/Core/Input/InputManager.h>
 
-#include <ScarletEngine/Components/Mesh.h>
-#include <ScarletEngine/Components/Camera.h>
-#include <ScarletEngine/Components/Transform.h>
-#include <ScarletEngine/Components/DirectionLight.h>
+#include <ScarletEngine/AssetLoading/AssetManager.h>
+
+#include <ScarletCoreEcs/Components/Mesh.h>
+#include <ScarletCoreEcs/Components/Camera.h>
+#include <ScarletCoreEcs/Components/Transform.h>
+#include <ScarletCoreEcs/Components/DirectionLight.h>
 
 #include "Views/EditorView/View/EditorView.h"
 #include "Views/EditorView/Panels/ViewportPanel.h"
@@ -183,15 +182,9 @@ void EditorManager::Init()
 {
     mInstance = new EditorManager();
 
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-    io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+    ImGui::SetCurrentContext(static_cast<ImGuiContext*>(Engine::GetImGuiContext()));
 
-    ImGui_ImplGlfw_InitForOpenGL(static_cast<GLFWwindow*>(Engine::Instance().GetMainWindow()->GetNativeWindow()), true);
-    ImGui_ImplOpenGL3_Init("#version 330");
+    ImGuiIO io = ImGui::GetIO();
 
     ImGui::StyleColorsDark();
     ImGuiStyle& style = ImGui::GetStyle();
@@ -209,10 +202,6 @@ void EditorManager::Init()
 
 void EditorManager::Destroy()
 {
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
-
     delete mInstance;
     mInstance = nullptr;
 }
@@ -351,7 +340,9 @@ void EditorManager::OpenScene(const std::string& filepath)
     mEditorScene->RegisterSystem<Component::Transform, Component::Camera>(cameraMovementFunction);
 
     mEditorScene->RegisterSystem<Component::Transform, Component::Mesh>([](Component::Transform& transform, Component::Mesh& mesh) {
-        Renderer::Instance().AddRenderCommand(mesh.material, mesh.mesh,
+        auto meshAsset = Engine::Instance().GetAssetManager().GetAsset(mesh.mesh.assetType, Ulid{ mesh.mesh.assetUlid });
+        auto materialAsset = Engine::Instance().GetAssetManager().GetAsset(mesh.material.assetType, Ulid{ mesh.material.assetUlid });
+        Renderer::Instance().AddRenderCommand(materialAsset, meshAsset,
             Math::TransformAsMatrix(transform.translation,
                 Math::Trig::RotationMatrix(transform.rotation.z, transform.rotation.x, transform.rotation.y), transform.scale));
         });
@@ -418,15 +409,6 @@ void EditorManager::EndRender() const
     mEditorView->Render();
 
     ImGui::Render();
-
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-    if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-    {
-        GLFWwindow* backupCurrentContext = glfwGetCurrentContext();
-        ImGui::UpdatePlatformWindows();
-        ImGui::RenderPlatformWindowsDefault();
-        glfwMakeContextCurrent(backupCurrentContext);
-    }
 }
 
 } // Namespace Scarlet::Editor.

@@ -2,12 +2,12 @@
 
 #ifdef DEV_CONFIGURATION
 
+#include <string>
 #include <stdexcept>
 
 #include <ScarletMath/Quat.h>
 
-#include "ScarletEngine/Core/Engine.h"
-#include "ScarletEngine/AssetLoading/AssetManager.h"
+#include <ScarletCore/AssetRef.h>
 
 namespace Scarlet
 {
@@ -78,9 +78,9 @@ inline std::string ReflectType::GetStringFromValue<Math::Quat>(const Math::Quat 
 }
 
 template <>
-inline std::string ReflectType::GetStringFromValue<WeakHandle<Resource::ILazyLoadAsset>>(const WeakHandle<Resource::ILazyLoadAsset> value)
+inline std::string ReflectType::GetStringFromValue<AssetRef>(const AssetRef value)
 {
-    return std::to_string(static_cast<int>(value->GetAssetType())) + "," + std::to_string(value->GetUlid());
+    return std::to_string(static_cast<int>(value.assetType)) + "," + std::to_string(value.assetUlid);
 }
 
 // --------- Sets. ---------
@@ -143,14 +143,12 @@ inline void ReflectType::SetValueFromString<Math::Quat>(Math::Quat& value, const
 }
 
 template <>
-inline void ReflectType::SetValueFromString<WeakHandle<Resource::ILazyLoadAsset>>(WeakHandle<Resource::ILazyLoadAsset>& value, const std::string_view& stringValue)
+inline void ReflectType::SetValueFromString<AssetRef>(AssetRef& value, const std::string_view& stringValue)
 {
     const size_t firstCommaPosition = stringValue.find_first_of(',');
 
-    const AssetType type = static_cast<AssetType>(std::stoi(std::string{ stringValue.substr(0, firstCommaPosition) }));
-    const Ulid ulid{ std::stoull(std::string{ stringValue.substr(firstCommaPosition + 1) }) };
-
-    value = Engine::Instance().GetAssetManager().GetAsset(type, ulid);
+    value.assetType = static_cast<AssetType>(std::stoi(std::string{ stringValue.substr(0, firstCommaPosition) }));
+    value.assetUlid = std::stoull(std::string{ stringValue.substr(firstCommaPosition + 1) });
 }
 
 } // Namespace Scarlet.

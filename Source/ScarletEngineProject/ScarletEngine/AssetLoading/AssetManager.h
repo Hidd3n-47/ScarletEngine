@@ -1,5 +1,7 @@
 #pragma once
 
+#include "ScarletEngine/Core/Defines.h"
+
 #include <array>
 
 #include "LazyLoadAsset.h"
@@ -10,7 +12,7 @@ namespace Scarlet
 /**
  * @class AssetManager: A class responsible for the creation and destruction of assets. This class is purley here to control lifetime of assets.
  */
-class AssetManager
+class ENGINE_API AssetManager
 {
 public:
     AssetManager() = default;

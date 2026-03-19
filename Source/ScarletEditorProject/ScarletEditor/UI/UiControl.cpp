@@ -7,7 +7,10 @@
 
 #include <ScarlEnt/RTTI/Property.h>
 
-#include <ScarletEngine/RTTI/ReflectType.h>
+#include <ScarletReflect/ReflectType.h>
+
+#include <ScarletEngine/Core/Engine.h>
+#include <ScarletEngine/AssetLoading/AssetManager.h>
 
 #include "UiControlProperties.h"
 #include "UiControlButtonProperties.h"
@@ -154,21 +157,24 @@ void UiControl::RenderVec4PropertyControl(const ScarlEnt::Property& property, co
 
 void UiControl::RenderAssetPropertyControl(const ScarlEnt::Property& property, const UiControlProperties& controlProperties)
 {
-    WeakHandle<Resource::ILazyLoadAsset> value;
+    AssetRef value;
     ReflectType::SetValueFromString(value, property.GetPropertyValue());
+
+    AssetManager& assetManager = Engine::Instance().GetAssetManager();
+    WeakHandle<Resource::ILazyLoadAsset> asset = assetManager.GetAsset(value.assetType, Ulid{ value.assetUlid });
 
     float lineHeight;
     std::string propertyId;
     RenderTwoColumnPropertyControl(lineHeight, propertyId, controlProperties);
 
-    const auto& loadedAssets = Engine::Instance().GetAssetManager().GetLoadedAssets(value->GetAssetType());
+    const auto& loadedAssets = Engine::Instance().GetAssetManager().GetLoadedAssets(asset->GetAssetType());
 
     const float windowWidth     = ImGui::GetWindowSize().x;
     constexpr float buttonWidth = 200.0f;
 
     ImGui::SetCursorPosX((windowWidth - buttonWidth) * 0.5f);
 
-    if (ImGui::Button((value->GetAssetPath().GetFileName() + "##" + propertyId).c_str(), { buttonWidth, 25.0f }))
+    if (ImGui::Button((asset->GetAssetPath().GetFileName() + "##" + propertyId).c_str(), { buttonWidth, 25.0f }))
     {
         ImGui::OpenPopup(std::string{ "AssetSelector" + propertyId}.c_str());
 
@@ -185,13 +191,13 @@ void UiControl::RenderAssetPropertyControl(const ScarlEnt::Property& property, c
 
         ImGui::BeginChild("PopupItems", { popupMinWidth, popupMaxHeight }, true, ImGuiWindowFlags_HorizontalScrollbar);
 
-        for (auto& [ulid, asset] : loadedAssets)
+        for (auto& [loadedUlid, loadedAsset] : loadedAssets)
         {
-            const std::string compName = std::string{ asset->GetAssetPath().GetFileName() };
+            const std::string compName = std::string{ loadedAsset->GetAssetPath().GetFileName() };
 
             if (ImGui::MenuItem(compName.c_str()))
             {
-                value = WeakHandle{ asset };
+                value.assetUlid = loadedUlid;
                 property.SetPropertyValue(ReflectType::GetStringFromValue(value));
                 ImGui::CloseCurrentPopup();
             }

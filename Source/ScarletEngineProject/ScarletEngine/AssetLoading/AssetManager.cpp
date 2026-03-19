@@ -4,6 +4,7 @@
 #include <ranges>
 #include <filesystem>
 
+#include <ScarletCore/AssetRef.h>
 #include <ScarletCore/Xml/XmlSerializer.h>
 
 namespace Scarlet

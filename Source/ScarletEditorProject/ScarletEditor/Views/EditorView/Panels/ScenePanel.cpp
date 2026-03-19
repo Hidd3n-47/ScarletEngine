@@ -7,7 +7,7 @@
 
 #include <ScarlEnt/Scene.h>
 
-#include <ScarletEngine/Components/Transform.h>
+#include <ScarletCoreEcs/Components/Transform.h>
 
 #include "Core/EditorManager.h"
 #include "Views/EditorView/View/EditorView.h"

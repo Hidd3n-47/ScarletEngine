@@ -20,9 +20,9 @@
 #include "VertexBuffer.h"
 #include "CubeMapTexture.h"
 
-#include "Components/Camera.h"
-#include "Components/Transform.h"
-#include "Components/DirectionLight.h"
+#include <ScarletCoreEcs/Components/Camera.h>
+#include <ScarletCoreEcs/Components/Transform.h>
+#include <ScarletCoreEcs/Components/DirectionLight.h>
 
 #include "AssetLoading/ILazyLoadAsset.h"
 
