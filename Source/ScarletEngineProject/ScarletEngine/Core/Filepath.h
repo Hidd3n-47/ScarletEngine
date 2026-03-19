@@ -92,8 +92,8 @@ public:
     inline static const std::filesystem::path SCARLET_ENGINE_DIRECTORY { "E:/Programming/ScarletEngine/" };
     inline static const std::filesystem::path SCARLET_PROJECT_DIRECTORY{ "E:/Programming/ScarletEngine/ScarletProjects/ScarletTestGameProject/" };
 private:
-    std::filesystem::path mRelativePath;
-    FilepathDirectory     mDirectory;
+    std::filesystem::path mRelativePath{ };
+    FilepathDirectory     mDirectory   { FilepathDirectory::ENGINE };
 };
 
 } // Namespace Scarlet.

@@ -19,6 +19,8 @@ public:
 
 #else // DEV_CONFIGURATION.
 
-#define SCARLET_COMPONENT(X)
+#include <string>
+
+#define SCARLET_COMPONENT(X) static std::string ComponentTypeName() { return std::string{ #X }; }
 
 #endif // Else DEV_CONFIGURATION.

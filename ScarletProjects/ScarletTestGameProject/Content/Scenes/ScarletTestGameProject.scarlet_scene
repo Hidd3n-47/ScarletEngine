@@ -29,7 +29,7 @@
 		</Component>
 		<Component typeId="Mesh">
 			<mesh type="asset">0,26605124924805398</mesh>
-			<material type="asset">2,0</material>
+			<material type="asset">2,26949044722005844</material>
 		</Component>
 	</Entity>
 	<Entity Mutable="true">
@@ -41,6 +41,29 @@
 		<Component typeId="Mesh">
 			<mesh type="asset">0,26558880580407306</mesh>
 			<material type="asset">2,26949044722005844</material>
+		</Component>
+	</Entity>
+	<Entity Mutable="true">
+		<Component typeId="Transform">
+			<translation type="vec3">1.300000,-16.400000,2.000000</translation>
+			<rotation type="vec3">2.100000,0.000000,-3.600000</rotation>
+			<scale type="vec3">1.000000,1.000000,1.000000</scale>
+		</Component>
+		<Component typeId="Camera">
+			<forwardVector type="vec3">-0.063000,0.997000,-0.037000</forwardVector>
+			<rightVector type="vec3">0.998000,0.063000,0.000000</rightVector>
+			<nearPlane type="float">0.100000</nearPlane>
+			<upVector type="vec3">-0.002000,0.037000,0.990000</upVector>
+			<farPlane type="float">1000.000000</farPlane>
+			<aspectRatio type="float">1.777778</aspectRatio>
+			<fov type="float">60.000000</fov>
+		</Component>
+		<Component typeId="DirectionLight">
+			<lightColor type="vec3">1.000000,1.000000,1.000000</lightColor>
+			<diffuseIntensity type="float">0.960000</diffuseIntensity>
+			<direction type="vec3">-1.000000,1.000000,-1.000000</direction>
+			<ambientIntensity type="float">0.190000</ambientIntensity>
+			<rimPower type="float">3.400000</rimPower>
 		</Component>
 	</Entity>
 </ScarletScene>

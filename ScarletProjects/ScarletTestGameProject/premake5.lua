@@ -24,6 +24,7 @@ project "ScarletTestGameProject"
         "$(SolutionDir)Source/ScarlEntProject/",
         "$(SolutionDir)Source/ScarletMathProject/",
         "$(SolutionDir)Source/ScarletCoreProject/",
+        "$(SolutionDir)Source/ScarletCoreEcsProject/",
         "$(SolutionDir)Source/ScarletEngineProject/",
     }
 
@@ -36,6 +37,7 @@ project "ScarletTestGameProject"
         "ScarlEnt",
         "ScarletMath",
         "ScarletCore",
+        "ScarletCoreEcs",
         "ScarletEngine"
     }
 

@@ -33,13 +33,14 @@ public:
 
     inline void CloseEngine() { mRunning = false; }
 
-    inline void ReloadGameDll() const { if (mReloadDllFunction) mReloadDllFunction(); }
-    inline void SetReloadDllFunction(const std::function<void()>& reloadDll) { mReloadDllFunction = reloadDll; }
-
     [[nodiscard]] inline WeakHandle<Window> GetMainWindow() const { return mMainWindow; }
 
     [[nodiscard]] inline AssetManager& GetAssetManager() const { return *mAssetManager; }
+
 #ifdef DEV_CONFIGURATION
+    inline void ReloadGameDll() const { if (mReloadDllFunction) mReloadDllFunction(); }
+    inline void SetReloadDllFunction(const std::function<void()>& reloadDll) { mReloadDllFunction = reloadDll; }
+
     static void* GetImGuiContext();
     inline void SetBeginRenderEvent(const std::function<void()>& beginRenderEvent) { mBeginRenderEvent = beginRenderEvent; }
     inline void SetEndRenderEvent(const std::function<void()>& endRenderEvent)     { mEndRenderEvent = endRenderEvent; }
@@ -48,18 +49,17 @@ private:
     Engine()  = default;
     ~Engine() = default;
 
-    inline static Engine* mInstance = nullptr;
+    static Engine* mInstance;
 
     WeakHandle<Window> mMainWindow;
 
-    AssetManager* mAssetManager;
+    AssetManager* mAssetManager = nullptr;
 
     bool mRunning = false;
 
+#ifdef DEV_CONFIGURATION
     std::function<void()> mReloadDllFunction;
     std::function<void()> mBeginRenderEvent;
-
-#ifdef DEV_CONFIGURATION
     std::function<void()> mEndRenderEvent;
 #endif // DEV_CONFIGURATION.
 

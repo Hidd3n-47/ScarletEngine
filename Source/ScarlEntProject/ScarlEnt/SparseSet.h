@@ -30,7 +30,7 @@ public:
      * @param id The unique ID of the item being added to the \ref SparseSet.
      * @param value 
      */
-    inline void Add(const uint64 id, T&& value)
+    inline T& Add(const uint64 id, T&& value)
     {
         // The sparse-array is a vector of array pointers.
         // It makes use of pointers to prevent allocation of the arrays whilst allowing for ordered pages.
@@ -63,6 +63,7 @@ public:
         // Note this is redundant as -1+1=0, but added for readability.
         // All IDs are offset by id_offset to map 0 to invalid_id.
         (*mSparse[pageIndex])[GetIndexInPageForId(id)] = mDense.size() - 1 + id_offset;
+        return mDense.back();
     }
 
     /**
@@ -72,9 +73,9 @@ public:
      * @param args The arguments forwarded to construct type \c T.
      */
     template <typename...Args>
-    inline void Add(const uint64 id, Args&&...args)
+    inline T& Add(const uint64 id, Args&&...args)
     {
-        Add(id, T{ std::forward<Args>(args)... });
+        return Add(id, T{ std::forward<Args>(args)... });
     }
 
     /**

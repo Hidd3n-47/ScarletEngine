@@ -2,169 +2,122 @@ import os
 import re
 from typing import Optional, Match
 
-ROOT_SEARCH_DIR             = "E:/Programming/ScarletEngine/Source/ScarletEngineProject/ScarletEngine/Components/"
-GENERATED_RTTI_OUTPUT_DIR   = ROOT_SEARCH_DIR + "Generated/"
+from ScarletTypes import types
+from StringTemplates import (
+    GENERATE_PROPERTIES_TEMPLATE,
+    REGISTER_COMPONENT_HEADER_TEMPLATE,
+    REGISTER_COMPONENT_SOURCE_TEMPLATE,
+    GENERATE_PROPERTY_TEMPLATE,
+    END_TEMPLATE
+)
+
+ROOT_SEARCH_DIR = "E:/Programming/ScarletEngine/Source/ScarletCoreEcsProject/ScarletCoreEcs/Components/"
+GENERATED_RTTI_OUTPUT_DIR = os.path.join(ROOT_SEARCH_DIR, "Generated/")
 
 COMPONENT_MACRO = "SCARLET_COMPONENT("
 
-types = {
-     "uint32"       : "UINT32"  ,
-     "float"        : "FLOAT"   ,
-     "std::string"  : "STRING"  ,
-     "Math::Vec3"   : "VEC3"    ,
-     "Math::Vec4"   : "VEC4"    ,
-     "Math::Quat"   : "QUAT"    ,
-     "WeakHandle<Resource::ILazyLoadAsset>" : "ASSET",
-}
-
 components = []
 
-# Function used to find all files that are considered "Components"
-# These are files that have the C++ macro 'SCARLET_COMPONENT()'
+# Function to find all files that have the C++ macro 'SCARLET_COMPONENT()'
 def get_component_files(path):
     result = []
     for root, dirs, files in os.walk(path):
         for file in files:
-            filepath = os.path.join(root,file)
+            filepath = os.path.join(root, file)
 
-            if not str(filepath).endswith(".h"):
+            if not filepath.endswith(".h"):
                 continue
 
-            component_found = False
             with open(filepath, "r") as f:
                 content = f.read()
-                component_lines = content.splitlines()
-                for line in component_lines:
-                    if line.find(COMPONENT_MACRO) != -1:
-                        component_found = True
-
-            if component_found:
-                result.append(component_lines)
+                if COMPONENT_MACRO in content:
+                    result.append(content.splitlines())
     return result
 
+# Generate RTTI for each component's member variables
 def generate_rtti_for_component(struct_name, member_variables):
     os.makedirs(GENERATED_RTTI_OUTPUT_DIR, exist_ok=True)
-    output_path = os.path.join(GENERATED_RTTI_OUTPUT_DIR, struct_name + ".generated.cpp")
+    output_path = os.path.join(GENERATED_RTTI_OUTPUT_DIR, f"{struct_name}.generated.cpp")
 
-    property_string = ""
-    for variable in member_variables:
-        property_string += "\n    { \"" + variable[1] + "\", Property{} },"
+    # Filter out member variables whose type is not in the 'types' dictionary
+    filtered_member_variables = [
+        variable for variable in member_variables
+        if types.get(variable[0]) != None
+    ]
 
+    # Prepare the RTTI property string for valid types
+    property_strings = [GENERATE_PROPERTY_TEMPLATE.format(property_name=variable[1],
+                                                          type_enum=types.get(variable[0], "Unknown"),
+                                                          struct_name=struct_name)
+                        for variable in filtered_member_variables]
+
+    # Join the property strings with new lines
+    property_string = "\n    ".join(property_strings)
+
+    # Write the generated RTTI code to a file
     with open(output_path, "w+") as f:
-        f.write('''\
-#include "ScarletEnginePch.h"
-#include "Components/{struct_name}.h"
+        f.write(GENERATE_PROPERTIES_TEMPLATE.format(struct_name=struct_name))
+        f.write(property_string)
+        f.write(END_TEMPLATE)
 
-#include <ScarlEnt/ComponentManager.h>
-#include "RTTI/ReflectType.h"
-
-namespace Scarlet::Component
-{{
-
-#ifdef DEV_CONFIGURATION
-
-void {struct_name}::GenerateProperties()
-{{
-    mProperties.clear();
-'''.format(struct_name=struct_name))
-
-        for variable in member_variables:
-            if variable[0] in types:
-                f.write('''\
-
-    mProperties["{property_name}"] = ScarlEnt::Property {{
-        ScarlEnt::PropertyType::{type_enum},
-        ScarlEnt::Registry::Instance().GetOrRegisterComponentId<{struct_name}>(),
-        [this] {{ return ReflectType::GetStringFromValue(this->{property_name}); }},
-        [this](const std::string_view& stringValue) {{ ReflectType::SetValueFromString(this->{property_name}, stringValue); }}
-    }};
-'''.format(struct_name=struct_name, type=variable[0], type_enum=types[variable[0]], property_name=variable[1]))
-            else:
-                print("Error processing variable type: " + variable[0])
-
-        f.write('''\
-}};
-
-#endif // DEV_CONFIGURATION.
-
-}} // Namespace Scarlet::Component.
-'''.format(struct_name=struct_name))
-
+# Register components in the generated header file
 def register_components():
     os.makedirs(GENERATED_RTTI_OUTPUT_DIR, exist_ok=True)
-    output_path = os.path.join(GENERATED_RTTI_OUTPUT_DIR, "Register.generated.h")
+    header_output_path = os.path.join(GENERATED_RTTI_OUTPUT_DIR, "Register.generated.h")
+    source_output_path = os.path.join(GENERATED_RTTI_OUTPUT_DIR, "Register.generated.cpp")
 
-    with open(output_path, "w+") as f:
-        f.write('''\
-#pragma once
-
-#include <ScarlEnt/Registry.h>
-#include <ScarlEnt/MutableEntityHandle.h>
-
-''')
+    with open(header_output_path, "w+") as f:
+        component_include_string = ""
         for comp in components:
-            f.write('''\
-#include "Components/{component_name}.h"
-'''.format(component_name = comp))
+            component_include_string += f'#include "ScarletCoreEcs/Components/{comp}.h"\n'
+        f.write(REGISTER_COMPONENT_HEADER_TEMPLATE.format(component_includes=component_include_string))
 
-        f.write('''\
-
-template <typename T>
-static void RegisterComponentTypeAndFunctionPointer(ScarlEnt::Registry& registry)
-{
-    const std::string componentName = registry.GetOrRegisterComponentId<T>().name;
-    registry.RegisterComponent(componentName, [](ScarlEnt::IEntityHandle* handle) {
-            ScarlEnt::MutableEntityHandle* mutableHandle = reinterpret_cast<ScarlEnt::MutableEntityHandle*>(handle);
-            mutableHandle->AddComponent<T>();
-            return mutableHandle->GetComponent<T>().GetProperties();
-        });
-}
-
-inline void RegisterComponents()
-{
-    ScarlEnt::Registry& registry = ScarlEnt::Registry::Instance();
-
-''')
+    with open(source_output_path, "w+") as f:
+        component_registry_string = ""
         for comp in components:
-            f.write('''\
-    RegisterComponentTypeAndFunctionPointer<Scarlet::Component::{component_name}>(registry);
-'''.format(component_name = comp))
+            component_registry_string += f'    RegisterComponentTypeAndFunctionPointer<Scarlet::Component::{comp}>(registry);\n'
+        f.write(REGISTER_COMPONENT_SOURCE_TEMPLATE.format(components_registry=component_registry_string))
 
-        f.write("}\n")
 
+# Analyze components in source files
 def analyse_components():
-    struct_pattern = re.compile(r'\s*struct\s+(\w+)')
-    field_pattern  = re.compile(r'^\s*(\w[\w\s*&:<>]*?)\s+(\w+)\b')
+    struct_pattern = re.compile(r'^\s*struct\s+(?:\w+\s+)*(\w+)')
+    field_pattern = re.compile(r'^\s*(\w[\w\s*&:<>]*?)\s+(\w+)\b')
 
     braces_level = 0
-    for componentLines in get_component_files(ROOT_SEARCH_DIR):
-        struct_name         = None
-        member_variables    = []
-        for line in componentLines:
+    for component_lines in get_component_files(ROOT_SEARCH_DIR):
+        struct_name = None
+        member_variables = []
+
+        for line in component_lines:
+            # Find struct names
             if not struct_name:
-                match:  Optional[Match[str]] = struct_pattern.search(line)
-                if match is not None:
+                match: Optional[Match[str]] = struct_pattern.search(line)
+                if match:
                     struct_name = match.group(1)
-                    print("Struct: " + struct_name)
+                    print(f"Struct: {struct_name}")
             else:
                 match = field_pattern.search(line)
-                if line.find('{') != -1:
-                    braces_level = braces_level + 1
-                if line.find('}') != -1:
-                    braces_level = braces_level - 1
+
+                # Track braces to handle nested code
+                if '{' in line:
+                    braces_level += 1
+                if '}' in line:
+                    braces_level -= 1
+
+                # Process variables when braces level is appropriate
                 if match and braces_level <= 1:
-                    if line.find("(") != -1 and line.find(")") != -1:
-                        if line.find("inline") != -1 or ((line.find("(") < line.find("{")) and line.find("{") != -1):
-                            continue
+                    # Skip function-like or inline declarations
+                    if "(" in line and ")" in line and ("inline" in line or line.find("{") < line.find("(")):
+                        continue
 
                     member_type, member_name = match.groups()
                     member_variables.append((member_type, member_name))
-                    print("Field: " + member_name + " -> [" + member_type + "]")
+                    print(f"Field: {member_name} -> [{member_type}]")
 
         components.append(struct_name)
-
         generate_rtti_for_component(struct_name, member_variables)
 
+# Run the analysis and component registration
 analyse_components()
-
 register_components()

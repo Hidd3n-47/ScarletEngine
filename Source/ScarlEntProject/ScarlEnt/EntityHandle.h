@@ -19,7 +19,7 @@ namespace ScarlEnt
  * of the scene.
  */
 template <typename...ArchetypeComponents>
-class EntityHandle DEBUG(: public IEntityHandle)
+class EntityHandle : public IEntityHandle
 {
     friend class Scene;
 public:

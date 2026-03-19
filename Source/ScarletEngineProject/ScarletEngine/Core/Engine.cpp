@@ -2,7 +2,6 @@
 #include "Engine.h"
 
 #include <ScarlEnt/Scene.h>
-#include <ScarlEnt/Registry.h>
 
 #include "Events/Event.h"
 #include "Events/ApplicationEvents.h"
@@ -29,6 +28,8 @@
 namespace Scarlet
 {
 
+Engine* Engine::mInstance = nullptr;
+
 void Engine::CreateEngine() noexcept
 {
     SCARLET_ASSERT(!mInstance && "Trying to create an instance of the engine one already exists.");
@@ -53,6 +54,7 @@ void Engine::Init() noexcept
 
     mAssetManager = new AssetManager();
     mAssetManager->LoadScarletAssets(Filepath{ FilepathDirectory::ENGINE, "EngineAssets/" });
+    mAssetManager->LoadScarletAssets(Filepath{ FilepathDirectory::PROJECT, "" });
 
 #ifdef DEV_CONFIGURATION
     IMGUI_CHECKVERSION();

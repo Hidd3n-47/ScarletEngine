@@ -29,6 +29,8 @@ public:
      */
     void LoadScarletAssets(const Filepath& assetPath);
 
+    inline WeakHandle<Resource::ILazyLoadAsset> GetAsset(const uint32 typeAsInt, uint64 ulidAsInt) { return GetAsset(static_cast<AssetType>(typeAsInt), Ulid{ ulidAsInt }); WeakHandle<Resource::ILazyLoadAsset>{  }; }
+
     /**
      * @brief Get an asset based off the \ref AssetType and unique identifier.
      * @param type The \ref AssetType.

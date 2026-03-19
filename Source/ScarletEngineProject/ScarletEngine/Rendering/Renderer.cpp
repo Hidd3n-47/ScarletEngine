@@ -8,6 +8,7 @@
 
 #include <ScarlEnt/Scene.h>
 #include <ScarlEnt/Registry.h>
+#include <ScarlEnt/IEntityHandle.h>
 
 #include <ScarletMath/Trig.h>
 
@@ -63,6 +64,14 @@ constexpr uint32 SKY_BOX_INDICES[SKY_BOX_INDEX_COUNT] =
     3, 7, 6,
     6, 2, 3
 };
+
+void UpdateViewAndProjectionMatrix(Scarlet::Component::Camera& camera, const Scarlet::Math::Vec3& eyePosition, const Scarlet::Math::Mat4& rotationMatrix)
+{
+    const Scarlet::Math::Vec3 forwardVector = rotationMatrix[1];
+    const Scarlet::Math::Vec3 upVector = rotationMatrix[2];
+    camera.viewMatrix = Scarlet::Math::LookAt(eyePosition, eyePosition + forwardVector, upVector);
+    camera.projectionMatrix = Scarlet::Math::Perspective(camera.fov, camera.aspectRatio, camera.nearPlane, camera.farPlane);
+}
 
 } // Anonymous namespace.
 
@@ -124,36 +133,50 @@ void Renderer::AddRenderCommand(WeakHandle<Resource::ILazyLoadAsset> material, W
 
 void Renderer::Render()
 {
-    auto* cameraEntity = reinterpret_cast<ScarlEnt::EntityHandle<Component::Transform, Component::Camera, Component::DirectionLight>*>(ScarlEnt::Registry::Instance().GetActiveScene()->GetCameraEntityHandle());
+    Component::Camera* camera;
+    Component::Transform* cameraTransform;
+    Component::DirectionLight* cameraDirectionLight;
 
-    if (cameraEntity == nullptr) [[unlikely]]
+    auto* ent = ScarlEnt::Registry::Instance().GetActiveScene()->GetCameraEntityHandle();
+
+    if (ent == nullptr) [[unlikely]]
     {
         return;
     }
 
-    const auto& cameraTransform      = cameraEntity->GetComponent<Component::Transform>();
-    const auto& cameraDirectionLight = cameraEntity->GetComponent<Component::DirectionLight>();
-
-    Component::Camera& camera = cameraEntity->GetComponent<Component::Camera>();
+    if (ent->IsMutable())
+    {
+        ScarlEnt::MutableEntityHandle* cameraEntity = reinterpret_cast<ScarlEnt::MutableEntityHandle*>(ent);
+        camera = &cameraEntity->GetComponent<Component::Camera>();
+        cameraTransform = &cameraEntity->GetComponent<Component::Transform>();
+        cameraDirectionLight = &cameraEntity->GetComponent<Component::DirectionLight>();
+    }
+    else
+    {
+        auto* cameraEntity = reinterpret_cast<ScarlEnt::EntityHandle<Component::Transform, Component::Camera, Component::DirectionLight>*>(ent);
+        camera = &cameraEntity->GetComponent<Component::Camera>();
+        cameraTransform = &cameraEntity->GetComponent<Component::Transform>();
+        cameraDirectionLight = &cameraEntity->GetComponent<Component::DirectionLight>();
+    }
 
     // Todo [Bug 74]: Quaternion rotation with camera results in roll when only changing pitch and yaw.
     //camera.UpdateViewAndProjectionMatrix(cameraTransform.translation, cameraTransform.rotation.GetRotationMatrix());
 
-    camera.UpdateViewAndProjectionMatrix(cameraTransform.translation, Math::Trig::RotationMatrix(cameraTransform.rotation.z, cameraTransform.rotation.x, cameraTransform.rotation.y));
+    UpdateViewAndProjectionMatrix(*camera, cameraTransform->translation, Math::Trig::RotationMatrix(cameraTransform->rotation.z, cameraTransform->rotation.x, cameraTransform->rotation.y));
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     mShader.Bind();
-    mShader.UploadUniform("uViewMatrix", camera.viewMatrix);
-    mShader.UploadUniform("uProjectionMatrix", camera.projectionMatrix);
+    mShader.UploadUniform("uViewMatrix", camera->viewMatrix);
+    mShader.UploadUniform("uProjectionMatrix", camera->projectionMatrix);
     mShader.UploadUniform("uTexture", 0);
 
-    mShader.UploadUniform("uCameraPosition", cameraTransform.translation);
-    mShader.UploadUniform("uLight.color", cameraDirectionLight.lightColor);
-    mShader.UploadUniform("uLight.ambientIntensity", cameraDirectionLight.ambientIntensity);
-    mShader.UploadUniform("uLight.diffuseIntensity", cameraDirectionLight.diffuseIntensity);
-    mShader.UploadUniform("uLight.direction", Math::Normalize(cameraDirectionLight.direction));
-    mShader.UploadUniform("uRimLightPower", cameraDirectionLight.rimPower);
+    mShader.UploadUniform("uCameraPosition", cameraTransform->translation);
+    mShader.UploadUniform("uLight.color", cameraDirectionLight->lightColor);
+    mShader.UploadUniform("uLight.ambientIntensity", cameraDirectionLight->ambientIntensity);
+    mShader.UploadUniform("uLight.diffuseIntensity", cameraDirectionLight->diffuseIntensity);
+    mShader.UploadUniform("uLight.direction", Math::Normalize(cameraDirectionLight->direction));
+    mShader.UploadUniform("uRimLightPower", cameraDirectionLight->rimPower);
 
     mInstanceBuffer.Bind();
     for (auto& [group, commands] : mCommands)
@@ -188,8 +211,8 @@ void Renderer::Render()
 
     mSkyBoxShader.UploadUniform("uSkyBox", 0);
     // Convert to a Mat3 to remove the translation as this shouldn't affect skymaps.
-    mSkyBoxShader.UploadUniform("uViewMatrix", Math::Mat4(Math::Mat3(camera.viewMatrix)));
-    mSkyBoxShader.UploadUniform("uProjectionMatrix", camera.projectionMatrix);
+    mSkyBoxShader.UploadUniform("uViewMatrix", Math::Mat4(Math::Mat3(camera->viewMatrix)));
+    mSkyBoxShader.UploadUniform("uProjectionMatrix", camera->projectionMatrix);
 
     mSkyBoxVao->Bind();
     mSkyBoxVbo->Bind();

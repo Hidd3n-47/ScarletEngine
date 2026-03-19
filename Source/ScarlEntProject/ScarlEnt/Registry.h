@@ -131,7 +131,7 @@ private:
     inline static Registry* mInstance = nullptr;
 
     Scarlet::WeakHandle<Scene> mSceneToChangeTo;
-    bool mDestroySceneOnChange;
+    bool mDestroySceneOnChange{ };
 
     DEBUG(unordered_map<std::string, AddComponentFunc> mComponentToAddComponentFunction);
 

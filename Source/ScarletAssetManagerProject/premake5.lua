@@ -1,6 +1,7 @@
--- ---------------------------- ScarletCoreEcs Project.
-project "ScarletCoreEcs"
-    kind "StaticLib"
+-- ---------------------------- ScarletAssetManage Project.
+project "ScarletAssetManager"
+    location "%{prj.name}"
+    kind "SharedLib"
     language "C++"
     staticruntime "Off"
     cppdialect "C++20"
@@ -16,31 +17,20 @@ project "ScarletCoreEcs"
 
     includedirs
     {
-        "",
         "%{prj.name}",
         "%{prj.name}/Src/",
 
-        "$(SolutionDir)/Deps/Include",
-
-        "$(SolutionDir)Source/ScarlEntProject/",
-        "$(SolutionDir)Source/ScarletMathProject/",
         "$(SolutionDir)Source/ScarletCoreProject/",
-        "$(SolutionDir)Source/ScarletReflectProject/",
-        "$(SolutionDir)Source/ScarletLoggerProject/",
+
     }
 
     libdirs
     {
-        "$(SolutionDir)Deps/Lib"
     }
 
     links
     {
-        "ScarlEnt",
-        "ScarletMath",
-        "ScarletCore",
-        "ScarletReflect",
-        "ScarletLogger",
+        "ScarletCore"
     }
 
     postbuildcommands
@@ -54,10 +44,10 @@ project "ScarletCoreEcs"
 
     filter "configurations:Dev"
         runtime "Debug"
-        defines { "COMPONENTS_BUILD", "DEV_CONFIGURATION"}
+        defines { "DEV_CONFIGURATION", "SCARLET_ASSET_MANAGER" }
         symbols "On"
 
     filter "configurations:Release"
         runtime "Release"
-        defines "COMPONENTS_BUILD"
+        defines "SCARLET_ASSET_MANAGER"
         optimize "On"

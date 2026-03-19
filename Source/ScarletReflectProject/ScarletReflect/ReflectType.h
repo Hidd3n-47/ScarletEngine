@@ -1,6 +1,5 @@
 #pragma once
 
-#ifdef DEV_CONFIGURATION
 
 #include <string>
 #include <stdexcept>
@@ -152,5 +151,3 @@ inline void ReflectType::SetValueFromString<AssetRef>(AssetRef& value, const std
 }
 
 } // Namespace Scarlet.
-
-#endif // DEV_CONFIGURATION.

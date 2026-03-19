@@ -7,7 +7,7 @@
 #include <ScarletEngine/Core/Engine.h>
 
 #ifdef DEV_CONFIGURATION
-#include <ScarletEditor/Core/EditorManager.h>)
+#include <ScarletEditor/Core/EditorManager.h>
 #endif // DEV_CONFIGURATION.
 
 #include "IGame.h"
@@ -21,7 +21,7 @@ void ApplicationManager::Init()
 
     DEBUG(Editor::EditorManager::Init());
 
-    Engine::Instance().SetReloadDllFunction([&] { LoadGameDll(); });
+    DEBUG(Engine::Instance().SetReloadDllFunction([&] { LoadGameDll(); }));
 }
 
 void ApplicationManager::Terminate()
@@ -48,7 +48,7 @@ void ApplicationManager::LoadGameDll()
 
     mGameDll = LoadLibraryA(tempPath.c_str());
 #else // DEV_CONFIGURATION.
-    const HMODULE gameDll = LoadLibrary(L"E:/Programming/ScarletEngine/Scratch/Bin/Release/ScarletTestGameProject/ScarletTestGameProject.dll");
+    mGameDll = LoadLibrary(L"E:/Programming/ScarletEngine/Scratch/Bin/Release/ScarletTestGameProject/ScarletTestGameProject.dll");
 #endif // !DEV_CONFIGURATION.
 
     if (!mGameDll)

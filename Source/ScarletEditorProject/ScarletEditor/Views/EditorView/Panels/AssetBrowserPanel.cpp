@@ -1,6 +1,8 @@
 ﻿#include "ScarletEditorPch.h"
 #include "AssetBrowserPanel.h"
 
+#ifdef DEV_CONFIGURATION
+
 #include <algorithm>
 
 #include <ScarletCore/AssetRef.h>
@@ -204,4 +206,7 @@ void AssetBrowserPanel::RenderIconLabel(const std::string& label, const float ic
 
     ImGui::PopTextWrapPos();
 }
+
 } // Namespace Scarlet::Editor.
+
+#endif // DEV_CONFIGURATION.

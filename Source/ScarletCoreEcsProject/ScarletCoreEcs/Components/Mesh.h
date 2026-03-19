@@ -1,7 +1,5 @@
 #pragma once
 
-#include "ScarletCoreEcs/Defines.h"
-
 #include <ScarlEnt/RTTI/Rtti.h>
 
 #include <ScarletCore/AssetRef.h>
@@ -9,7 +7,7 @@
 namespace Scarlet::Component
 {
 
-struct COMPONENT_API Mesh
+struct Mesh
 {
     AssetRef mesh     = { AssetType::MESH    , 0 };
     AssetRef material = { AssetType::MATERIAL, 0 };

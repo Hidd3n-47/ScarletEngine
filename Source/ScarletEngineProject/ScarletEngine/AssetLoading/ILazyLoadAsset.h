@@ -3,6 +3,8 @@
 #include <ScarletCore/Ulid.h>
 #include <ScarletCore/AssetRef.h>
 
+#include "ScarletEngine/Core/Filepath.h"
+
 namespace Scarlet::Resource
 {
 
@@ -13,6 +15,7 @@ namespace Scarlet::Resource
 class ILazyLoadAsset
 {
 public:
+    ILazyLoadAsset(const uint32 assetTypeAsInt, const Ulid ulid);
     ILazyLoadAsset(const AssetType type, const Ulid ulid, const Filepath& assetPath) : mAssetType(type), mUlid(ulid), mAssetPath(std::move(assetPath)){ }
     virtual ~ILazyLoadAsset() = default;
 

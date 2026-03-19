@@ -78,7 +78,7 @@ public:
      * @param mutableEntityRuntimeId The runtime identifier of the mutable entity whose component is being added.
      */
     template <typename Component, typename...Args>
-    void AddComponent(const uint32 mutableEntityRuntimeId, Args&&...args);
+    Component& AddComponent(const uint32 mutableEntityRuntimeId, Args&&...args);
 
     /**
      * @brief Remove a component from a mutable entity.
@@ -179,7 +179,7 @@ inline Scarlet::Ulid ComponentManager::AddEntity(ArchetypeComponents&&... values
 }
 
 template <typename Component, typename...Args>
-inline void ComponentManager::AddComponent(const uint32 mutableEntityRuntimeId, Args&&...args)
+inline Component& ComponentManager::AddComponent(const uint32 mutableEntityRuntimeId, Args&&...args)
 {
     const ComponentId componentId = Registry::Instance().GetOrRegisterComponentId<Component>();
 
@@ -197,11 +197,13 @@ inline void ComponentManager::AddComponent(const uint32 mutableEntityRuntimeId, 
     mComponentBitsetToMutableEntities[entityBitset].erase(mutableEntityRuntimeId);
     mComponentBitsetToMutableEntities[newBitset].emplace(mutableEntityRuntimeId);
 
-    static_cast<MutableComponentArray<Component>*>(mComponentIdToSparseSetArray[componentId.id])->Add(mutableEntityRuntimeId, std::forward<Args>(args)...);
+    Component& comp = static_cast<MutableComponentArray<Component>*>(mComponentIdToSparseSetArray[componentId.id])->Add(mutableEntityRuntimeId, std::forward<Args>(args)...);
 
 #ifdef DEV_CONFIGURATION
     mMutableEntityIdToComponentViews[mutableEntityRuntimeId].emplace_back(componentId, [&, mutableEntityRuntimeId] { return GetMutableEntityComponent<Component>(mutableEntityRuntimeId).GetProperties(); });
 #endif // DEV_CONFIGURATION.
+
+    return comp;
 }
 
 template <typename Component>

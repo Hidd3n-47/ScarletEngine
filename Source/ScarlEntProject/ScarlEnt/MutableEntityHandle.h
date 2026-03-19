@@ -18,7 +18,7 @@ class Scene;
  * The component manager is valid for the life-time of the scene. This coupling of lifetime is okay as entities are only valid for the life-time \\n
  * of the scene.
  */
-class SCARLENT_API MutableEntityHandle DEBUG(: public IEntityHandle)
+class SCARLENT_API MutableEntityHandle : public IEntityHandle
 {
     friend class Scene;
 public:
@@ -42,11 +42,11 @@ public:
      * @param args The arguments forwarded to the constructor of the component.
      */
     template <typename T, typename...Args>
-    void AddComponent(Args&&...args)
+    T& AddComponent(Args&&...args)
     {
         DEBUG(SCARLENT_ASSERT(mIsValid && "Trying to add component on mutable entity that has been marked as invalid."));
 
-        mComponentManagerRef->AddComponent<T>(mEntityId.runtimeId, std::forward<Args>(args)...);
+        return mComponentManagerRef->AddComponent<T>(mEntityId.runtimeId, std::forward<Args>(args)...);
     }
 
     /**
@@ -115,8 +115,8 @@ public:
 #endif // SCARLENT_TEST.
     [[nodiscard]] inline uint64 GetComponentBitset() { return mComponentManagerRef->GetMutableEntityComponentBitset(mEntityId.runtimeId); }
 
-#ifdef DEV_CONFIGURATION
     [[nodiscard]] inline bool IsMutable() const override { return true; }
+#ifdef DEV_CONFIGURATION
     [[nodiscard]] inline uint64 GetRuntimeId() const override { return mEntityId.runtimeId; }
     [[nodiscard]] inline const vector<ComponentView>& GetComponentViews() override { return mComponentManagerRef->GetMutableEntityComponentView(mEntityId.runtimeId); }
 #endif // DEV_CONFIGURATION.

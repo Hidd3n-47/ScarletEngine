@@ -24,7 +24,7 @@
 
 #else // DEV_CONFIGURATION.
 
-#define DEBUG(X)
+#define DEBUG(...)
 
 #ifdef SCARLENT_TEST
 #include <stdexcept>

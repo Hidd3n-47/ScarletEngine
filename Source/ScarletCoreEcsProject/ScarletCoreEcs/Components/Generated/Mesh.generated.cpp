@@ -12,7 +12,6 @@ namespace Scarlet::Component
 void Mesh::GenerateProperties()
 {
     mProperties.clear();
-
     mProperties["mesh"] = ScarlEnt::Property {
         ScarlEnt::PropertyType::ASSET,
         ScarlEnt::Registry::Instance().GetOrRegisterComponentId<Mesh>(),
@@ -20,7 +19,7 @@ void Mesh::GenerateProperties()
         [this](const std::string_view& stringValue) { ReflectType::SetValueFromString(this->mesh, stringValue); }
     };
 
-    mProperties["material"] = ScarlEnt::Property {
+        mProperties["material"] = ScarlEnt::Property {
         ScarlEnt::PropertyType::ASSET,
         ScarlEnt::Registry::Instance().GetOrRegisterComponentId<Mesh>(),
         [this] { return ReflectType::GetStringFromValue(this->material); },

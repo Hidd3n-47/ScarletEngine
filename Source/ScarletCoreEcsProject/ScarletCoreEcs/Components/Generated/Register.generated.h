@@ -8,6 +8,9 @@
 #include "ScarletCoreEcs/Components/Mesh.h"
 #include "ScarletCoreEcs/Components/Transform.h"
 
+
+#ifdef DEV_CONFIGURATION
+
 template <typename T>
 static void RegisterComponentTypeAndFunctionPointer(ScarlEnt::Registry& registry)
 {
@@ -19,7 +22,10 @@ static void RegisterComponentTypeAndFunctionPointer(ScarlEnt::Registry& registry
         });
 }
 
-struct COMPONENT_API Register
+struct Register
 {
     static void RegisterComponents();
 };
+
+#endif // DEV_CONFIGURATION.
+

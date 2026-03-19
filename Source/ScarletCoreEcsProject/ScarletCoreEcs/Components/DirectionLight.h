@@ -1,7 +1,5 @@
 #pragma once
 
-#include "ScarletCoreEcs/Defines.h"
-
 #include <ScarletMath/Math.h>
 
 #include <ScarlEnt/RTTI/Rtti.h>
@@ -9,7 +7,7 @@
 namespace Scarlet::Component
 {
 
-struct COMPONENT_API DirectionLight
+struct DirectionLight
 {
     Math::Vec3 lightColor  = { 1.0f, 1.0f, 1.0f };
     Math::Vec3 direction   = { -1.0f, 1.0f, -1.0f };
