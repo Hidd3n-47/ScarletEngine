@@ -6,6 +6,11 @@
 
 #include <ScarletCore/WeakHandle.h>
 
+namespace ScarlEnt
+{
+class Scene;
+} // Namespace ScarlEnt.
+
 namespace Scarlet
 {
 
@@ -30,6 +35,8 @@ public:
     void Destroy() const noexcept;
 
     void Run() const;
+
+    void RegisterEngineSystems(WeakHandle<ScarlEnt::Scene> scene);
 
     inline void CloseEngine() { mRunning = false; }
 

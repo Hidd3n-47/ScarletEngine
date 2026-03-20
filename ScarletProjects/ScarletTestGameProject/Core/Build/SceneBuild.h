@@ -8,21 +8,14 @@
 #include <ScarlEnt/Registry.h>
 #include <ScarlEnt/MutableEntityHandle.h>
 
-#include <ScarletEngine/Core/Engine.h>
-#include <ScarletEngine/AssetLoading/AssetManager.h>
-
 #include <ScarletCoreEcs/Components/Generated/Register.generated.h>
-
-#include "ScarletMath/Trig.h"
 
 namespace Scarlet
 {
 
 inline void InitGameScene()
 {
-    AssetManager& assetManager = Engine::Instance().GetAssetManager();
-
-    auto scene = ScarlEnt::Registry::Instance().CreateScene("ScarletTestGameProject");
+    WeakHandle<ScarlEnt::Scene> scene = ScarlEnt::Registry::Instance().GetScene("ScarletTestGameProject");
     ScarlEnt::Registry::Instance().SetActiveScene(scene);
 
     {
@@ -91,13 +84,6 @@ inline void InitGameScene()
         DirectionLight.rimPower = float{ 3.400000 };
         scene->SetCameraEntityHandle(&ent);
     }
-    scene->RegisterSystem<Component::Transform, Component::Mesh>([](Component::Transform& transform, Component::Mesh& mesh) {
-        auto meshAsset = Engine::Instance().GetAssetManager().GetAsset(mesh.mesh.assetType, Ulid{ mesh.mesh.assetUlid });
-        auto materialAsset = Engine::Instance().GetAssetManager().GetAsset(mesh.material.assetType, Ulid{ mesh.material.assetUlid });
-        Renderer::Instance().AddRenderCommand(materialAsset, meshAsset,
-            Math::TransformAsMatrix(transform.translation,
-                Math::Trig::RotationMatrix(transform.rotation.z, transform.rotation.x, transform.rotation.y), transform.scale));
-        });
 }
 
 } // Namespace Scarlet.

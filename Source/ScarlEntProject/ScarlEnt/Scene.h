@@ -16,10 +16,13 @@ class SCARLENT_API Scene
 {
     friend class Registry;
 public:
+    virtual void Init()    { }
+    virtual void Destroy() { }
+
     /**
      * @brief Update the scene. This will update all the registered systems.
      */
-    void Update();
+    inline void Update() { mComponentManager.Update(); }
 
     /**
      * @brief Register a system that will act over a subset of components calling the update function.
@@ -28,6 +31,11 @@ public:
      */
     template <typename...Components>
     void RegisterSystem(const std::function<void(Components&...)>& updateFunction);
+
+    /**
+     * @brief Remove all the registered systems.
+     */
+    inline void RemoveAllSystems() { mComponentManager.RemoveAllSystems(); }
 
     /**
      * @brief Add an entity to the scene.
@@ -70,10 +78,15 @@ public:
 
     DEBUG([[nodiscard]] inline const vector<IEntityHandle*>& GetEntityHandles()        const { return mEntityHandles; })
     DEBUG([[nodiscard]] inline const vector<IEntityHandle*>& GetMutableEntityHandles() const { return mMutableEntityHandles; })
-private:
+protected:
     Scene(const std::string_view friendlyName);
-    DEBUG(~Scene());
+#ifdef DEV_CONFIGURATION
+    virtual ~Scene();
+#else // DEV_CONFIGURATION.
+    virtual ~Scene() = default;
+#endif // !DEV_CONFIGURATION.
 
+private:
     std::string mFriendlyName;
 
     ComponentManager mComponentManager;

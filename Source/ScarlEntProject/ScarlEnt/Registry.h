@@ -50,16 +50,44 @@ public:
     void PostUpdate();
 
     /**
-     * @brief Create a new \ref Scene.
+     * @brief Get or create a new \ref Scene.
      * @param friendlyName The friendly name of the scene.
-     * @return A \ref WeakHandle to the created scene.
+     * @tparam T The type of \ref Scene. This class must derive from \ref Scene.
+     * @return A \ref WeakHandle to the retrieved or created scene.
      */
-    [[nodiscard]] Scarlet::WeakHandle<Scene> CreateScene(const std::string_view friendlyName);
+    template <typename T = Scene>
+    Scarlet::WeakHandle<Scene> GetOrCreateScene(const std::string_view friendlyName);
+    /**
+     * @brief Remove a scene by its friendly name.
+     * @param friendlyName The friendly name of the scene that is to be destroyed.
+     */
+    void RemoveScene(const std::string& friendlyName);
     /**
      * @brief Remove a scene.
      * @param scene The \ref WeakHandle to a scene that is to be destroyed.
      */
     void RemoveScene(Scarlet::WeakHandle<Scene>& scene);
+
+    /**
+     * @brief Change the friendly name of a scene.
+     * @param scene The scene whose friendly name is changing.
+     * @param newName The new friendly name of the scene.
+     */
+    void RenameScene(Scarlet::WeakHandle<Scene> scene, const std::string& newName);
+
+    /**
+     * @brief Get a scene by its friendly name.
+     * @param friendlyName The friendly name of the scene.
+     * @return Get a scene by its friendly name. Returns an invalid \ref WeakHandle if not found.
+     */
+    [[nodiscard]] Scarlet::WeakHandle<Scene> GetScene(const std::string& friendlyName) const;
+
+    /**
+     * @brief A function used to change from an active scene to a new scene. This is the safe way to prevent issues with executing systems and lifetime.
+     * @param sceneToChangeToFriendlyName The new scene's friendly name that will become active once all systems have been changed.
+     * @param destroySceneOnChange \c true to destroy the scene after successfully changing the active scene to the \c newScene, \c false otherwise.
+     */
+    void ChangeScene(const std::string& sceneToChangeToFriendlyName, const bool destroySceneOnChange = false);
 
     /**
      * @brief A function used to change from an active scene to a new scene. This is the safe way to prevent issues with executing systems and lifetime.
@@ -105,7 +133,7 @@ public:
      * @return The type ID for the component.
      */
     template <typename ComponentType>
-    [[nodiscard]] inline static std::string GetComponentTypeId() { return ComponentType::ComponentTypeName(); return typeid(ComponentType).name(); }
+    [[nodiscard]] inline static std::string GetComponentTypeId() { return ComponentType::ComponentTypeName(); }
 
 #ifdef SCARLENT_TEST
     /**
@@ -144,6 +172,24 @@ private:
 };
 
 /* ============================================================================================================================== */
+
+template <typename T>
+Scarlet::WeakHandle<Scene> Registry::GetOrCreateScene(const std::string_view friendlyName)
+{
+    static_assert(std::is_base_of_v<Scene, T>, "To create a scene of that type, the type should inherit from ScarlEnt::Scene.");
+
+    const std::string name = std::string{ friendlyName };
+
+    if (mScenes.contains(name))
+    {
+        return Scarlet::WeakHandle{ mScenes[name] };
+    }
+
+    Scene* scene = new T{ friendlyName };
+    mScenes[std::string{ friendlyName }] = scene;
+
+    return Scarlet::WeakHandle{ scene };
+}
 
 template <typename T>
 inline ComponentId Registry::GetOrRegisterComponentId()

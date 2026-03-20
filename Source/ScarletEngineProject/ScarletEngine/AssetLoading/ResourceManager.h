@@ -19,7 +19,7 @@ class LazyLoadAsset;
  * @tparam Asset The type of asset.
  */
 template <typename Asset>
-class ResourceManager
+class ENGINE_API ResourceManager
 {
     friend class Renderer;
 public:

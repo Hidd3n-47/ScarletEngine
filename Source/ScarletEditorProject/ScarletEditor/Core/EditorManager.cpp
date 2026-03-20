@@ -206,57 +206,8 @@ void EditorManager::Destroy()
     mInstance = nullptr;
 }
 
-
-void EditorManager::OpenScene(const std::string& filepath)
+void EditorManager::RegisterEditorSystems()
 {
-    const XmlDocument document = XmlSerializer::Deserialize(filepath);
-
-    const std::string newSceneFriendlyName = std::filesystem::path{ filepath }.stem().string();
-
-    if (const auto activeScene = ScarlEnt::Registry::Instance().GetActiveScene();
-        activeScene.IsValid() && activeScene->GetFriendlyName() == newSceneFriendlyName)
-    {
-        SCARLET_ERROR("Failed to open scene as this scene is already currently open.");
-        return;
-    }
-
-    EditorView* view = dynamic_cast<EditorView*>(mEditorView);
-    view->GetSelectionManager().SetSelectedEntity(nullptr);
-
-    mEditorScene = ScarlEnt::Registry::Instance().CreateScene(newSceneFriendlyName);
-    mCurrentSceneFilepath = filepath;
-
-    for (const XmlElement& entityNode : document.GetRootElement()->GetChildElements())
-    {
-        if (entityNode.GetTagName() == "ProjectPath") continue;
-
-        if (entityNode.GetAttributeValue("Mutable") == "true")
-        {
-            ScarlEnt::MutableEntityHandle entity = mEditorScene->AddMutableEntity();
-
-            for (const XmlElement& component : entityNode.GetChildElements())
-            {
-                auto* componentProperties = ScarlEnt::Registry::Instance().AddComponentToHandle(component.GetAttributeValue("typeId").c_str(), &entity);
-
-                for (auto& [propertyName, property] : *componentProperties)
-                {
-                    for (const XmlElement& componentProperty : component.GetChildElements())
-                    {
-                        if (componentProperty.GetTagName() == propertyName)
-                        {
-                            property.SetPropertyValue(componentProperty.GetValue());
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    Component::Transform cameraTransform{ };
-    cameraTransform.translation = Math::Vec3{ 0.0f, -10.0f, 2.0f };
-    mCameraEntity = mEditorScene->AddEntity<Component::Transform, Component::Camera, Component::DirectionLight>(std::move(cameraTransform), Component::Camera{}, Component::DirectionLight{ });
-    mEditorScene->SetCameraEntityHandle(&mCameraEntity);
-
     auto cameraMovementFunction = [&](Component::Transform& transform, Component::Camera& viewportCamera) {
         if (const std::shared_ptr<Panel> viewportPanel = mEditorView->GetPanel<ViewportPanel>(); !viewportPanel->IsHovered())
         {
@@ -339,13 +290,61 @@ void EditorManager::OpenScene(const std::string& filepath)
 
     mEditorScene->RegisterSystem<Component::Transform, Component::Camera>(cameraMovementFunction);
 
-    mEditorScene->RegisterSystem<Component::Transform, Component::Mesh>([](Component::Transform& transform, Component::Mesh& mesh) {
-        auto meshAsset = Engine::Instance().GetAssetManager().GetAsset(mesh.mesh.assetType, Ulid{ mesh.mesh.assetUlid });
-        auto materialAsset = Engine::Instance().GetAssetManager().GetAsset(mesh.material.assetType, Ulid{ mesh.material.assetUlid });
-        Renderer::Instance().AddRenderCommand(materialAsset, meshAsset,
-            Math::TransformAsMatrix(transform.translation,
-                Math::Trig::RotationMatrix(transform.rotation.z, transform.rotation.x, transform.rotation.y), transform.scale));
-        });
+    Engine::Instance().RegisterEngineSystems(mEditorScene);
+}
+
+void EditorManager::OpenScene(const std::string& filepath)
+{
+    const XmlDocument document = XmlSerializer::Deserialize(filepath);
+
+    const std::string newSceneFriendlyName = std::filesystem::path{ filepath }.stem().string();
+
+    if (const auto activeScene = ScarlEnt::Registry::Instance().GetActiveScene();
+        activeScene.IsValid() && activeScene->GetFriendlyName() == newSceneFriendlyName)
+    {
+        SCARLET_ERROR("Failed to open scene as this scene is already currently open.");
+        return;
+    }
+
+    EditorView* view = dynamic_cast<EditorView*>(mEditorView);
+    view->GetSelectionManager().SetSelectedEntity(nullptr);
+
+    mEditorScene = ScarlEnt::Registry::Instance().GetOrCreateScene(newSceneFriendlyName);
+
+    mCurrentSceneFilepath = filepath;
+
+    for (const XmlElement& entityNode : document.GetRootElement()->GetChildElements())
+    {
+        if (entityNode.GetTagName() == "ProjectPath") continue;
+
+        if (entityNode.GetAttributeValue("Mutable") == "true")
+        {
+            ScarlEnt::MutableEntityHandle entity = mEditorScene->AddMutableEntity();
+
+            for (const XmlElement& component : entityNode.GetChildElements())
+            {
+                auto* componentProperties = ScarlEnt::Registry::Instance().AddComponentToHandle(component.GetAttributeValue("typeId").c_str(), &entity);
+
+                for (auto& [propertyName, property] : *componentProperties)
+                {
+                    for (const XmlElement& componentProperty : component.GetChildElements())
+                    {
+                        if (componentProperty.GetTagName() == propertyName)
+                        {
+                            property.SetPropertyValue(componentProperty.GetValue());
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    Component::Transform cameraTransform{ };
+    cameraTransform.translation = Math::Vec3{ 0.0f, -10.0f, 2.0f };
+    mCameraEntity = mEditorScene->AddEntity<Component::Transform, Component::Camera, Component::DirectionLight>(std::move(cameraTransform), Component::Camera{}, Component::DirectionLight{ });
+    mEditorScene->SetCameraEntityHandle(&mCameraEntity);
+
+    RegisterEditorSystems();
 
     if (!ScarlEnt::Registry::Instance().GetActiveScene().IsValid()) [[unlikely]]
     {

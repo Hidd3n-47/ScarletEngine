@@ -1,6 +1,8 @@
 #include "Game.h"
 
-#include <iostream>
+#include <ScarlEnt/Registry.h>
+
+#include "Scenes/ScarletTestGameProjectScene.h"
 
 #ifndef DEV_CONFIGURATION
 #include "Build/SceneBuild.h"
@@ -8,7 +10,7 @@
 
 void Game::Init()
 {
-    std::cout << "Hello from game side.\n";
+    ScarlEnt::Registry::Instance().GetOrCreateScene<ScarletTestGameProject>("ScarletTestGameProject");
 
 #ifndef DEV_CONFIGURATION
     Scarlet::InitGameScene();
@@ -17,5 +19,5 @@ void Game::Init()
 
 void Game::Terminate()
 {
-    std::cout << "Goodbye from game side.\n";
+    ScarlEnt::Registry::Instance().RemoveScene("ScarletTestGameProject");
 }

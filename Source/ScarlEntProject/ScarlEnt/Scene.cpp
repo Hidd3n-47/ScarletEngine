@@ -19,11 +19,6 @@ Scene::~Scene()
 }
 #endif // DEV_CONFIGURATION.
 
-void Scene::Update()
-{
-    mComponentManager.Update();
-}
-
 MutableEntityHandle Scene::AddMutableEntity()
 {
 #ifdef DEV_CONFIGURATION

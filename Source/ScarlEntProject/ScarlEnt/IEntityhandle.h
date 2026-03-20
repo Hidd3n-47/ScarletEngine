@@ -1,5 +1,7 @@
 #pragma once
 
+#include "ScarlEnt/Defines.h"
+
 #ifdef DEV_CONFIGURATION
 
 #include <ScarletCore/vector.h>
@@ -10,7 +12,7 @@
 namespace ScarlEnt
 {
 
-class IEntityHandle
+class SCARLENT_API IEntityHandle
 {
 public:
     virtual ~IEntityHandle() = default;

@@ -41,6 +41,11 @@ public:
     static void Destroy();
 
     /**
+     * @brief Register the systems needed for the editor - example, viewport camera.
+     */
+    void RegisterEditorSystems();
+
+    /**
      * @brief Open a given scene at the passed in filepath.
      * @param filepath The filepath of the scene being opened and loaded into the editor.
      */
@@ -69,11 +74,19 @@ public:
      */
     [[nodiscard]] inline WeakHandle<ScarlEnt::Scene> GetGameScene() const { return mEditorScene;}
 
+    /**
+     * @brief Get the filepath to the currently open scene.
+     * @return The filepath of the currently open scene.
+     */
+    [[nodiscard]] inline std::string GetCurrentScenePath() const { return mCurrentSceneFilepath; }
+
     inline static constexpr Ulid BACK_ICON_ULID      { 1 };
     inline static constexpr Ulid DIRECTORY_ICON_ULID { 2 };
     inline static constexpr Ulid ASSET_ICON_ULID     { 3 };
     inline static constexpr Ulid SCENE_ICON_ULID     { 4 };
     inline static constexpr Ulid COMPONENT_ICON_ULID { 5 };
+    inline static constexpr Ulid PLAY_ICON_ULID      { 6 };
+    inline static constexpr Ulid STOP_ICON_ULID      { 7 };
 private:
     EditorManager();
     ~EditorManager();

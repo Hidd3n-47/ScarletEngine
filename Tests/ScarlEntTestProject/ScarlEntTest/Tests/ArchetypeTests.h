@@ -28,11 +28,11 @@ public:
     {
         bool passed = false;
 
-        ScarlEnt::Archetype archetype(Scarlet::Ulid{}, 0);
+        ScarlEnt::Archetype archetype(Scarlet::Ulid{}, Int{ 0 });
 
         try
         {
-            archetype.AddEntity(Scarlet::Ulid{}, 'c');
+            archetype.AddEntity(Scarlet::Ulid{}, Char{ 'c' });
         }
         catch (std::runtime_error&)
         {
@@ -47,9 +47,9 @@ public:
         constexpr int initialValue = 2;
         const Scarlet::Ulid id;
 
-        ScarlEnt::Archetype archetype(id, static_cast<int>(initialValue));
+        ScarlEnt::Archetype archetype(id, Int{ initialValue });
 
-        return archetype.GetComponent<int>(id) == initialValue;
+        return archetype.GetComponent<Int>(id) == Int{ initialValue };
     }
 
     static bool SingleCustomTypeInitialisedCorrectly()
@@ -70,9 +70,9 @@ public:
         constexpr int initialValue = 2;
         const Scarlet::Ulid id;
 
-        ScarlEnt::Archetype archetype(id, static_cast<int>(initialValue), static_cast<long>(initialValue * initialValue));
+        ScarlEnt::Archetype archetype(id, Int{ initialValue }, Vec2{ 0, initialValue * initialValue });
 
-        return archetype.GetComponent<int>(id) == initialValue && archetype.GetComponent<long>(id) == initialValue * initialValue;
+        return archetype.GetComponent<Int>(id) == Int{ initialValue } && archetype.GetComponent<Vec2>(id) == Vec2{ 0, initialValue * initialValue };
     }
 
     static bool DoubleCustomTypeInitialisedCorrectly()
@@ -162,21 +162,21 @@ public:
 
         bool passed = true;
 
-        ScarlEnt::Archetype archetype(Scarlet::Ulid{}, static_cast<int>(initialValue), float{}, long{}, 'a');
-        archetype.AddEntity(Scarlet::Ulid{}, static_cast<int>(initialSquare), float{}, long{}, 'b');
-        archetype.AddEntity(Scarlet::Ulid{}, static_cast<int>(initialCubed), float{}, long{}, 'c');
+        ScarlEnt::Archetype archetype(Scarlet::Ulid{}, Int{ initialValue }, Vec2{}, Vec3{}, Char{ 'a' });
+        archetype.AddEntity(Scarlet::Ulid{}, Int{ initialSquare }, Vec2{}, Vec3{}, Char{ 'b' });
+        archetype.AddEntity(Scarlet::Ulid{}, Int{ initialCubed }, Vec2{}, Vec3{}, Char{ 'c' });
 
-        const auto [intArray, charArray] = archetype.GetComponentArrays<int, char>();
+        const auto [intArray, charArray] = archetype.GetComponentArrays<Int, Char>();
 
         passed &= intArray->componentArray.size() == 3;
-        passed &= intArray->componentArray[0] == initialValue;
-        passed &= intArray->componentArray[1] == initialSquare;
-        passed &= intArray->componentArray[2] == initialCubed;
+        passed &= intArray->componentArray[0] == Int{ initialValue };
+        passed &= intArray->componentArray[1] == Int{ initialSquare};
+        passed &= intArray->componentArray[2] == Int{ initialCubed };
 
         passed &= charArray->componentArray.size() == 3;
-        passed &= charArray->componentArray[0] == 'a';
-        passed &= charArray->componentArray[1] == 'b';
-        passed &= charArray->componentArray[2] == 'c';
+        passed &= charArray->componentArray[0] == Char{ 'a' };
+        passed &= charArray->componentArray[1] == Char{ 'b' };
+        passed &= charArray->componentArray[2] == Char{ 'c' };
 
         return passed;
     }

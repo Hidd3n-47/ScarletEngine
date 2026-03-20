@@ -73,7 +73,7 @@ public:
     {
         bool passed = true;
 
-        auto scene = ScarlEnt::Registry::Instance().CreateScene("Testing");
+        auto scene = ScarlEnt::Registry::Instance().GetOrCreateScene("Testing");
 
         passed &= ScarlEnt::Registry::Instance().GetNumberOfScenes() == 1;
 
@@ -88,7 +88,7 @@ public:
     {
         bool passed = true;
 
-        auto scene = ScarlEnt::Registry::Instance().CreateScene("Testing");
+        auto scene = ScarlEnt::Registry::Instance().GetOrCreateScene("Testing");
 
         passed &= !ScarlEnt::Registry::Instance().GetActiveScene().IsValid();
         passed &= ScarlEnt::Registry::Instance().GetNumberOfScenes() == 1;
@@ -112,7 +112,7 @@ public:
 
         const std::string sceneName{ "Testing" };
 
-        auto scene = ScarlEnt::Registry::Instance().CreateScene(sceneName);
+        auto scene = ScarlEnt::Registry::Instance().GetOrCreateScene(sceneName);
         ScarlEnt::Registry::Instance().RemoveScene(scene);
 
         try
@@ -158,8 +158,8 @@ public:
     {
         bool passed = false;
 
-        Scarlet::WeakHandle<ScarlEnt::Scene> test1 = ScarlEnt::Registry::Instance().CreateScene("Test1");
-        Scarlet::WeakHandle<ScarlEnt::Scene> test2 = ScarlEnt::Registry::Instance().CreateScene("Test2");
+        Scarlet::WeakHandle<ScarlEnt::Scene> test1 = ScarlEnt::Registry::Instance().GetOrCreateScene("Test1");
+        Scarlet::WeakHandle<ScarlEnt::Scene> test2 = ScarlEnt::Registry::Instance().GetOrCreateScene("Test2");
 
         ScarlEnt::Registry::Instance().SetActiveScene(test1);
 

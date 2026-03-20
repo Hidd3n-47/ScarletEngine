@@ -37,9 +37,6 @@ with open("E:/Programming/ScarletEngine/ScarletProjects/ScarletTestGameProject/C
 #include <ScarlEnt/Registry.h>
 #include <ScarlEnt/MutableEntityHandle.h>
 
-#include <ScarletEngine/Core/Engine.h>
-#include <ScarletEngine/AssetLoading/AssetManager.h>
-
 #include <ScarletCoreEcs/Components/Generated/Register.generated.h>
 
 namespace Scarlet
@@ -47,9 +44,7 @@ namespace Scarlet
 
 inline void InitGameScene()
 {{
-    AssetManager& assetManager = Engine::Instance().GetAssetManager();
-
-    auto scene = ScarlEnt::Registry::Instance().CreateScene(\"{scene_name}\");
+    WeakHandle<ScarlEnt::Scene> scene = ScarlEnt::Registry::Instance().GetScene(\"{scene_name}\");
     ScarlEnt::Registry::Instance().SetActiveScene(scene);
 '''.format(scene_name="ScarletTestGameProject"))
     for e in entities:

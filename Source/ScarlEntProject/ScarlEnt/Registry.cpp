@@ -26,6 +26,10 @@ void Registry::PostUpdate()
 
         mActiveScene = mSceneToChangeTo;
 
+#ifndef DEV_CONFIGURATION
+        mActiveScene->Init();
+#endif // !DEV_CONFIGURATION.
+
         if (mDestroySceneOnChange)
         {
             RemoveScene(currentScene);
@@ -35,12 +39,15 @@ void Registry::PostUpdate()
     mSceneToChangeTo.Invalidate();
 }
 
-Scarlet::WeakHandle<Scene> Registry::CreateScene(const std::string_view friendlyName)
+void Registry::RemoveScene(const std::string& friendlyName)
 {
-    Scene* scene = new Scene{ friendlyName };
-    mScenes[std::string{ friendlyName }] = scene;
+    SCARLENT_ASSERT(mScenes.contains(friendlyName) && "Trying to remove a scene with a friendlyName that hasn't been added.");
 
-    return Scarlet::WeakHandle{ scene };
+    Scarlet::WeakHandle scene = GetScene(friendlyName);
+    if (scene.IsValid()) [[likely]]
+    {
+        RemoveScene(scene);
+    }
 }
 
 void Registry::RemoveScene(Scarlet::WeakHandle<Scene>& scene)
@@ -56,10 +63,42 @@ void Registry::RemoveScene(Scarlet::WeakHandle<Scene>& scene)
 
     SCARLENT_ASSERT(mScenes.contains(friendlyName) && "Trying to remove a scene that isn't in the scene map.");
 
+#ifndef DEV_CONFIGURATION
+    scene->Destroy();
+#endif // !DEV_CONFIGURATION.
+
     delete mScenes[friendlyName];
     mScenes.erase(friendlyName);
 
     scene.Invalidate();
+}
+
+void Registry::RenameScene(Scarlet::WeakHandle<Scene> scene, const std::string& newName)
+{
+    const std::string currentName = std::string{ scene->GetFriendlyName() };
+    Scene* currentScene = mScenes[currentName];
+
+    mScenes.erase(currentName);
+
+    mScenes[newName] = currentScene;
+    currentScene->mFriendlyName = newName;
+}
+
+Scarlet::WeakHandle<Scene> Registry::GetScene(const std::string& friendlyName) const
+{
+    if (!mScenes.contains(friendlyName))
+    {
+        return Scarlet::WeakHandle<Scene>{ };
+    }
+
+    return Scarlet::WeakHandle{ mScenes.at(friendlyName) };
+}
+
+void Registry::ChangeScene(const std::string& sceneToChangeToFriendlyName, const bool destroySceneOnChange)
+{
+    SCARLENT_ASSERT(mScenes.contains(sceneToChangeToFriendlyName) && "Trying to retrieve a scene by friendly name that hasn't been added.");
+
+    ChangeScene(Scarlet::WeakHandle{ mScenes[sceneToChangeToFriendlyName] }, destroySceneOnChange);
 }
 
 void Registry::ChangeScene(const Scarlet::WeakHandle<Scene> newScene, const bool destroySceneOnChange)
@@ -75,6 +114,10 @@ void Registry::SetActiveScene(const Scarlet::WeakHandle<Scene> scene)
     SCARLENT_ASSERT(!mActiveScene.IsValid() && "Trying to change when scene is active. Use Registry::ChangeScene to safely change scene at runtime.");
 
     mActiveScene = scene;
+
+#ifndef DEV_CONFIGURATION
+    mActiveScene->Init();
+#endif // !DEV_CONFIGURATION.
 }
 
 #ifdef DEV_CONFIGURATION

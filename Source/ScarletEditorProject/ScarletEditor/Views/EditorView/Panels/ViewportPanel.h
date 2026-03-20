@@ -36,6 +36,8 @@ private:
 
     Framebuffer* mFramebuffer;
 
+    bool mGameSimulating = false;
+
     // Todo Christian: Change this to a component so that this happens before the render.
     /**
      * @brief This function is called from the engine so that the framebuffer can be bound before the render begins.

@@ -46,6 +46,19 @@ public:
     }
 
     /**
+     * @brief Remove all the registered systems.
+     */
+    void RemoveAllSystems()
+    {
+        for (const ISystem* system : mSystems)
+        {
+            delete system;
+        }
+
+        mSystems.clear();
+    }
+
+    /**
      * @brief Go through each registered system and update. Each archetype will be iterated over and compared to the required components of the system, updating the components \\n
      * based on the registered update function if so.
      */
@@ -129,7 +142,9 @@ private:
     // Archetype - i.e. Immutable entities.
     unordered_map<uint64, Archetype*>        mArchetypeComponents;
     unordered_map<Scarlet::Ulid, Archetype*> mEntityIdToArchetypeComponentArray;
-    DEBUG(unordered_map<Scarlet::Ulid, vector<ComponentView>> mEntityIdToComponentViews);
+#ifdef DEV_CONFIGURATION
+    unordered_map<Scarlet::Ulid, vector<ComponentView>> mEntityIdToComponentViews;
+#endif // DEV_CONFIGURATION.
 
     // SparseSet - i.e. Mutable entities.
     uint32 mMutableEntitiesId = 0;
@@ -137,7 +152,9 @@ private:
     SparseSet<ISparseComponentArray*, Registry::COMPONENTS_PAGE_SIZE> mComponentIdToSparseSetArray;
     SparseSet<uint64, Registry::COMPONENT_BITSET_PAGE_SIZE>           mMutableEntityToComponentBitset;
     unordered_map<uint64, std::unordered_set<uint32>>                 mComponentBitsetToMutableEntities;
-    DEBUG(unordered_map<uint32, vector<ComponentView>>                mMutableEntityIdToComponentViews);
+#ifdef DEV_CONFIGURATION
+    unordered_map<uint32, vector<ComponentView>>                      mMutableEntityIdToComponentViews;
+#endif // DEV_CONFIGURATION.
 
     // Systems.
     vector<ISystem*> mSystems;

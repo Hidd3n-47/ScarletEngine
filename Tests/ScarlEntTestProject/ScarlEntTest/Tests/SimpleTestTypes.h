@@ -10,6 +10,20 @@ struct Int
     }
 
     inline unordered_map<std::string, ScarlEnt::Property>* GetProperties() const { return nullptr; }
+    inline static std::string ComponentTypeName() { return "Int"; }
+};
+
+struct Char
+{
+    char x = 0;
+
+    bool operator==(const Char& other) const
+    {
+        return x == other.x;
+    }
+
+    inline unordered_map<std::string, ScarlEnt::Property>* GetProperties() const { return nullptr; }
+    inline static std::string ComponentTypeName() { return "Char"; }
 };
 
 struct Vec2
@@ -31,6 +45,7 @@ struct Vec2
     }
 
     inline unordered_map<std::string, ScarlEnt::Property>* GetProperties() const { return nullptr; }
+    inline static std::string ComponentTypeName() { return "Vec2"; }
 };
 
 struct Vec3
@@ -45,4 +60,5 @@ struct Vec3
     }
 
     inline unordered_map<std::string, ScarlEnt::Property>* GetProperties() const { return nullptr; }
+    inline static std::string ComponentTypeName() { return "Vec3"; }
 };
