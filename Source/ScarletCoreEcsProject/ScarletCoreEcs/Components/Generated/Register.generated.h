@@ -5,7 +5,7 @@
 
 #include "ScarletCoreEcs/Components/Camera.h"
 #include "ScarletCoreEcs/Components/DirectionLight.h"
-#include "ScarletCoreEcs/Components/Mesh.h"
+#include "ScarletCoreEcs/Components/StaticMesh.h"
 #include "ScarletCoreEcs/Components/Transform.h"
 
 

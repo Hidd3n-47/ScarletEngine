@@ -5,7 +5,7 @@
 
 #include <ScarlEnt/Scene.h>
 
-#include <ScarletCoreEcs/Components/Mesh.h>
+#include <ScarletCoreEcs/Components/StaticMesh.h>
 #include <ScarletCoreEcs/Components/Transform.h>
 
 #include "Events/Event.h"
@@ -142,9 +142,9 @@ void Engine::Run() const
 void Engine::RegisterEngineSystems(WeakHandle<ScarlEnt::Scene> scene)
 {
     // Rendering System.
-    scene->RegisterSystem<Component::Transform, Component::Mesh>([&](Component::Transform& transform, Component::Mesh& mesh) {
-        auto meshAsset     = mAssetManager->GetAsset(mesh.mesh.assetType    , Ulid{ mesh.mesh.assetUlid     });
-        auto materialAsset = mAssetManager->GetAsset(mesh.material.assetType, Ulid{ mesh.material.assetUlid });
+    scene->RegisterSystem<Component::Transform, Component::StaticMesh>([&](Component::Transform& transform, Component::StaticMesh& mesh) {
+        WeakHandle<Resource::ILazyLoadAsset> meshAsset     = mAssetManager->GetAsset(mesh.mesh.assetType    , Ulid{ mesh.mesh.assetUlid     });
+        WeakHandle<Resource::ILazyLoadAsset> materialAsset = mAssetManager->GetAsset(mesh.material.assetType, Ulid{ mesh.material.assetUlid });
         Renderer::Instance().AddRenderCommand(materialAsset, meshAsset,
             Math::TransformAsMatrix(transform.translation,
                 Math::Trig::RotationMatrix(transform.rotation.z, transform.rotation.x, transform.rotation.y), transform.scale));

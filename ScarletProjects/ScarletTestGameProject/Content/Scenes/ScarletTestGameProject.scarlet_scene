@@ -5,9 +5,9 @@
 			<rotation type="vec3">0.000000,0.000000,0.000000</rotation>
 			<scale type="vec3">1.000000,1.000000,1.000000</scale>
 		</Component>
-		<Component typeId="Mesh">
+		<Component typeId="StaticMesh">
 			<mesh type="asset">0,0</mesh>
-			<material type="asset">2,29304308355926851</material>
+			<material type="asset">2,0</material>
 		</Component>
 	</Entity>
 	<Entity Mutable="true">
@@ -16,7 +16,7 @@
 			<rotation type="vec3">0.000000,0.000000,0.000000</rotation>
 			<scale type="vec3">1.000000,1.000000,1.000000</scale>
 		</Component>
-		<Component typeId="Mesh">
+		<Component typeId="StaticMesh">
 			<mesh type="asset">0,26604845367616295</mesh>
 			<material type="asset">2,26949044722005844</material>
 		</Component>
@@ -27,7 +27,7 @@
 			<rotation type="vec3">0.900000,-24.150000,0.000000</rotation>
 			<scale type="vec3">1.000000,1.000000,1.000000</scale>
 		</Component>
-		<Component typeId="Mesh">
+		<Component typeId="StaticMesh">
 			<mesh type="asset">0,26605124924805398</mesh>
 			<material type="asset">2,26949044722005844</material>
 		</Component>
@@ -38,9 +38,9 @@
 			<rotation type="vec3">0.000000,0.000000,0.000000</rotation>
 			<scale type="vec3">20.000000,20.000000,20.000000</scale>
 		</Component>
-		<Component typeId="Mesh">
+		<Component typeId="StaticMesh">
 			<mesh type="asset">0,26558880580407306</mesh>
-			<material type="asset">2,26949044722005844</material>
+			<material type="asset">2,29548269772074606</material>
 		</Component>
 	</Entity>
 	<Entity Mutable="true">

@@ -7,12 +7,12 @@
 namespace Scarlet::Component
 {
 
-struct Mesh
+struct StaticMesh
 {
     AssetRef mesh     = { AssetType::MESH    , 0 };
     AssetRef material = { AssetType::MATERIAL, 0 };
 
-    SCARLET_COMPONENT(Mesh)
+    SCARLET_COMPONENT(StaticMesh)
 };
 
 } // Namespace Scarlet::Component.

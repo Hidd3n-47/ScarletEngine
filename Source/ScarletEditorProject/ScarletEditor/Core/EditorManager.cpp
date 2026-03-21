@@ -19,9 +19,9 @@
 
 #include <ScarletEngine/AssetLoading/AssetManager.h>
 
-#include <ScarletCoreEcs/Components/Mesh.h>
 #include <ScarletCoreEcs/Components/Camera.h>
 #include <ScarletCoreEcs/Components/Transform.h>
+#include <ScarletCoreEcs/Components/StaticMesh.h>
 #include <ScarletCoreEcs/Components/DirectionLight.h>
 
 #include "Views/EditorView/View/EditorView.h"

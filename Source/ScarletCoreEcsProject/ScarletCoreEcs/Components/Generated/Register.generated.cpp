@@ -8,7 +8,7 @@ void Register::RegisterComponents()
 
     RegisterComponentTypeAndFunctionPointer<Scarlet::Component::Camera>(registry);
     RegisterComponentTypeAndFunctionPointer<Scarlet::Component::DirectionLight>(registry);
-    RegisterComponentTypeAndFunctionPointer<Scarlet::Component::Mesh>(registry);
+    RegisterComponentTypeAndFunctionPointer<Scarlet::Component::StaticMesh>(registry);
     RegisterComponentTypeAndFunctionPointer<Scarlet::Component::Transform>(registry);
 
 }
