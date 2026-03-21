@@ -6,6 +6,9 @@
 #include <algorithm>
 
 #include <ScarletCore/AssetRef.h>
+#include <ScarletCore/Xml/XmlSerializer.h>
+
+#include <ScarletReflect/ReflectType.h>
 
 #include <ScarletEngine/Rendering/Texture.h>
 #include <ScarletEngine/Rendering/Renderer.h>
@@ -14,8 +17,8 @@
 
 #include <ScarletEngine/AssetLoading/AssetManager.h>
 
+#include "Core/FileDialog.h"
 #include "Core/EditorManager.h"
-
 
 namespace Scarlet::Editor
 {
@@ -144,6 +147,8 @@ void AssetBrowserPanel::Render()
     }
 
     ImGui::Columns(1);
+
+    CreateAssetPopup();
 }
 
 void AssetBrowserPanel::RenderBackAndPathTextInput(const uint32 backIconId)
@@ -205,6 +210,370 @@ void AssetBrowserPanel::RenderIconLabel(const std::string& label, const float ic
     ImGui::TextWrapped("%s", label.c_str());
 
     ImGui::PopTextWrapPos();
+}
+
+void AssetBrowserPanel::RenderContextMenu()
+{
+    if (ImGui::BeginPopupContextWindow("AssetBrowserRightClick"))
+    {
+        mContextOpen = true;
+        if (ImGui::MenuItem("New Folder"))
+        {
+            mCreateFolder = true;
+        }
+        if (ImGui::BeginMenu("Create Asset"))
+        {
+            for (uint32 i{ 0 }; i < static_cast<uint32>(AssetType::ASSET_TYPE_COUNT); ++i)
+            {
+                if (const AssetType type = static_cast<AssetType>(i); ImGui::MenuItem(AssetManager::AssetTypeToString(type).c_str()))
+                {
+                    mCreateFile        = true;
+                    mAssetTypeToCreate = type;
+                }
+            }
+            ImGui::EndMenu();
+        }
+        ImGui::EndPopup();
+    }
+    else
+    {
+        mContextOpen = false;
+    }
+}
+
+void AssetBrowserPanel::CreateAssetPopup()
+{
+    auto ClosePopupFunc = [&]{
+        mCreateFile = false;
+        mCreateFolder = false;
+
+        ImGui::CloseCurrentPopup();
+    };
+
+    if (mCreateFile || mCreateFolder)
+    {
+        ImGui::OpenPopup("CreateAsset");
+
+        ImGui::SetNextWindowSize(ImVec2{ CREATE_ASSET_WIDTH, CREATE_ASSET_HEIGHT });
+
+        const ImGuiIO& io = ImGui::GetIO();
+        ImGui::SetNextWindowPos(ImVec2{ io.DisplaySize.x * 0.5f, io.DisplaySize.y * 0.5f }, ImGuiCond_Always, ImVec2{ 0.5f, 0.5f });
+    }
+
+    if (ImGui::BeginPopup("CreateAsset", ImGuiWindowFlags_NoMove))
+    {
+        if (mCreateFolder)
+        {
+            CreateFolder();
+        }
+        else
+        {
+            switch (mAssetTypeToCreate)
+            {
+            case AssetType::TEXTURE:
+                CreateTexture();
+                break;
+            case AssetType::MATERIAL:
+                CreateMaterial();
+                break;
+            case AssetType::MESH:
+                CreateMesh();
+                break;
+            case AssetType::ASSET_TYPE_COUNT:
+            default:
+                SCARLET_WARN("Failed to create specific asset due to an unprocessed asset type.");
+                mCreateFile   = false;
+                mCreateFolder = false;
+                break;
+            }
+        }
+
+        ImGui::EndPopup();
+    }
+}
+
+void AssetBrowserPanel::CreateFolder()
+{
+    auto ClosePopupFunc = [&] {
+        mCreateFile   = false;
+        mCreateFolder = false;
+
+        ImGui::CloseCurrentPopup();
+    };
+
+    const std::string popupTitle = "Create Folder";
+    const ImVec2 textSize        = ImGui::CalcTextSize(popupTitle.c_str());
+
+    ImGui::SetCursorPosX((CREATE_ASSET_WIDTH - textSize.x) * 0.5f);
+    ImGui::Text("%s", popupTitle.c_str());
+
+    constexpr uint32 assetNameLength = 50;
+    char assetName[assetNameLength]  = { };
+
+    bool createAsset = false;
+
+    ImGui::SetCursorPosY((CREATE_ASSET_HEIGHT - textSize.y) * 0.5f);
+    ImGui::SetCursorPosX(20.0f);
+
+    ImGui::Text("Folder Name: ");
+    ImGui::SameLine(130.0f);
+
+    if (ImGui::InputText("##FolderName", assetName, assetNameLength, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_EditOnCreate))
+    {
+        createAsset = true;
+    }
+
+    ImGui::SetCursorPosY(CREATE_ASSET_HEIGHT - 35.0f);
+    if (ImGui::Button("Cancel"))
+    {
+        ClosePopupFunc();
+    }
+
+    ImGui::SameLine(ImGui::GetWindowSize().x - 70.0f);
+
+    if (ImGui::Button("Create") || createAsset)
+    {
+        if (assetName[0] != ' ')
+        {
+            std::filesystem::path path{ mCurrentDirectory.GetAbsolutePath() };
+            path /= std::string{ assetName };
+
+            create_directory(path);
+        }
+
+        ClosePopupFunc();
+    }
+}
+
+void AssetBrowserPanel::CreateTexture()
+{
+    CreateMenuWithSelectingAssetFromBrowser(AssetType::TEXTURE, FILE_FILTER("Texture", ".png"));
+}
+
+void AssetBrowserPanel::CreateMaterial()
+{
+    static std::string enteredAssetName{};
+    static Ulid selectedAssetUlid{ AssetManager::INVALID_ULID };
+    static Math::Vec3 ambient{ 1.0f };
+    static Math::Vec3 diffuse{ 1.0f };
+
+    auto ClosePopupFunc = [&] {
+        mCreateFile   = false;
+        mCreateFolder = false;
+
+        enteredAssetName  = "";
+
+        selectedAssetUlid = { AssetManager::INVALID_ULID };
+
+        ambient = Math::Vec3{ 1.0f };
+        diffuse = Math::Vec3{ 1.0f };
+
+        ImGui::CloseCurrentPopup();
+        };
+
+    const std::string popupTitle = "Create Asset";
+    const ImVec2 textSize = ImGui::CalcTextSize(popupTitle.c_str());
+
+    ImGui::SetCursorPosX((CREATE_ASSET_WIDTH - textSize.x) * 0.5f);
+    ImGui::Text("%s", popupTitle.c_str());
+
+    constexpr uint32 assetNameLength = 50;
+    char assetName[assetNameLength] = { };
+
+    if (!enteredAssetName.empty())
+    {
+        strcpy_s(assetName, enteredAssetName.c_str());
+        assetName[assetNameLength - 1] = '\0';
+    }
+
+    const float middleY = (CREATE_ASSET_HEIGHT - textSize.y) * 0.5f;
+
+    ImGui::SetCursorPosY(50.0f);
+    ImGui::SetCursorPosX(20.0f);
+
+    ImGui::Text("Name: ");
+    ImGui::SameLine(130.0f);
+
+    if (ImGui::InputText("##AssetName", assetName, assetNameLength))
+    {
+        enteredAssetName = std::string{ assetName };
+    }
+
+    ImGui::SetCursorPosY(middleY - 30.0f);
+    ImGui::SetCursorPosX(20.0f);
+
+    ImGui::Text("Texture: ");
+    ImGui::SameLine(130.0f);
+
+    auto selectedTexture = Engine::Instance().GetAssetManager().GetAsset(AssetType::TEXTURE, selectedAssetUlid);
+
+    if (ImGui::Button(selectedTexture->GetAssetPath().GetFileName().c_str(), ImVec2{ CREATE_ASSET_WIDTH * 0.57f, 30.0f }))
+    {
+        ImGui::OpenPopup("AssetSelector");
+
+        constexpr float yPadding = 5.0f;
+        const ImVec2 buttonPos  = ImGui::GetItemRectMin();
+        const ImVec2 buttonSize = ImGui::GetItemRectSize();
+        ImGui::SetNextWindowPos({ buttonPos.x + buttonSize.x * 0.5f, buttonPos.y + buttonSize.y + yPadding }, ImGuiCond_Always, { 0.5f, 0.0f });
+    }
+
+    if (ImGui::BeginPopup("AssetSelector", ImGuiWindowFlags_NoMove))
+    {
+        const auto& loadedAssets = Engine::Instance().GetAssetManager().GetLoadedAssets(AssetType::TEXTURE);
+        constexpr float popupMinWidth  = 250.0f;
+        constexpr float popupMaxHeight = 200.0f;
+
+        ImGui::BeginChild("PopupItems", { popupMinWidth, popupMaxHeight }, true, ImGuiWindowFlags_HorizontalScrollbar);
+
+        for (auto& [loadedUlid, loadedAsset] : loadedAssets)
+        {
+            const std::string compName = std::string{ loadedAsset->GetAssetPath().GetFileName() };
+
+            if (ImGui::MenuItem(compName.c_str()))
+            {
+                selectedAssetUlid = loadedAsset->GetUlid();
+                ImGui::CloseCurrentPopup();
+            }
+        }
+
+        ImGui::EndChild();
+        ImGui::EndPopup();
+    }
+
+    ImGui::Text("Ambient Color");
+    ImGui::SameLine(130.0f);
+    ImGui::DragFloat3("##ambient", &ambient.x, 0.001f, 0.0f, 1.0f, "%.3f");
+
+    ImGui::Text("Diffuse Color");
+    ImGui::SameLine(130.0f);
+    ImGui::DragFloat3("##diffuse", &diffuse.x, 0.001f, 0.0f, 1.0f, "%.3f");
+
+
+    ImGui::SetCursorPosY(CREATE_ASSET_HEIGHT - 35.0f);
+    if (ImGui::Button("Cancel"))
+    {
+        ClosePopupFunc();
+    }
+
+    ImGui::SameLine(ImGui::GetWindowSize().x - 70.0f);
+
+    if (ImGui::Button("Create"))
+    {
+        if (!enteredAssetName.empty())
+        {
+            const Ulid ulid{};
+
+            XmlElement* root = new XmlElement{ "Scarlet" };
+            (void)root->AddAttribute("AssetType", std::to_string(static_cast<int>(AssetType::MATERIAL)));
+            (void)root->AddAttribute("ulid", std::to_string(ulid));
+            root->AddChild("texture"     , "", std::to_string(selectedAssetUlid));
+            root->AddChild("ambientColor", "", ReflectType::GetStringFromValue(ambient));
+            root->AddChild("diffuseColor", "", ReflectType::GetStringFromValue(diffuse));
+
+            XmlSerializer::Serialize(XmlDocument{ root }, std::format("{}/{}.scarlet", mCurrentDirectory.GetAbsolutePath(), enteredAssetName));
+
+            Engine::Instance().GetAssetManager().LoadAsset(AssetType::MATERIAL, mCurrentDirectory / std::format("{}.scarlet", enteredAssetName), ulid);
+        }
+        ClosePopupFunc();
+    }
+}
+
+
+void AssetBrowserPanel::CreateMesh()
+{
+    CreateMenuWithSelectingAssetFromBrowser(AssetType::MESH, FILE_FILTER("Static Mesh", ".obj"));
+}
+
+void AssetBrowserPanel::CreateMenuWithSelectingAssetFromBrowser(const AssetType type, const char* browserFilter)
+{
+    static std::string enteredAssetName{};
+    static std::string enteredAssetPath{};
+
+    auto ClosePopupFunc = [&] {
+        mCreateFile   = false;
+        mCreateFolder = false;
+
+        enteredAssetPath = "";
+        enteredAssetName = "";
+
+        ImGui::CloseCurrentPopup();
+    };
+
+    const std::string popupTitle = "Create Asset";
+    const ImVec2 textSize        = ImGui::CalcTextSize(popupTitle.c_str());
+
+    ImGui::SetCursorPosX((CREATE_ASSET_WIDTH - textSize.x) * 0.5f);
+    ImGui::Text("%s", popupTitle.c_str());
+
+    constexpr uint32 assetNameLength = 50;
+    char assetName[assetNameLength] = { };
+
+    if (!enteredAssetName.empty())
+    {
+        strcpy_s(assetName, enteredAssetName.c_str());
+        assetName[assetNameLength - 1] = '\0';
+    }
+
+    const float middleY = (CREATE_ASSET_HEIGHT - textSize.y) * 0.5f;
+
+    ImGui::SetCursorPosY(middleY - 20.0f);
+    ImGui::SetCursorPosX(20.0f);
+
+    ImGui::Text("Name: ");
+    ImGui::SameLine(130.0f);
+
+    if (ImGui::InputText("##AssetName", assetName, assetNameLength))
+    {
+        enteredAssetName = std::string{ assetName };
+    }
+
+    ImGui::SetCursorPosY(middleY + 20.0f);
+    ImGui::SetCursorPosX(20.0f);
+
+    ImGui::Text("Path: ");
+    ImGui::SameLine(130.0f);
+
+    ImGui::Text("%s", enteredAssetPath.c_str());
+
+    std::filesystem::path assetPath{};
+
+    ImGui::SameLine(CREATE_ASSET_WIDTH - 70.0f);
+
+    if (ImGui::Button("Browse"))
+    {
+        const std::string item = FileDialog::OpenFile(browserFilter);
+
+        if (!item.empty())
+        {
+            assetPath = std::filesystem::relative(item, mCurrentDirectory.GetAbsolutePath());
+            enteredAssetPath = assetPath.string();
+        }
+    }
+
+    ImGui::SetCursorPosY(CREATE_ASSET_HEIGHT - 35.0f);
+    if (ImGui::Button("Cancel"))
+    {
+        ClosePopupFunc();
+    }
+
+    ImGui::SameLine(ImGui::GetWindowSize().x - 70.0f);
+
+    if (ImGui::Button("Create"))
+    {
+        if (!enteredAssetPath.empty() && !enteredAssetName.empty())
+        {
+            const Ulid ulid{};
+
+            XmlElement* root = new XmlElement{ "Scarlet" };
+            (void)root->AddAttribute("AssetType", std::to_string(static_cast<int>(type)));
+            (void)root->AddAttribute("ulid", std::to_string(ulid));
+            root->AddChild("filepath", "", enteredAssetPath);
+
+            XmlSerializer::Serialize(XmlDocument{ root }, std::format("{}/{}.scarlet", mCurrentDirectory.GetAbsolutePath(), enteredAssetName));
+            Engine::Instance().GetAssetManager().LoadAsset(type, mCurrentDirectory / enteredAssetPath, ulid);
+        }
+        ClosePopupFunc();
+    }
 }
 
 } // Namespace Scarlet::Editor.

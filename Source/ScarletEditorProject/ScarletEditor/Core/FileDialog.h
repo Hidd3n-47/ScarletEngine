@@ -3,6 +3,8 @@
 namespace Scarlet
 {
 
+#define FILE_FILTER(NAME, EXT) NAME " (*" EXT ")\0*" EXT "\0"
+
 class FileDialog
 {
 public:

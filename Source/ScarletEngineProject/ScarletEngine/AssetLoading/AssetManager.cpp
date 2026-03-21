@@ -55,6 +55,22 @@ void AssetManager::LoadScarletAssets(const Filepath& assetPath)
     }
 }
 
+void AssetManager::LoadAsset(const AssetType type, const Filepath& filepath, const Ulid ulid)
+{
+    if (type == AssetType::MESH)
+    {
+        (void)CreateAsset<Resource::Mesh>(AssetType::MESH, filepath, ulid);
+    }
+    else if (type == AssetType::TEXTURE)
+    {
+        (void)CreateAsset<Resource::Texture>(AssetType::TEXTURE, filepath, ulid);
+    }
+    else if (type == AssetType::MATERIAL)
+    {
+        (void)CreateAsset<Resource::Material>(AssetType::MATERIAL, filepath, ulid);
+    }
+}
+
 void AssetManager::RemoveAsset(WeakHandle<Resource::ILazyLoadAsset>& asset)
 {
     const int assetType = static_cast<int>(asset->GetAssetType());
@@ -64,6 +80,23 @@ void AssetManager::RemoveAsset(WeakHandle<Resource::ILazyLoadAsset>& asset)
     mTypeArrayForUlidToAssets[assetType].erase(ulid);
 
     asset.Invalidate();
+}
+
+std::string AssetManager::AssetTypeToString(const AssetType type)
+{
+    switch (type)
+    {
+    case AssetType::TEXTURE:
+        return "Texture";
+    case AssetType::MESH:
+        return "Static Mesh";
+    case AssetType::MATERIAL:
+        return "Material";
+    case AssetType::ASSET_TYPE_COUNT:
+    default:
+        SCARLET_WARN("Requesting asset type string of an unhandled case.");
+        return "UNKNOWN_ASSET_STRING";
+    }
 }
 
 } // Namespace Scarlet.

@@ -29,6 +29,20 @@ public:
      */
     void LoadScarletAssets(const Filepath& assetPath);
 
+    /**
+     * @brief Load in an asset at the given filepath.
+     * @param type The type of the asset.
+     * @param filepath The filepath for the asset.
+     * @param ulid The unique identifier of the asset.
+     */
+    void LoadAsset(const AssetType type, const Filepath& filepath, const Ulid ulid);
+
+    /**
+     * @brief Get an asset based off the \ref AssetType and unique identifier.
+     * @param typeAsInt The \ref AssetType as an \c int.
+     * @param ulidAsInt The unique identifier of the asset as an \c uint64
+     * @return A \ref WeakHandle to \ref ILazyLoadAsset of the asset with the given type and unique identifier.
+     */
     inline WeakHandle<Resource::ILazyLoadAsset> GetAsset(const uint32 typeAsInt, uint64 ulidAsInt) { return GetAsset(static_cast<AssetType>(typeAsInt), Ulid{ ulidAsInt }); WeakHandle<Resource::ILazyLoadAsset>{  }; }
 
     /**
@@ -62,6 +76,13 @@ public:
      * @return An unordered map between unique identifier and the \ref ILazyLoadAsset for the given \ref AssetType.
      */
     inline const unordered_map<Ulid, Resource::ILazyLoadAsset*>& GetLoadedAssets(const AssetType type) const { return mTypeArrayForUlidToAssets[static_cast<int>(type)]; }
+
+    /**
+     * @brief Get the asset type as a string.
+     * @param type The \ref AssetType.
+     * @return The \ref AssetType as a string.
+     */
+    static std::string AssetTypeToString(const AssetType type);
 
     static constexpr Ulid INVALID_ULID{ 0 };
 private:

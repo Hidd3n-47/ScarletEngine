@@ -7,7 +7,7 @@
 		</Component>
 		<Component typeId="Mesh">
 			<mesh type="asset">0,0</mesh>
-			<material type="asset">2,0</material>
+			<material type="asset">2,29304308355926851</material>
 		</Component>
 	</Entity>
 	<Entity Mutable="true">

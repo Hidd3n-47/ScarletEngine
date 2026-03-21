@@ -77,7 +77,7 @@ public:
      * @param attributeValue The value of the attribute being added.
      * @return \c true if the attribute was added correctly, \c false when not - example, the element already contains an attribute with the given value.
      */
-    [[nodiscard]] bool AddAttribute(const std::string& attributeName, const std::string& attributeValue);
+    bool AddAttribute(const std::string& attributeName, const std::string& attributeValue);
 
     /**
      * @brief Add a new child element to this element.

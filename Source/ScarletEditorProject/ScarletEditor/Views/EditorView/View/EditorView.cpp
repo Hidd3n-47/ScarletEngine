@@ -56,7 +56,7 @@ void EditorView::RenderMenuBar()
         {
             if (ImGui::MenuItem("Open..."))
             {
-                const std::string filepath = FileDialog::OpenFile("Scarlet Scene (*.scarlet_scene)\0*.scarlet_scene\0");
+                const std::string filepath = FileDialog::OpenFile(FILE_FILTER("Scarlet Scene", ".scarlet_scene"));
 
                 if (!filepath.empty())
                 {
@@ -71,7 +71,7 @@ void EditorView::RenderMenuBar()
 
             if (ImGui::MenuItem("Save as..."))
             {
-                const std::string filepath = FileDialog::SaveAsFile("Scarlet Scene (*.scarlet_scene)\0*.scarlet_scene\0");
+                const std::string filepath = FileDialog::SaveAsFile(FILE_FILTER("Scarlet Scene", ".scarlet_scene"));
 
                 if (!filepath.empty())
                 {
