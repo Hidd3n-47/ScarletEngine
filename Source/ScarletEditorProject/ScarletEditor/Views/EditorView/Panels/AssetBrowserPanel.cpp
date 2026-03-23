@@ -252,8 +252,8 @@ void AssetBrowserPanel::CreateAssetPopup()
 
         ImGui::SetNextWindowSize(ImVec2{ CREATE_ASSET_WIDTH, CREATE_ASSET_HEIGHT });
 
-        const ImGuiIO& io = ImGui::GetIO();
-        ImGui::SetNextWindowPos(ImVec2{ io.DisplaySize.x * 0.5f, io.DisplaySize.y * 0.5f }, ImGuiCond_Always, ImVec2{ 0.5f, 0.5f });
+        const ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+        ImGui::SetNextWindowPos(center, ImGuiCond_Always, ImVec2{ 0.5f, 0.5f });
     }
 
     if (ImGui::BeginPopup("CreateAsset", ImGuiWindowFlags_NoMove))
