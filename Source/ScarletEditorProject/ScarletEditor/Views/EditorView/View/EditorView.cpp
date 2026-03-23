@@ -4,6 +4,7 @@
 #ifdef DEV_CONFIGURATION
 
 #include <ScarletEngine/Core/Engine.h>
+#include <ScarletEngine/Core/Window/Window.h>
 
 #include "Core/FileDialog.h"
 #include "Core/EditorManager.h"
@@ -46,6 +47,10 @@ EditorView::EditorView()
     AddPanel<ViewportPanel>();
     AddPanel<PropertiesPanel>();
     AddPanel<AssetBrowserPanel>();
+
+    WeakHandle<Window> window = Engine::Instance().GetMainWindow();
+    window->SetSize(1920, 1080);
+    window->SetPosition(-1, -1);
 }
 
 void EditorView::RenderMenuBar()

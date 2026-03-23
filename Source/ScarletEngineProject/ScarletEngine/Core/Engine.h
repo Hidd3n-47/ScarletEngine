@@ -38,6 +38,8 @@ public:
 
     void RegisterEngineSystems(WeakHandle<ScarlEnt::Scene> scene);
 
+    void LoadScarletAssets();
+
     inline void CloseEngine() { mRunning = false; }
 
     [[nodiscard]] inline WeakHandle<Window> GetMainWindow() const { return mMainWindow; }
@@ -49,8 +51,9 @@ public:
     inline void SetReloadDllFunction(const std::function<void()>& reloadDll) { mReloadDllFunction = reloadDll; }
 
     static void* GetImGuiContext();
-    inline void SetBeginRenderEvent(const std::function<void()>& beginRenderEvent) { mBeginRenderEvent = beginRenderEvent; }
-    inline void SetEndRenderEvent(const std::function<void()>& endRenderEvent)     { mEndRenderEvent = endRenderEvent; }
+    inline void SetBeginRenderEvent(const std::function<void()>& beginRenderEvent) { mBeginRenderEvent      = beginRenderEvent; }
+    inline void SetEndRenderEvent(const std::function<void()>& endRenderEvent)     { mEndRenderEvent        = endRenderEvent; }
+    inline void SetEditorPostUpdateEvent(const std::function<void()>& postUpdate)  { mEditorPostUpdateEvent = postUpdate; }
 #endif // DEV_CONFIGURATION.
 private:
     Engine()  = default;
@@ -68,6 +71,7 @@ private:
     std::function<void()> mReloadDllFunction;
     std::function<void()> mBeginRenderEvent;
     std::function<void()> mEndRenderEvent;
+    std::function<void()> mEditorPostUpdateEvent;
 #endif // DEV_CONFIGURATION.
 
     void OnEvent(Event& event);

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <ScarletEngine/Core/Defines.h>
+
 #include <string>
 #include <filesystem>
 
@@ -17,15 +19,15 @@ enum class FilepathDirectory : uint8
  * @class Filepath: A class that can be used to create paths for files relative to the project folder.
  * @note \ref Filepath represents a file and hence must have an extension. A \ref Filepath is not a directory.
  */
-class Filepath
+class ENGINE_API Filepath
 {
 public:
     Filepath()  = default;
     ~Filepath() = default;
 
-    explicit Filepath(FilepathDirectory directory, const char* path)        : mRelativePath{ path }, mDirectory{ directory } { /* Empty. */ }
-    explicit Filepath(FilepathDirectory directory, const std::string& path) : mRelativePath{ path }, mDirectory{ directory } { /* Empty. */ }
-    explicit Filepath(FilepathDirectory directory, const std::filesystem::path& path) : mRelativePath{ path }, mDirectory{ directory } { /* Empty. */ }
+    explicit Filepath(const FilepathDirectory directory, const char* path)        : mRelativePath{ path }, mDirectory{ directory } { /* Empty. */ }
+    explicit Filepath(const FilepathDirectory directory, const std::string& path) : mRelativePath{ path }, mDirectory{ directory } { /* Empty. */ }
+    explicit Filepath(const FilepathDirectory directory, const std::filesystem::path& path) : mRelativePath{ path }, mDirectory{ directory } { /* Empty. */ }
 
     Filepath(const Filepath&)            = default;
     Filepath(Filepath&&)                 = default;
@@ -45,7 +47,7 @@ public:
     [[nodiscard]] inline std::string GetAbsolutePath() const
     {
         return ((mDirectory == FilepathDirectory::ENGINE ?
-                SCARLET_ENGINE_DIRECTORY : SCARLET_PROJECT_DIRECTORY) / mRelativePath).string();
+                SCARLET_ENGINE_DIRECTORY : mScarletProjectDirectory) / mRelativePath).string();
     }
 
     /**
@@ -89,11 +91,15 @@ public:
         return newPath;
     }
 
-    inline static const std::filesystem::path SCARLET_ENGINE_DIRECTORY { "E:/Programming/ScarletEngine/" };
-    inline static const std::filesystem::path SCARLET_PROJECT_DIRECTORY{ "E:/Programming/ScarletEngine/ScarletProjects/ScarletTestGameProject/" };
+    inline static const std::filesystem::path& GetProjectDirectory() { return mScarletProjectDirectory; }
+    inline static void SetProjectDirectory(const std::filesystem::path& projectDirectory) { SCARLET_INFO("Project path set to: {}", projectDirectory.string()); mScarletProjectDirectory = projectDirectory; }
+
+    static const std::filesystem::path SCARLET_ENGINE_DIRECTORY;
 private:
     std::filesystem::path mRelativePath{ };
     FilepathDirectory     mDirectory   { FilepathDirectory::ENGINE };
+
+    static std::filesystem::path mScarletProjectDirectory;
 };
 
 } // Namespace Scarlet.

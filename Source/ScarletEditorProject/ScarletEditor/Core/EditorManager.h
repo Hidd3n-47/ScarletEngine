@@ -47,13 +47,13 @@ public:
 
     /**
      * @brief Open a given scene at the passed in filepath.
-     * @param filepath The filepath of the scene being opened and loaded into the editor.
+     * @param filepath The absolute filepath of the scene being opened and loaded into the editor.
      */
     void OpenScene(const std::string& filepath);
 
     /**
      * @brief Save the currently active editor scene to the given filepath.
-     * @param filepath The filepath where the editor scene is being saved to.
+     * @param filepath The absolute filepath where the editor scene is being saved to.
      */
     void SaveSceneAs(const std::string& filepath);
 
@@ -80,6 +80,18 @@ public:
      */
     [[nodiscard]] inline std::string GetCurrentScenePath() const { return mCurrentSceneFilepath; }
 
+    /**
+     * @brief Open a game project.
+     * @param filepath The absolute filepath of the game project. This is the path to the actual .scarlet_project file.
+     */
+    inline void OpenGameProject(const std::string& filepath) { mProjectPathToOpen = filepath; }
+
+    /**
+     * @brief Get the name of the currently open project.
+     * @return The name of the currently opened project.
+     */
+    inline std::string GetProjectName() const { return mProjectName; }
+
     inline static constexpr Ulid BACK_ICON_ULID      { 1 };
     inline static constexpr Ulid DIRECTORY_ICON_ULID { 2 };
     inline static constexpr Ulid ASSET_ICON_ULID     { 3 };
@@ -94,10 +106,22 @@ private:
 
     WeakHandle<ScarlEnt::Scene> mEditorScene;
     std::string mCurrentSceneFilepath{};
+    std::string mProjectPathToOpen{};
+    std::string mProjectName{};
 
     ScarlEnt::EntityHandle<Component::Transform, Component::Camera, Component::DirectionLight> mCameraEntity;
 
-    IView* mEditorView;
+    IView* mEditorView = nullptr;
+
+    /**
+     * @brief A function called at the end of an update to safely clean-up or remove instances referenced in the update function.
+     */
+    void PostUpdate();
+
+    /**
+     * @brief Internal function to open a project. This opens the project set by the public mutator, this function must be called in post update to safely change.
+     */
+    void OpenGameProject();
 };
 
 } // Namespace Scarlet::Editor.

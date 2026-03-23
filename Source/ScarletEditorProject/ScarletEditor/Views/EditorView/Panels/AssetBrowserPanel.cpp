@@ -157,6 +157,8 @@ void AssetBrowserPanel::RenderBackAndPathTextInput(const uint32 backIconId)
 
     constexpr float backIconSize = 15.0f;
 
+    ImGui::PushStyleColor(ImGuiCol_Button, ImU32{ 22ul << 16 | 22ul << 8ul | 24 });
+
     if (ImGui::ImageButton("Back", backIconId, ImVec2{ backIconSize, backIconSize }, ImVec2{ 0.0f, 1.0f }, ImVec2{ 1.0f, 0.0f }))
     {
         if (const std::string relativePathStr = mCurrentDirectory.GetRelativePath(); !relativePathStr.empty())
@@ -192,6 +194,7 @@ void AssetBrowserPanel::RenderBackAndPathTextInput(const uint32 backIconId)
             }
         }
     }
+    ImGui::PopStyleColor();
 
     ImGui::EndGroup();
 }
@@ -243,13 +246,6 @@ void AssetBrowserPanel::RenderContextMenu()
 
 void AssetBrowserPanel::CreateAssetPopup()
 {
-    auto ClosePopupFunc = [&]{
-        mCreateFile = false;
-        mCreateFolder = false;
-
-        ImGui::CloseCurrentPopup();
-    };
-
     if (mCreateFile || mCreateFolder)
     {
         ImGui::OpenPopup("CreateAsset");

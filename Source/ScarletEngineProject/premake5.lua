@@ -66,7 +66,7 @@ project "ScarletEngine"
 
     filter "configurations:Dev"
         runtime "Debug"
-        defines { "ENGINE_BUILD", "DEV_CONFIGURATION" }
+        defines { "ENGINE_BUILD", "DEV_CONFIGURATION", "SCARLET_ENGINE_PATH=R\"($(SolutionDir))\"" }
         symbols "On"
 
     filter "configurations:Release"

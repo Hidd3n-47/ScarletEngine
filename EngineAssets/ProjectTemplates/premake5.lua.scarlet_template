@@ -1,0 +1,58 @@
+workspace "{project_name}"
+architecture "x64"
+
+configurations
+{{
+    "Dev",
+    "Release"
+}}
+
+-- ---------------------------- {project_name} Project.
+project "{project_name}"
+    kind "SharedLib"
+    language "C++"
+    staticruntime "Off"
+    cppdialect "C++20"
+
+    targetdir(path.join("{project_path}", "Scratch/Bin/", "%{{prj.name}}"))
+    objdir(path.join("{project_path}", "Scratch/Bin-Int/", "%{{prj.name}}"))
+
+    files
+    {{
+        "**.h",
+        "**.cpp",
+    }}
+
+    includedirs
+    {{
+        "$(SolutionDir)Deps/Include/",
+        "$(SolutionDir)Source/ScarletProject/",
+        "$(SolutionDir)Source/ScarletProject/src/",
+        "$(SolutionDir)Source/ScarlEntProject/",
+        "$(SolutionDir)Source/ScarletMathProject/",
+        "$(SolutionDir)Source/ScarletCoreProject/",
+        "$(SolutionDir)Source/ScarletCoreEcsProject/",
+        "$(SolutionDir)Source/ScarletEngineProject/",
+    }}
+
+    links
+    {{
+        "ScarlEnt",
+        "ScarletMath",
+        "ScarletCore",
+        "ScarletCoreEcs",
+        "ScarletEngine"
+    }}
+
+    filter "system:windows"
+        systemversion "latest"
+
+    filter "configurations:Dev"
+        runtime "Debug"
+        defines {{ "DEV_CONFIGURATION", "GAME_DLL_BUILD" }}
+        symbols "On"
+
+    filter "configurations:Release"
+        runtime "Release"
+        defines "GAME_DLL_BUILD"
+        optimize "On"

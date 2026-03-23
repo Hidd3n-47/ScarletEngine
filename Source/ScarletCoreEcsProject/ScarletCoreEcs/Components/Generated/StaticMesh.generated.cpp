@@ -19,7 +19,7 @@ void StaticMesh::GenerateProperties()
         [this](const std::string_view& stringValue) { ReflectType::SetValueFromString(this->mesh, stringValue); }
     };
 
-        mProperties["material"] = ScarlEnt::Property {
+    mProperties["material"] = ScarlEnt::Property {
         ScarlEnt::PropertyType::ASSET,
         ScarlEnt::Registry::Instance().GetOrRegisterComponentId<StaticMesh>(),
         [this] { return ReflectType::GetStringFromValue(this->material); },

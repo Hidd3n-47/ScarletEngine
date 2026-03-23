@@ -81,6 +81,15 @@ WeakHandle<Window> WindowManager::CreateWindowInternal(const char* title, Window
     glfwSetScrollCallback(window, 
         [](GLFWwindow* win, const double xOffset, const double yOffset) { DispatchEvent<MouseScrollEvent>(win, static_cast<float>(xOffset), static_cast<float>(yOffset)); });
 
+    glfwSetFramebufferSizeCallback(window,
+        [](GLFWwindow* win, const int w, const int h) {
+            WindowProperties& data = *static_cast<WindowProperties*>(glfwGetWindowUserPointer(win));
+            data.width  = w;
+            data.height = h;
+
+            DispatchEvent<WindowResizedEvent>(win, static_cast<uint32>(w), static_cast<uint32>(h));
+        });
+
     glfwSetMouseButtonCallback(window, [](GLFWwindow* win, const int button, const int action, const int mods)
         {
             switch (action)

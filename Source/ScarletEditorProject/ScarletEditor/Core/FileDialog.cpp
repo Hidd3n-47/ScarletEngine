@@ -3,6 +3,7 @@
 
 #include <windows.h>
 #include <commdlg.h>
+#include <shlobj.h>
 
 #include <glfw/glfw3.h>
 #define GLFW_EXPOSE_NATIVE_WIN32
@@ -28,9 +29,27 @@ std::string FileDialog::OpenFile(const char* filter)
     ofn.nFilterIndex = 1;
     ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR;
 
-    if (GetOpenFileNameA(&ofn) == TRUE)
+    if (GetOpenFileNameA(&ofn))
     {
         return ofn.lpstrFile;
+    }
+
+    return std::string{};
+}
+
+std::string FileDialog::OpenFolder()
+{
+    BROWSEINFOA browseInfo = { };
+    browseInfo.hwndOwner   = glfwGetWin32Window(static_cast<GLFWwindow*>(Engine::Instance().GetMainWindow()->GetNativeWindow()));
+    browseInfo.lpszTitle   = "Select a folder";
+    browseInfo.ulFlags     = BIF_RETURNONLYFSDIRS | BIF_NEWDIALOGSTYLE;
+
+    LPITEMIDLIST pathList = SHBrowseForFolderA(&browseInfo);
+
+    char path[MAX_PATH];
+    if (SHGetPathFromIDListA(pathList, path))
+    {
+        return std::string{ path };
     }
 
     return std::string{};

@@ -45,15 +45,15 @@
 	</Entity>
 	<Entity Mutable="true">
 		<Component typeId="Transform">
-			<translation type="vec3">1.300000,-16.400000,2.000000</translation>
-			<rotation type="vec3">2.100000,0.000000,-3.600000</rotation>
+			<translation type="vec3">-1.269482,-14.376840,1.613425</translation>
+			<rotation type="vec3">9.099999,0.000000,-2.249999</rotation>
 			<scale type="vec3">1.000000,1.000000,1.000000</scale>
 		</Component>
 		<Component typeId="Camera">
-			<forwardVector type="vec3">-0.063000,0.997000,-0.037000</forwardVector>
-			<rightVector type="vec3">0.998000,0.063000,0.000000</rightVector>
+			<forwardVector type="vec3">-0.038766,0.986650,-0.158158</forwardVector>
+			<rightVector type="vec3">0.999229,0.039260,0.000000</rightVector>
 			<nearPlane type="float">0.100000</nearPlane>
-			<upVector type="vec3">-0.002000,0.037000,0.990000</upVector>
+			<upVector type="vec3">-0.006209,0.158030,0.987414</upVector>
 			<farPlane type="float">1000.000000</farPlane>
 			<aspectRatio type="float">1.777778</aspectRatio>
 			<fov type="float">60.000000</fov>

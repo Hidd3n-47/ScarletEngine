@@ -137,23 +137,31 @@ void Renderer::Render()
     Component::Transform* cameraTransform;
     Component::DirectionLight* cameraDirectionLight;
 
-    auto* ent = ScarlEnt::Registry::Instance().GetActiveScene()->GetCameraEntityHandle();
+    ScarlEnt::IEntityHandle* cameraHandle = nullptr;
 
-    if (ent == nullptr) [[unlikely]]
+    const WeakHandle<ScarlEnt::Scene> scene = ScarlEnt::Registry::Instance().GetActiveScene();
+
+    if (!scene.IsValid()) [[unlikely]]
     {
         return;
     }
 
-    if (ent->IsMutable())
+    cameraHandle = scene->GetCameraEntityHandle();
+    if (!cameraHandle) [[unlikely]]
     {
-        ScarlEnt::MutableEntityHandle* cameraEntity = reinterpret_cast<ScarlEnt::MutableEntityHandle*>(ent);
+        return;
+    }
+
+    if (cameraHandle->IsMutable())
+    {
+        ScarlEnt::MutableEntityHandle* cameraEntity = reinterpret_cast<ScarlEnt::MutableEntityHandle*>(cameraHandle);
         camera = &cameraEntity->GetComponent<Component::Camera>();
         cameraTransform = &cameraEntity->GetComponent<Component::Transform>();
         cameraDirectionLight = &cameraEntity->GetComponent<Component::DirectionLight>();
     }
     else
     {
-        auto* cameraEntity = reinterpret_cast<ScarlEnt::EntityHandle<Component::Transform, Component::Camera, Component::DirectionLight>*>(ent);
+        auto* cameraEntity = reinterpret_cast<ScarlEnt::EntityHandle<Component::Transform, Component::Camera, Component::DirectionLight>*>(cameraHandle);
         camera = &cameraEntity->GetComponent<Component::Camera>();
         cameraTransform = &cameraEntity->GetComponent<Component::Transform>();
         cameraDirectionLight = &cameraEntity->GetComponent<Component::DirectionLight>();

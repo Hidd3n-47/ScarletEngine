@@ -6,6 +6,13 @@ namespace Scarlet::Editor
 struct PanelProperties
 {
     std::string_view title = "NoTitle";
+    float width            = 500.0f;
+    float height           = 500.0f;
+    float positionX        = 0.0f;
+    float positionY        = 0.0f;
+    bool moveable          = true;
+    bool resizable         = true;
+    bool titleBar          = true;
 };
 
 class IView;
@@ -41,6 +48,7 @@ public:
     [[nodiscard]] inline bool IsHovered() const { return mIsHovered; }
 protected:
     IView* mView;
+    PanelProperties mProperties;
 
     bool mIsFocused = false;
     bool mIsHovered = false;
@@ -50,8 +58,6 @@ protected:
      */
     virtual void RenderContextMenu() {}
 private:
-    PanelProperties mProperties;
-
     /**
      * @brief Internal render function where the render code of the panel is added.
      */

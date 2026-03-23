@@ -8,7 +8,8 @@ namespace Scarlet
  */
 enum class EventType
 {
-    WINDOW_CLOSE,
+    WINDOW_CLOSE, 
+    WINDOW_RESIZED,
 
     MOUSE_MOVE,
     MOUSE_SCROLL,

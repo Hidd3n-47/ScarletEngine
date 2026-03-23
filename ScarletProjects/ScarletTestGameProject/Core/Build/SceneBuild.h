@@ -24,7 +24,7 @@ inline void InitGameScene()
         Transform.translation = Math::Vec3{ -4.050000,0.000000,-1.350000 };
         Transform.rotation = Math::Vec3{ 0.000000,0.000000,0.000000 };
         Transform.scale = Math::Vec3{ 1.000000,1.000000,1.000000 };
-        auto& Mesh = ent.AddComponent<Component::Mesh>();
+        auto& Mesh = ent.AddComponent<Component::StaticMesh>();
         Mesh.mesh = AssetRef{ 0,0 };
         Mesh.material = AssetRef{ 2,0 };
     }
@@ -35,7 +35,7 @@ inline void InitGameScene()
         Transform.translation = Math::Vec3{ 3.700000,0.000000,0.000000 };
         Transform.rotation = Math::Vec3{ 0.000000,0.000000,0.000000 };
         Transform.scale = Math::Vec3{ 1.000000,1.000000,1.000000 };
-        auto& Mesh = ent.AddComponent<Component::Mesh>();
+        auto& Mesh = ent.AddComponent<Component::StaticMesh>();
         Mesh.mesh = AssetRef{ 0,26604845367616295 };
         Mesh.material = AssetRef{ 2,26949044722005844 };
     }
@@ -46,7 +46,7 @@ inline void InitGameScene()
         Transform.translation = Math::Vec3{ -2.650000,-1.250000,2.500000 };
         Transform.rotation = Math::Vec3{ 0.900000,-24.150000,0.000000 };
         Transform.scale = Math::Vec3{ 1.000000,1.000000,1.000000 };
-        auto& Mesh = ent.AddComponent<Component::Mesh>();
+        auto& Mesh = ent.AddComponent<Component::StaticMesh>();
         Mesh.mesh = AssetRef{ 0,26605124924805398 };
         Mesh.material = AssetRef{ 2,26949044722005844 };
     }
@@ -57,9 +57,9 @@ inline void InitGameScene()
         Transform.translation = Math::Vec3{ 4.950000,0.000000,5.600000 };
         Transform.rotation = Math::Vec3{ 0.000000,0.000000,0.000000 };
         Transform.scale = Math::Vec3{ 20.000000,20.000000,20.000000 };
-        auto& Mesh = ent.AddComponent<Component::Mesh>();
+        auto& Mesh = ent.AddComponent<Component::StaticMesh>();
         Mesh.mesh = AssetRef{ 0,26558880580407306 };
-        Mesh.material = AssetRef{ 2,26949044722005844 };
+        Mesh.material = AssetRef{ 2,29548269772074606 };
     }
 
     {

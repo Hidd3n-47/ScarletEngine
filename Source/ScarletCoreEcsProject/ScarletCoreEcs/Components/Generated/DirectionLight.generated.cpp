@@ -19,28 +19,28 @@ void DirectionLight::GenerateProperties()
         [this](const std::string_view& stringValue) { ReflectType::SetValueFromString(this->lightColor, stringValue); }
     };
 
-        mProperties["direction"] = ScarlEnt::Property {
+    mProperties["direction"] = ScarlEnt::Property {
         ScarlEnt::PropertyType::VEC3,
         ScarlEnt::Registry::Instance().GetOrRegisterComponentId<DirectionLight>(),
         [this] { return ReflectType::GetStringFromValue(this->direction); },
         [this](const std::string_view& stringValue) { ReflectType::SetValueFromString(this->direction, stringValue); }
     };
 
-        mProperties["ambientIntensity"] = ScarlEnt::Property {
+    mProperties["ambientIntensity"] = ScarlEnt::Property {
         ScarlEnt::PropertyType::FLOAT,
         ScarlEnt::Registry::Instance().GetOrRegisterComponentId<DirectionLight>(),
         [this] { return ReflectType::GetStringFromValue(this->ambientIntensity); },
         [this](const std::string_view& stringValue) { ReflectType::SetValueFromString(this->ambientIntensity, stringValue); }
     };
 
-        mProperties["diffuseIntensity"] = ScarlEnt::Property {
+    mProperties["diffuseIntensity"] = ScarlEnt::Property {
         ScarlEnt::PropertyType::FLOAT,
         ScarlEnt::Registry::Instance().GetOrRegisterComponentId<DirectionLight>(),
         [this] { return ReflectType::GetStringFromValue(this->diffuseIntensity); },
         [this](const std::string_view& stringValue) { ReflectType::SetValueFromString(this->diffuseIntensity, stringValue); }
     };
 
-        mProperties["rimPower"] = ScarlEnt::Property {
+    mProperties["rimPower"] = ScarlEnt::Property {
         ScarlEnt::PropertyType::FLOAT,
         ScarlEnt::Registry::Instance().GetOrRegisterComponentId<DirectionLight>(),
         [this] { return ReflectType::GetStringFromValue(this->rimPower); },

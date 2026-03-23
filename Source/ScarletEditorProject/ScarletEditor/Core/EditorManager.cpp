@@ -21,10 +21,11 @@
 
 #include <ScarletCoreEcs/Components/Camera.h>
 #include <ScarletCoreEcs/Components/Transform.h>
-#include <ScarletCoreEcs/Components/StaticMesh.h>
 #include <ScarletCoreEcs/Components/DirectionLight.h>
 
 #include "Views/EditorView/View/EditorView.h"
+#include "Views/ProjectSelectView/View/ProjectSelectView.h"
+
 #include "Views/EditorView/Panels/ViewportPanel.h"
 
 namespace Scarlet::Editor
@@ -120,7 +121,7 @@ static void SetScarletDarkTheme()
     // --------
     // Buttons
     // --------
-    colors[ImGuiCol_Button]        = mainDock;
+    colors[ImGuiCol_Button]        = surface;
     colors[ImGuiCol_ButtonHovered] = scarlet;
     colors[ImGuiCol_ButtonActive]  = scarletActive;
 
@@ -161,19 +162,20 @@ EditorManager::EditorManager()
 {
     Engine& engineInstance = Engine::Instance();
 
-    mEditorView = new EditorView();
+    mEditorView = new ProjectSelectView();
 
     engineInstance.SetEndRenderEvent([&] { EndRender(); });
-    engineInstance.GetAssetManager().LoadScarletAssets(Filepath{ FilepathDirectory::PROJECT, "" });
-
-    OpenScene(Filepath{ FilepathDirectory::ENGINE, "EngineAssets/Scenes/DefaultScene.scarlet_scene" }.GetAbsolutePath() );
+    engineInstance.SetEditorPostUpdateEvent([&] { PostUpdate(); });
 }
 
 EditorManager::~EditorManager()
 {
     Engine::Instance().SetEndRenderEvent(nullptr);
 
-    SaveCurrentScene();
+    if (mEditorScene.IsValid())
+    {
+        SaveCurrentScene();
+    }
 
     delete mEditorView;
 }
@@ -306,8 +308,10 @@ void EditorManager::OpenScene(const std::string& filepath)
         return;
     }
 
-    EditorView* view = dynamic_cast<EditorView*>(mEditorView);
-    view->GetSelectionManager().SetSelectedEntity(nullptr);
+    if (EditorView* view = dynamic_cast<EditorView*>(mEditorView); view) [[likely]]
+    {
+        view->GetSelectionManager().SetSelectedEntity(nullptr);
+    }
 
     mEditorScene = ScarlEnt::Registry::Instance().GetOrCreateScene(newSceneFriendlyName);
 
@@ -393,13 +397,6 @@ void EditorManager::SaveSceneAs(const std::string& filepath)
 
 void EditorManager::SaveCurrentScene()
 {
-    if (mCurrentSceneFilepath.ends_with("DefaultScene.scarlet_scene"))
-    {
-        // Don't save default scene.
-        // Todo Christian: There should be prompt to see if the user would like to save the scene.
-        return;
-    }
-
     SaveSceneAs(mCurrentSceneFilepath);
 }
 
@@ -408,6 +405,39 @@ void EditorManager::EndRender() const
     mEditorView->Render();
 
     ImGui::Render();
+}
+
+void EditorManager::PostUpdate()
+{
+    if (!mProjectPathToOpen.empty())
+    {
+        OpenGameProject();
+    }
+}
+
+void EditorManager::OpenGameProject()
+{
+    SCARLET_DEBUG("Opening scarlet project: {}", mProjectPathToOpen);
+
+    XmlDocument projectDoc = XmlSerializer::Deserialize(mProjectPathToOpen);
+
+    const std::string relativeScenePath = projectDoc.GetRootElement()->GetChildElements()[0].GetAttributeValue("relativePath");
+    
+    const std::filesystem::path projectToOpen{ mProjectPathToOpen };
+    const std::filesystem::path projectDirectory = projectToOpen.parent_path();
+    Filepath::SetProjectDirectory(projectDirectory);
+    mProjectName = projectToOpen.stem().string();
+
+    delete mEditorView;
+    mEditorView = new EditorView();
+
+    Engine::Instance().GetAssetManager().LoadScarletAssets(Filepath{ FilepathDirectory::PROJECT, "" });
+
+    Engine::Instance().ReloadGameDll();
+
+    OpenScene((projectDirectory / relativeScenePath).string());
+
+    mProjectPathToOpen = "";
 }
 
 } // Namespace Scarlet::Editor.

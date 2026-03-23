@@ -4,6 +4,7 @@
 #include <ScarletEngine/Core/Engine.h>
 
 #include <ScarletCoreEcs/Components/Transform.h>
+#include <ScarletCoreEcs/Components/StaticMesh.h>
 
 class ScarletTestGameProject : public ScarlEnt::Scene
 {
@@ -14,7 +15,7 @@ public:
     {
         Scarlet::Engine::Instance().RegisterEngineSystems(Scarlet::WeakHandle<Scene>{ this });
 
-        RegisterSystem<Scarlet::Component::Transform>([](Scarlet::Component::Transform& t)
+        RegisterSystem<Scarlet::Component::Transform, Scarlet::Component::StaticMesh>([](Scarlet::Component::Transform& t, Scarlet::Component::StaticMesh&)
             {
                 t.rotation.z += 0.1f;
                 if (t.rotation.z >= 360.0f)

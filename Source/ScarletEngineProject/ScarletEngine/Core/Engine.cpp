@@ -48,8 +48,12 @@ void Engine::Init() noexcept
     WindowManager::InitApi();
 
     WindowProperties windowProperties{ .eventCallback = [](Event& e) { Instance().OnEvent(e); } };
-    DEBUG(windowProperties.resizable = true);
-    mMainWindow = WindowManager::CreateWindowInternal("Scarlet Engine", std::move(windowProperties));
+#ifdef DEV_CONFIGURATION
+    windowProperties.resizable = true;
+    windowProperties.width     = 800;
+    windowProperties.height    = 500;
+#endif // DEV_CONFIGURATION.
+    mMainWindow = WindowManager::CreateWindowInternal("Scarlet Editor", std::move(windowProperties));
 
     ScarlEnt::Registry::Init();
 
@@ -57,9 +61,7 @@ void Engine::Init() noexcept
 
     DEBUG(Register::RegisterComponents());
 
-    mAssetManager = new AssetManager();
-    mAssetManager->LoadScarletAssets(Filepath{ FilepathDirectory::ENGINE, "EngineAssets/" });
-    mAssetManager->LoadScarletAssets(Filepath{ FilepathDirectory::PROJECT, "" });
+    LoadScarletAssets();
 
 #ifdef DEV_CONFIGURATION
     IMGUI_CHECKVERSION();
@@ -109,9 +111,16 @@ void Engine::Run() const
 
         WindowManager::ApiPoll();
 
-        ScarlEnt::Registry::Instance().GetActiveScene()->Update();
+#ifdef DEV_CONFIGURATION
+        if (WeakHandle<ScarlEnt::Scene> scene = ScarlEnt::Registry::Instance().GetActiveScene();  scene.IsValid()) [[unlikely]]
+        {
+            scene->Update();
+        }
 
-        DEBUG(if (mBeginRenderEvent) mBeginRenderEvent());
+        if (mBeginRenderEvent) mBeginRenderEvent();
+#else // DEV_CONFIGURATION.
+        ScarlEnt::Registry::Instance().GetActiveScene()->Update();
+#endif // !DEV_CONFIGURATION.
 
         Renderer::Instance().Render();
 
@@ -136,6 +145,8 @@ void Engine::Run() const
         mMainWindow->Update();
 
         ScarlEnt::Registry::Instance().PostUpdate();
+
+        DEBUG(if (mEditorPostUpdateEvent) mEditorPostUpdateEvent());
     }
 }
 
@@ -149,6 +160,20 @@ void Engine::RegisterEngineSystems(WeakHandle<ScarlEnt::Scene> scene)
             Math::TransformAsMatrix(transform.translation,
                 Math::Trig::RotationMatrix(transform.rotation.z, transform.rotation.x, transform.rotation.y), transform.scale));
         });
+}
+
+void Engine::LoadScarletAssets()
+{
+    SCARLET_ASSERT(!mAssetManager && "Trying to load in Scarlet Assets when there are already loaded assets.");
+
+    mAssetManager = new AssetManager();
+
+    mAssetManager->LoadScarletAssets(Filepath{ FilepathDirectory::ENGINE , "EngineAssets/" });
+
+    if (!Filepath::GetProjectDirectory().empty())
+    {
+        mAssetManager->LoadScarletAssets(Filepath{ FilepathDirectory::PROJECT, "" });
+    }
 }
 
 #ifdef DEV_CONFIGURATION

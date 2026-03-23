@@ -1,5 +1,7 @@
 #pragma once
 
+#include "ScarletEngine/Core/Defines.h"
+
 struct GLFWwindow;
 
 namespace Scarlet
@@ -33,7 +35,7 @@ struct WindowProperties
  * A class to hold a handle to a window that allows for window interaction that is API agnostic.\\n
  * Use @ref WindowManager to create and destroy a window.
  */
-class Window
+class ENGINE_API Window
 {
 public:
     Window(GLFWwindow* windowHandle, WindowProperties&& windowProperties);
@@ -43,6 +45,23 @@ public:
      */
     void Update() const;
 
+    /**
+     * @brief Set the position of the window. Both -1 on \c positionX and \c positionY will center the window.
+     * @param positionX The position relative to the x-axis.
+     * @param positionY The position relative to the y-axis.
+     */
+    void SetPosition(const int positionX, const int positionY) const;
+    /**
+     * @brief Set the width and height of the window.
+     * @param width The new width of the window.
+     * @param height The new height of the window.
+     */
+    void SetSize(const uint32 width, const uint32 height) const;
+    /**
+     * @brief Set the title of the window.
+     * @param title The new title of the window.
+     */
+    void SetTitle(const char* title) const;
     /**
      * @brief Get the width of the window.
      * @return The width of the window.

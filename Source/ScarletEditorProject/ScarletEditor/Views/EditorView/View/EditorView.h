@@ -21,7 +21,6 @@ class Panel;
  */
 class EditorView final : public IView
 {
-friend class EditorViewInputLayer;
 public:
     EditorView();
     ~EditorView() override = default;
