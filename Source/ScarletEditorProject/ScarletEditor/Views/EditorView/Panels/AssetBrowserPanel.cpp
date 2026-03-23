@@ -5,7 +5,6 @@
 
 #include <algorithm>
 
-#include <ScarletCore/AssetRef.h>
 #include <ScarletCore/Xml/XmlSerializer.h>
 
 #include <ScarletReflect/ReflectType.h>
@@ -22,32 +21,6 @@
 
 namespace Scarlet::Editor
 {
-
-namespace
-{
-
-enum FileTypeEnum
-{
-    ASSET,
-    SCENE,
-    COMPONENT,
-};
-
-struct FileTypes
-{
-    uint32           iconId;
-    FileTypeEnum     type;
-    std::string_view extension;
-};
-
-struct FileInfo
-{
-    uint32       iconId;
-    FileTypeEnum type;
-    std::string  fileName;
-};
-
-} // Anonymous Namespace.
 
 AssetBrowserPanel::AssetBrowserPanel(IView* view) : Panel{ view, {.title = "Asset Browser" } }
 {
@@ -67,6 +40,8 @@ void AssetBrowserPanel::Render()
 
     RenderBackAndPathTextInput(backIconId);
 
+    RenderSearchBar();
+
     const array<FileTypes, 3> fileTypes{
         FileTypes{.iconId = assetIconId    , .type = ASSET    , .extension = ".scarlet"       },
         FileTypes{.iconId = sceneIconId    , .type = SCENE    , .extension = ".scarlet_scene" },
@@ -80,6 +55,22 @@ void AssetBrowserPanel::Render()
 
     ImGui::Columns(columnCount, "AssetBrowserColumns", false);
 
+    if (mSearchString.empty())
+    {
+        RenderUnsearchedAssets(fileTypes, directoryIconId);
+    }
+    else
+    {
+        RenderSearchedAssets(fileTypes);
+    }
+
+    ImGui::Columns(1);
+
+    CreateAssetPopup();
+}
+
+void AssetBrowserPanel::RenderUnsearchedAssets(const array<FileTypes, 3>& fileTypes, const uint32 directoryIconId) const
+{
     // Split the directories and files so that alphabetical order doesn't mix the two together.
     vector<FileInfo>              scarletFiles;
     vector<std::filesystem::path> directories;
@@ -101,7 +92,7 @@ void AssetBrowserPanel::Render()
             {
                 if (type.extension == extension)
                 {
-                    scarletFiles.emplace_back(type.iconId,type.type, asset.path().filename().string());
+                    scarletFiles.emplace_back(type.iconId, type.type, asset.path().filename().string());
                 }
             }
         }
@@ -145,10 +136,51 @@ void AssetBrowserPanel::Render()
         ImGui::EndGroup();
         ImGui::NextColumn();
     }
+}
 
-    ImGui::Columns(1);
+void AssetBrowserPanel::RenderSearchedAssets(const array<FileTypes, 3>& fileTypes) const
+{
+    vector<FileInfo> scarletFiles;
 
-    CreateAssetPopup();
+    for (const auto& asset : std::filesystem::recursive_directory_iterator(mCurrentDirectory.GetAbsolutePath()))
+    {
+        if (!asset.is_directory())
+        {
+            const std::string extension = asset.path().extension().string();
+            for (const FileTypes& type : fileTypes)
+            {
+                std::string filename = asset.path().filename().string();
+
+                std::ranges::transform(filename, filename.begin(), [](const unsigned char c) { return std::tolower(c); });
+
+                if (type.extension == extension && filename.find(mSearchString) != std::string::npos)
+                {
+                    scarletFiles.emplace_back(type.iconId, type.type, asset.path().filename().string());
+                }
+            }
+        }
+    }
+
+    constexpr float iconWidth = 80.0f;
+
+    for (const auto& [iconId, type, fileName] : scarletFiles)
+    {
+        ImGui::BeginGroup();
+
+        if (ImGui::ImageButton(fileName.c_str(), iconId, ImVec2{ iconWidth, iconWidth }, ImVec2{ 0.0f, 1.0f }, ImVec2{ 1.0f, 0.0f }))
+        {
+            if (type == SCENE)
+            {
+                EditorManager::Instance().SaveCurrentScene();
+                EditorManager::Instance().OpenScene(mCurrentDirectory.GetAbsolutePath() + "\\" + fileName);
+            }
+        }
+
+        RenderIconLabel(fileName, iconWidth);
+
+        ImGui::EndGroup();
+        ImGui::NextColumn();
+    }
 }
 
 void AssetBrowserPanel::RenderBackAndPathTextInput(const uint32 backIconId)
@@ -181,6 +213,8 @@ void AssetBrowserPanel::RenderBackAndPathTextInput(const uint32 backIconId)
 
     ImGui::SameLine();
 
+    ImGui::SetNextItemWidth(500.0f);
+
     if (ImGui::InputText("##inputPath", buffer, MAX_FILEPATH_LENGTH, ImGuiInputTextFlags_EnterReturnsTrue))
     {
         if (const std::filesystem::path enteredPath = std::filesystem::path{ buffer }; enteredPath.is_relative())
@@ -197,6 +231,34 @@ void AssetBrowserPanel::RenderBackAndPathTextInput(const uint32 backIconId)
     ImGui::PopStyleColor();
 
     ImGui::EndGroup();
+}
+
+void AssetBrowserPanel::RenderSearchBar()
+{
+    ImGui::SameLine();
+
+    const float width = ImGui::GetWindowWidth();
+
+    ImGui::SetCursorPosX(width - 300.0f);
+
+    ImGui::SetNextItemWidth(250.0f);
+
+    char buffer[MAX_FILEPATH_LENGTH];
+
+    (void)std::snprintf(buffer, MAX_FILEPATH_LENGTH, "%s", mSearchString.c_str());
+    if (ImGui::InputText("##testing", buffer, MAX_FILEPATH_LENGTH))
+    {
+        mSearchString = std::string{ buffer };
+    }
+
+    ImGui::SameLine();
+
+    if (ImGui::Button("X##CancelSearch"))
+    {
+        mSearchString = "";
+    }
+
+    ImGui::NewLine();
 }
 
 void AssetBrowserPanel::RenderIconLabel(const std::string& label, const float iconWidth)

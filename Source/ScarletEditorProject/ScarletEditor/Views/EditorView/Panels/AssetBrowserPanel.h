@@ -2,6 +2,7 @@
 
 #ifdef DEV_CONFIGURATION
 
+#include <ScarletCore/array.h>
 #include <ScarletCore/AssetRef.h>
 
 #include "UI/Panel.h"
@@ -28,14 +29,41 @@ public:
 
     inline static constexpr uint32 MAX_FILEPATH_LENGTH{ 260 };
 private:
-    Filepath mCurrentDirectory;
+    enum FileTypeEnum
+    {
+        ASSET,
+        SCENE,
+        COMPONENT,
+    };
+
+    struct FileTypes
+    {
+        uint32           iconId;
+        FileTypeEnum     type;
+        std::string_view extension;
+    };
+
+    struct FileInfo
+    {
+        uint32       iconId;
+        FileTypeEnum type;
+        std::string  fileName;
+    };
+
+    Filepath    mCurrentDirectory;
+    std::string mSearchString;
 
     AssetType   mAssetTypeToCreate = AssetType::ASSET_TYPE_COUNT;
     bool mCreateFile   = false;
     bool mCreateFolder = false;
     bool mContextOpen  = false;
 
+    void RenderUnsearchedAssets(const array<FileTypes, 3>& fileTypes, const uint32 directoryIconId);
+    void RenderSearchedAssets(const array<FileTypes, 3>& fileTypes);
+
     void RenderBackAndPathTextInput(const uint32 backIconId);
+    void RenderSearchBar();
+
     static void RenderIconLabel(const std::string& label, const float iconWidth);
 
     void RenderContextMenu() override;
