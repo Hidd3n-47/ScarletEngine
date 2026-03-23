@@ -10,6 +10,7 @@
 #include <ScarletEngine/Core/Window/Window.h>
 
 #include "Core/EditorManager.h"
+#include "Core/FileDialog.h"
 
 #ifdef DEV_CONFIGURATION
 
@@ -30,7 +31,7 @@ RecentProjectsPanel::RecentProjectsPanel(IView* view)
     const XmlDocument document = XmlSerializer::Deserialize(GetRecentProjectFilepath());
     if (document.IsValidDocument()) [[ likely]]
     {
-        for (const XmlElement& element : document.GetRootElement()->GetChildElements())
+        for (const XmlElement& element : document.GetRootElement()->GetChildElements()[0].GetChildElements())
         {
             // Only store the recent project if it's still valid.
             if (std::filesystem::exists( element.GetValue()))
@@ -43,12 +44,13 @@ RecentProjectsPanel::RecentProjectsPanel(IView* view)
 
 RecentProjectsPanel::~RecentProjectsPanel()
 {
-    XmlElement* element = new XmlElement{ "RecentProjects" };
+    XmlElement* element = new XmlElement{ "Scarlet" };
+    XmlElement* recents = element->AddChild("RecentProjects");
 
     const int size = static_cast<int>(mRecentProjects.size());
     for (int i = 0; i < std::min(size, 10); ++i)
     {
-        element->AddChild("Recent", "", mRecentProjects[i]);
+        recents->AddChild("Recent", "", mRecentProjects[i]);
     }
 
     const std::string path = GetRecentProjectFilepath();
@@ -77,6 +79,24 @@ void RecentProjectsPanel::Render()
         if (ImGui::Button(path.filename().string().c_str()))
         {
             EditorManager::Instance().OpenGameProject(path.string());
+        }
+    }
+
+    const char* openLabel = "Open...";
+
+    const float width = ImGui::CalcTextSize(openLabel).x;
+
+    ImGui::SetCursorPosX((ImGui::GetWindowWidth() - width) * 0.5f);
+    ImGui::SetCursorPosY(mProperties.height - 40.0f);
+    if (ImGui::Button("Open..."))
+    {
+        const std::string filepath = FileDialog::OpenFile(FILE_FILTER("Scarlet Project", ".scarlet_project"));
+
+        if (!filepath.empty())
+        {
+            mRecentProjects.emplace_back(filepath);
+
+            EditorManager::Instance().OpenGameProject(filepath);
         }
     }
 }
