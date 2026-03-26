@@ -47,6 +47,12 @@ inline std::string ReflectType::GetStringFromValue(const T value)
 }
 
 template <>
+inline std::string ReflectType::GetStringFromValue<bool>(const bool value)
+{
+    return value ? "true" : "false";
+}
+
+template <>
 inline std::string ReflectType::GetStringFromValue<float>(const float value)
 {
     return std::to_string(value);
@@ -87,6 +93,13 @@ template <typename T>
 inline void ReflectType::SetValueFromString(T& value, const std::string_view& stringValue)
 {
     throw std::runtime_error("Failed to get reflection value for type: " + std::string{ typeid(T).name() });
+}
+
+template <>
+inline void ReflectType::SetValueFromString<bool>(bool& value, const std::string_view& stringValue)
+{
+    const std::string str = std::string{ stringValue };
+    value = str == "true";
 }
 
 template <>

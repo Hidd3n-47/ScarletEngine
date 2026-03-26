@@ -6,8 +6,10 @@ void Register::RegisterComponents()
 {
     ScarlEnt::Registry& registry = ScarlEnt::Registry::Instance();
 
+    RegisterComponentTypeAndFunctionPointer<Scarlet::Component::BoundingBox>(registry);
     RegisterComponentTypeAndFunctionPointer<Scarlet::Component::Camera>(registry);
     RegisterComponentTypeAndFunctionPointer<Scarlet::Component::DirectionLight>(registry);
+    RegisterComponentTypeAndFunctionPointer<Scarlet::Component::EditorInfo>(registry);
     RegisterComponentTypeAndFunctionPointer<Scarlet::Component::StaticMesh>(registry);
     RegisterComponentTypeAndFunctionPointer<Scarlet::Component::Transform>(registry);
 

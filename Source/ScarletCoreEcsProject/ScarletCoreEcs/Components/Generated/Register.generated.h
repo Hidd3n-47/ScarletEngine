@@ -3,8 +3,10 @@
 #include <ScarlEnt/Registry.h>
 #include <ScarlEnt/MutableEntityHandle.h>
 
+#include "ScarletCoreEcs/Components/BoundingBox.h"
 #include "ScarletCoreEcs/Components/Camera.h"
 #include "ScarletCoreEcs/Components/DirectionLight.h"
+#include "ScarletCoreEcs/Components/EditorInfo.h"
 #include "ScarletCoreEcs/Components/StaticMesh.h"
 #include "ScarletCoreEcs/Components/Transform.h"
 

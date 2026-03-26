@@ -36,6 +36,12 @@ void PropertiesPanel::Render()
 
                 switch (property.GetType())
                 {
+                case ScarlEnt::PropertyType::BOOL:
+                    UiControl::RenderBoolPropertyControl(property, { .propertyName = propertyName, .propertyId = entityName });
+                    break;
+                case ScarlEnt::PropertyType::STRING:
+                    UiControl::RenderStringPropertyControl(property, { .propertyName = propertyName, .propertyId = entityName });
+                    break;
                 case ScarlEnt::PropertyType::FLOAT:
                     UiControl::RenderFloatPropertyControl(property, { .propertyName = propertyName, .propertyId = entityName });
                     break;

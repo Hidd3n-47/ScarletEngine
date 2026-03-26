@@ -19,7 +19,7 @@ void BoundingBox::GenerateProperties()
         [this](const std::string_view& stringValue) { ReflectType::SetValueFromString(this->localMinimum, stringValue); }
     };
 
-        mProperties["localMaximum"] = ScarlEnt::Property {
+    mProperties["localMaximum"] = ScarlEnt::Property {
         ScarlEnt::PropertyType::VEC3,
         ScarlEnt::Registry::Instance().GetOrRegisterComponentId<BoundingBox>(),
         [this] { return ReflectType::GetStringFromValue(this->localMaximum); },

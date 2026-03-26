@@ -13,7 +13,7 @@ struct Transform
     Math::Vec3 rotation   { };
     Math::Vec3 scale      { 1.0f };
 
-    SCARLET_COMPONENT(Transform);
+    SCARLET_COMPONENT(Transform)
 };
 
 } // Namespace Scarlet::Component.

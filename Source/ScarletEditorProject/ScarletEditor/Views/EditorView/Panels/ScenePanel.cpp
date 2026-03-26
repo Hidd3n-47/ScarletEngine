@@ -27,28 +27,16 @@ void ScenePanel::Render()
     ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 5.0f);
 
     const std::string sceneFriendlyName{ scene->GetFriendlyName() };
-    ImGui::Text(sceneFriendlyName.c_str());
+    ImGui::Text("%s", sceneFriendlyName.c_str());
     ImGui::SameLine();
     ImGui::SetCursorPos({ ImGui::GetWindowWidth() - 35.0f, ImGui::GetCursorPosY() - 5.0f });
 
     if (ImGui::Button("+"))
     {
         ImGui::OpenPopup("AddEntity");
-    }
 
-    if (ImGui::BeginPopup("AddEntity")) 
-    {
-        ImGui::Text("Add Entity");
-        ImGui::Separator();
-
-        if (ImGui::MenuItem("Mutable Entity"))
-        {
-            auto ent = scene->AddMutableEntity();
-            ent.AddComponent<Component::Transform>();
-            ImGui::CloseCurrentPopup();
-        }
-
-        ImGui::EndPopup();
+        ScarlEnt::MutableEntityHandle ent = scene->AddMutableEntity();
+        ent.AddComponent<Component::Transform>();
     }
 
     ImGui::EndGroup();
@@ -58,39 +46,18 @@ void ScenePanel::Render()
     // ----------- Entities Tree. ----------------
     if (scene.IsValid())
     {
-        if (ImGui::CollapsingHeader("Immutable Entities", ImGuiTreeNodeFlags_DefaultOpen))
+        const auto& vec = scene->GetMutableEntityHandles();
+        for (size_t i{ 0 }; i < vec.size(); ++i)
         {
-            const auto& vec = scene->GetEntityHandles();
-            for (size_t i{ 0 }; i < vec.size(); ++i)
+            ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_Leaf;
+            flags |= selectionManager.GetSelectedEntity() == vec[i] ? ImGuiTreeNodeFlags_Selected : 0;
+            if (ImGui::TreeNodeEx(std::format("{} {} {}", "Entity", i, "##mutable").c_str(), flags))
             {
-                ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_Leaf;
-                flags |= selectionManager.GetSelectedEntity() == vec[i] ? ImGuiTreeNodeFlags_Selected : 0;
-                if (ImGui::TreeNodeEx(std::format("Entity {}", i).c_str(), flags))
+                if (ImGui::IsItemClicked())
                 {
-                    if (ImGui::IsItemClicked())
-                    {
-                        selectionManager.SetSelectedEntity(vec[i]);
-                    }
-                    ImGui::TreePop();
+                    selectionManager.SetSelectedEntity(vec[i]);
                 }
-            }
-        }
-
-        if (ImGui::CollapsingHeader("Mutable Entities", ImGuiTreeNodeFlags_DefaultOpen))
-        {
-            const auto& vec = scene->GetMutableEntityHandles();
-            for (size_t i{ 0 }; i < vec.size(); ++i)
-            {
-                ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_Leaf;
-                flags |= selectionManager.GetSelectedEntity() == vec[i] ? ImGuiTreeNodeFlags_Selected : 0;
-                if (ImGui::TreeNodeEx(std::format("Entity {}##mutable", i).c_str(), flags))
-                {
-                    if (ImGui::IsItemClicked())
-                    {
-                        selectionManager.SetSelectedEntity(vec[i]);
-                    }
-                    ImGui::TreePop();
-                }
+                ImGui::TreePop();
             }
         }
     }

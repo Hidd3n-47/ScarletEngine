@@ -321,22 +321,19 @@ void EditorManager::OpenScene(const std::string& filepath)
     {
         if (entityNode.GetTagName() == "ProjectPath") continue;
 
-        if (entityNode.GetAttributeValue("Mutable") == "true")
+        ScarlEnt::MutableEntityHandle entity = mEditorScene->AddMutableEntity();
+
+        for (const XmlElement& component : entityNode.GetChildElements())
         {
-            ScarlEnt::MutableEntityHandle entity = mEditorScene->AddMutableEntity();
+            auto* componentProperties = ScarlEnt::Registry::Instance().AddComponentToHandle(component.GetAttributeValue("typeId").c_str(), &entity);
 
-            for (const XmlElement& component : entityNode.GetChildElements())
+            for (auto& [propertyName, property] : *componentProperties)
             {
-                auto* componentProperties = ScarlEnt::Registry::Instance().AddComponentToHandle(component.GetAttributeValue("typeId").c_str(), &entity);
-
-                for (auto& [propertyName, property] : *componentProperties)
+                for (const XmlElement& componentProperty : component.GetChildElements())
                 {
-                    for (const XmlElement& componentProperty : component.GetChildElements())
+                    if (componentProperty.GetTagName() == propertyName)
                     {
-                        if (componentProperty.GetTagName() == propertyName)
-                        {
-                            property.SetPropertyValue(componentProperty.GetValue());
-                        }
+                        property.SetPropertyValue(componentProperty.GetValue());
                     }
                 }
             }

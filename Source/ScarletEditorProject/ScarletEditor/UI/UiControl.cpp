@@ -18,6 +18,60 @@
 namespace Scarlet::Editor
 {
 
+void UiControl::RenderBoolPropertyControl(const ScarlEnt::Property& property, const UiControlProperties& controlProperties)
+{
+    bool value;
+    ReflectType::SetValueFromString(value, property.GetPropertyValue());
+
+    float lineHeight;
+    std::string propertyId;
+    RenderTwoColumnPropertyControl(lineHeight, propertyId, controlProperties);
+
+    ImGui::PushMultiItemsWidths(3, ImGui::CalcItemWidth());
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0.0f, 4.0f });
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 4);
+
+    ImGui::Checkbox(("##string" + propertyId).c_str(), &value);
+
+    ImGui::PopStyleVar(2);
+    ImGui::PopItemWidth();
+    ImGui::Columns(1);
+
+    property.SetPropertyValue(ReflectType::GetStringFromValue(value));
+}
+
+void UiControl::RenderStringPropertyControl(const ScarlEnt::Property& property, const UiControlProperties& controlProperties)
+{
+    std::string value = property.GetPropertyValue();
+
+    float lineHeight;
+    std::string propertyId;
+    RenderTwoColumnPropertyControl(lineHeight, propertyId, controlProperties);
+
+    ImGui::PushMultiItemsWidths(3, ImGui::CalcItemWidth());
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0.0f, 4.0f });
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 4);
+
+    ImGui::SetNextItemWidth(275.0f);
+
+    constexpr uint32 maxEntityNameSize = 50;
+    char entityName[maxEntityNameSize] = { };
+
+    strcpy_s(entityName, value.c_str());
+    entityName[maxEntityNameSize - 1] = '\0';
+
+    if (ImGui::InputText(("##string" + propertyId).c_str(), entityName, maxEntityNameSize))
+    {
+        value = std::string{ entityName };
+    }
+
+    ImGui::PopStyleVar(2);
+    ImGui::PopItemWidth();
+    ImGui::Columns(1);
+
+    property.SetPropertyValue(value);
+}
+
 void UiControl::RenderFloatPropertyControl(const ScarlEnt::Property& property, const UiControlProperties& controlProperties /* = {} */)
 {
     float value;

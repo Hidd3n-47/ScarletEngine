@@ -59,7 +59,7 @@ private:
     bool mContextOpen  = false;
 
     void RenderUnsearchedAssets(const array<FileTypes, 3>& fileTypes, const uint32 directoryIconId);
-    void RenderSearchedAssets(const array<FileTypes, 3>& fileTypes);
+    void RenderSearchedAssets(const array<FileTypes, 3>& fileTypes) const;
 
     void RenderBackAndPathTextInput(const uint32 backIconId);
     void RenderSearchBar();

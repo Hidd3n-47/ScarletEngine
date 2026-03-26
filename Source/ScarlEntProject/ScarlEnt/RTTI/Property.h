@@ -53,6 +53,7 @@ public:
     {
         // todo try make constexpr
         if (mType == PropertyType::FLOAT)    return "float";
+        if (mType == PropertyType::BOOL)     return "bool";
         if (mType == PropertyType::STRING)   return "string";
         if (mType == PropertyType::VEC3)     return "vec3";
         if (mType == PropertyType::VEC4)     return "vec4";

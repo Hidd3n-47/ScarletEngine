@@ -69,7 +69,7 @@ void AssetBrowserPanel::Render()
     CreateAssetPopup();
 }
 
-void AssetBrowserPanel::RenderUnsearchedAssets(const array<FileTypes, 3>& fileTypes, const uint32 directoryIconId) const
+void AssetBrowserPanel::RenderUnsearchedAssets(const array<FileTypes, 3>& fileTypes, const uint32 directoryIconId)
 {
     // Split the directories and files so that alphabetical order doesn't mix the two together.
     vector<FileInfo>              scarletFiles;

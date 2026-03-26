@@ -52,7 +52,7 @@ def generate_rtti_for_component(struct_name, member_variables):
                         for variable in filtered_member_variables]
 
     # Join the property strings with new lines
-    property_string = "\n    ".join(property_strings)
+    property_string = "\n".join(property_strings)
 
     # Write the generated RTTI code to a file
     with open(output_path, "w+") as f:

@@ -1,5 +1,6 @@
 types = {
      "uint32"       : "UINT32"  ,
+     "bool"         : "BOOL"   ,
      "float"        : "FLOAT"   ,
      "std::string"  : "STRING"  ,
      "Math::Vec3"   : "VEC3"    ,

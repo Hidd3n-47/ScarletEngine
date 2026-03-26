@@ -21,6 +21,18 @@ class UiControl
 {
 public:
     /**
+     * @brief Add a property control for a bool.
+     * @param property The property the control is for.
+     * @param controlProperties The properties of the control.
+     */
+    static void RenderBoolPropertyControl(const ScarlEnt::Property& property, const UiControlProperties& controlProperties = {});
+    /**
+     * @brief Add a property control for a string.
+     * @param property The property the control is for.
+     * @param controlProperties The properties of the control.
+     */
+    static void RenderStringPropertyControl(const ScarlEnt::Property& property, const UiControlProperties& controlProperties = {});
+    /**
      * @brief Add a property control for a float.
      * @param property The property the control is for.
      * @param controlProperties The properties of the control.
