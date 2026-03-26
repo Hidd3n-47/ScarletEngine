@@ -8,6 +8,7 @@
 #include <ScarlEnt/Scene.h>
 
 #include <ScarletCoreEcs/Components/Transform.h>
+#include <ScarletCoreEcs/Components/EditorInfo.h>
 
 #include "Core/EditorManager.h"
 #include "Views/EditorView/View/EditorView.h"
@@ -17,12 +18,14 @@ namespace Scarlet::Editor
 
 void ScenePanel::Render()
 {
-    EditorView* editorView             = dynamic_cast<EditorView*>(mView);
-    SelectionManager& selectionManager = editorView->GetSelectionManager();
-
     WeakHandle<ScarlEnt::Scene> scene = EditorManager::Instance().GetGameScene();
 
-    // ----------- Title Bar ----------------
+    RenderPanelTitleBar(scene);
+    RenderEntityTree(scene);
+}
+
+void ScenePanel::RenderPanelTitleBar(WeakHandle<ScarlEnt::Scene> scene)
+{
     ImGui::BeginGroup();
     ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 5.0f);
 
@@ -36,26 +39,34 @@ void ScenePanel::Render()
         ImGui::OpenPopup("AddEntity");
 
         ScarlEnt::MutableEntityHandle ent = scene->AddMutableEntity();
+        ent.AddComponent<Component::EditorInfo>();
         ent.AddComponent<Component::Transform>();
     }
 
     ImGui::EndGroup();
 
     ImGui::Separator();
+}
 
-    // ----------- Entities Tree. ----------------
+void ScenePanel::RenderEntityTree(WeakHandle<ScarlEnt::Scene> scene) const
+{
+    EditorView* editorView             = dynamic_cast<EditorView*>(mView);
+    SelectionManager& selectionManager = editorView->GetSelectionManager();
+
     if (scene.IsValid())
     {
-        const auto& vec = scene->GetMutableEntityHandles();
-        for (size_t i{ 0 }; i < vec.size(); ++i)
+        for (ScarlEnt::IEntityHandle* entityHandle : scene->GetMutableEntityHandles())
         {
             ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_Leaf;
-            flags |= selectionManager.GetSelectedEntity() == vec[i] ? ImGuiTreeNodeFlags_Selected : 0;
-            if (ImGui::TreeNodeEx(std::format("{} {} {}", "Entity", i, "##mutable").c_str(), flags))
+            flags |= selectionManager.GetSelectedEntity() == entityHandle ? ImGuiTreeNodeFlags_Selected : 0;
+
+            const std::string entityName = reinterpret_cast<ScarlEnt::MutableEntityHandle*>(entityHandle)->GetComponent<Component::EditorInfo>().name;
+
+            if (ImGui::TreeNodeEx(std::format("{} {}", entityName, "##mutable").c_str(), flags))
             {
                 if (ImGui::IsItemClicked())
                 {
-                    selectionManager.SetSelectedEntity(vec[i]);
+                    selectionManager.SetSelectedEntity(entityHandle);
                 }
                 ImGui::TreePop();
             }

@@ -4,6 +4,11 @@
 
 #include "UI/Panel.h"
 
+namespace ScarlEnt
+{
+class Scene;
+} // Namespace ScarlEnt.
+
 namespace Scarlet::Editor
 {
 
@@ -23,6 +28,10 @@ public:
 
     /** @copydoc Panel::Render */
     void Render() override;
+
+private:
+    static void RenderPanelTitleBar(WeakHandle<ScarlEnt::Scene> scene);
+    void RenderEntityTree(WeakHandle<ScarlEnt::Scene> scene) const;
 };
 
 } // Namespace Scarlet::Editor.
