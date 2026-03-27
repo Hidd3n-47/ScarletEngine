@@ -2,7 +2,14 @@
 
 #ifdef DEV_CONFIGURATION
 
+#include <ScarletCore/unordered_set.h>
+
 #include "UI/Panel.h"
+
+namespace ScarlEnt
+{
+class IEntityHandle;
+} // Namespace ScarlEnt.
 
 namespace Scarlet::Editor
 {
@@ -13,7 +20,7 @@ namespace Scarlet::Editor
 class PropertiesPanel final : public Panel
 {
 public:
-    explicit inline PropertiesPanel(IView* view) : Panel{ view, { .title = "Properties" } } { /* Empty */ }
+    explicit PropertiesPanel(IView* view);
     ~PropertiesPanel() override = default;
 
     PropertiesPanel(const PropertiesPanel&)            = delete;
@@ -23,6 +30,12 @@ public:
 
     /** @copydoc Panel::Render */
     void Render() override;
+private:
+    void RenderRemoveComponentButton(const std::string& componentName, ScarlEnt::IEntityHandle* entity) const;
+    static void RenderAddComponentButton();
+    static void RenderAddComponentDropdown(ScarlEnt::IEntityHandle* entity);
+
+    unordered_set<std::string> mUnremovableComponents;
 };
 
 } // Namespace Scarlet::Editor.

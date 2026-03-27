@@ -121,11 +121,25 @@ void Registry::SetActiveScene(const Scarlet::WeakHandle<Scene> scene)
 }
 
 #ifdef DEV_CONFIGURATION
-unordered_map<std::string, Property>* Registry::AddComponentToHandle(const char* componentType, IEntityHandle* handle)
+PropertyMap* Registry::AddComponentToHandle(const char* componentType, IEntityHandle* handle)
 {
-    SCARLENT_ASSERT(mComponentToAddComponentFunction.contains(componentType) && "Trying to add a component to an entity that hasn't been registered.");
+    SCARLENT_ASSERT(mComponentToTypelessFunctionMap.contains(componentType) && "Trying to add a component to an entity that hasn't been registered.");
 
-    return mComponentToAddComponentFunction[componentType](handle);
+    return mComponentToTypelessFunctionMap[componentType].addComponent(handle);
+}
+
+bool Registry::HasHandleGotComponent(const char* componentType, IEntityHandle* handle)
+{
+    SCARLENT_ASSERT(mComponentToTypelessFunctionMap.contains(componentType) && "Trying to add a component to an entity that hasn't been registered.");
+
+    return mComponentToTypelessFunctionMap[componentType].hasComponent(handle);
+}
+
+void Registry::RemoveComponentFromHandle(const char* componentType, IEntityHandle* handle)
+{
+    SCARLENT_ASSERT(mComponentToTypelessFunctionMap.contains(componentType) && "Trying to add a component to an entity that hasn't been registered.");
+
+    mComponentToTypelessFunctionMap[componentType].removeComponent(handle);
 }
 #endif // DEV_CONFIGURATION.
 

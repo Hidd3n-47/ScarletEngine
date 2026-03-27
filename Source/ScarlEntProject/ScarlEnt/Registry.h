@@ -12,6 +12,7 @@
 
 #ifdef DEV_CONFIGURATION
 #include "RTTI/Property.h"
+#include "TypelessComponentFunctions.h"
 #endif // DEV_CONFIGURATION.
 
 namespace ScarlEnt
@@ -145,9 +146,13 @@ public:
 #endif // SCARLENT_TEST.
 
 #ifdef DEV_CONFIGURATION
-    void RegisterComponent(const std::string& componentName, const AddComponentFunc& addComponentFunction) { mComponentToAddComponentFunction[componentName] = addComponentFunction; }
-    unordered_map<std::string, Property>* AddComponentToHandle(const char* componentType, IEntityHandle* handle);
-    [[nodiscard]] inline const unordered_map<std::string, AddComponentFunc>& GetComponentToAddComponentMap() const { return mComponentToAddComponentFunction; }
+    void RegisterComponent(const std::string& componentName, const TypelessComponentFunctions& typelessFunctions) { mComponentToTypelessFunctionMap[componentName] = typelessFunctions; }
+
+    PropertyMap* AddComponentToHandle(const char* componentType, IEntityHandle* handle);
+    [[nodiscard]] bool HasHandleGotComponent(const char* componentType, IEntityHandle* handle);
+    void RemoveComponentFromHandle(const char* componentType, IEntityHandle* handle);
+
+    [[nodiscard]] inline const unordered_map<std::string, TypelessComponentFunctions>& GetComponentToAddRemoveComponentMap() const { return mComponentToTypelessFunctionMap; }
 #endif // DEV_CONFIGURATION.
 
     static constexpr size_t COMPONENTS_PAGE_SIZE = 10;
@@ -161,14 +166,14 @@ private:
     Scarlet::WeakHandle<Scene> mSceneToChangeTo;
     bool mDestroySceneOnChange{ };
 
-    DEBUG(unordered_map<std::string, AddComponentFunc> mComponentToAddComponentFunction);
-
     unordered_map<std::string, ComponentId> mComponentIdMap;
     unordered_map<uint64, uint32> mComponentBitmaskToId;
     uint32 mNumberOfRegisteredComponents = 0;
 
     Scarlet::WeakHandle<Scene> mActiveScene;
     unordered_map<std::string, Scene*> mScenes;
+
+    DEBUG(unordered_map<std::string, TypelessComponentFunctions> mComponentToTypelessFunctionMap);
 };
 
 /* ============================================================================================================================== */

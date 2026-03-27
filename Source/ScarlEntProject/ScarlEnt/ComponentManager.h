@@ -247,16 +247,14 @@ inline void ComponentManager::RemoveComponent(const uint32 mutableEntityRuntimeI
     static_cast<MutableComponentArray<Component>*>(mComponentIdToSparseSetArray[componentId.id])->Remove(mutableEntityRuntimeId);
 
 #ifdef DEV_CONFIGURATION
-    auto vector = mMutableEntityIdToComponentViews[mutableEntityRuntimeId];
-    for (auto it = vector.begin(); it != vector.end(); ) 
+    auto& vector = mMutableEntityIdToComponentViews[mutableEntityRuntimeId];
+    for (auto it = vector.begin(); it != vector.end(); ++it)
     {
         if (it->GetComponentId().id == componentId.id) 
         {
             vector.erase(it);
             return;
         }
-
-        ++it;
     }
 #endif // DEV_CONFIGURATION.
 }

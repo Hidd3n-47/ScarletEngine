@@ -6,12 +6,22 @@
 
 #include <ScarlEnt/Registry.h>
 
+#include <ScarletCoreEcs/Components/EditorInfo.h>
+#include <ScarletCoreEcs/Components/Transform.h>
+
 #include "Views/EditorView/View/EditorView.h"
 
 #include "UI/UiControl.h"
 
 namespace Scarlet::Editor
 {
+
+PropertiesPanel::PropertiesPanel(IView* view)
+    : Panel{ view, {.title = "Properties" } }
+{
+    mUnremovableComponents.emplace(ScarlEnt::Registry::Instance().GetOrRegisterComponentId<Component::EditorInfo>().name);
+    mUnremovableComponents.emplace(ScarlEnt::Registry::Instance().GetOrRegisterComponentId<Component::Transform>().name);
+}
 
 void PropertiesPanel::Render()
 {
@@ -65,13 +75,49 @@ void PropertiesPanel::Render()
                     break;
                 }
             }
+
+            RenderRemoveComponentButton(componentName, selected);
         }
     }
 
     ImGui::NewLine();
 
-    const float windowWidth     = ImGui::GetWindowSize().x;
+    RenderAddComponentButton();
+    RenderAddComponentDropdown(selected);
+
+}
+
+void PropertiesPanel::RenderRemoveComponentButton(const std::string& componentName, ScarlEnt::IEntityHandle* entity) const
+{
+    if (mUnremovableComponents.contains(componentName))
+    {
+        return;
+    }
+
+    ImGui::NewLine();
+
+    const std::string label = "Remove Component##" + componentName;
+
+    const float     windowWidth = ImGui::GetWindowSize().x;
     constexpr float buttonWidth = 150.0f;
+
+    ImGui::SetCursorPosX((windowWidth - buttonWidth) * 0.5f);
+
+    if (ImGui::Button(label.c_str(), { buttonWidth, 25.0f }))
+    {
+        ScarlEnt::Registry::Instance().RemoveComponentFromHandle(componentName.c_str(), entity);
+    }
+}
+
+void PropertiesPanel::RenderAddComponentButton()
+{
+    const float     windowWidth = ImGui::GetWindowSize().x;
+    constexpr float buttonWidth = 150.0f;
+
+    // Add a separator between the components details and the add button. 
+    // New line to have some space between the button and separator.
+    ImGui::Separator();
+    ImGui::NewLine();
 
     ImGui::SetCursorPosX((windowWidth - buttonWidth) * 0.5f);
 
@@ -84,7 +130,10 @@ void PropertiesPanel::Render()
         const ImVec2 buttonSize  = ImGui::GetItemRectSize();
         ImGui::SetNextWindowPos({ buttonPos.x + buttonSize.x * 0.5f, buttonPos.y + buttonSize.y + yPadding }, ImGuiCond_Always, { 0.5f, 0.0f });
     }
+}
 
+void PropertiesPanel::RenderAddComponentDropdown(ScarlEnt::IEntityHandle* entity)
+{
     if (ImGui::BeginPopup("AddComponent", ImGuiWindowFlags_NoMove))
     {
         constexpr float popupMinWidth  = 200.0f;
@@ -92,13 +141,16 @@ void PropertiesPanel::Render()
 
         ImGui::BeginChild("PopupItems", { popupMinWidth, popupMaxHeight }, true, ImGuiWindowFlags_HorizontalScrollbar);
 
-        for (const std::string_view componentName : ScarlEnt::Registry::Instance().GetComponentToAddComponentMap() | std::views::keys)
+        for (const std::string& componentName : ScarlEnt::Registry::Instance().GetComponentToAddRemoveComponentMap() | std::views::keys)
         {
-            const std::string compName = std::string{ componentName };
-
-            if (ImGui::MenuItem(compName.c_str()))
+            if (ScarlEnt::Registry::Instance().HasHandleGotComponent(componentName.c_str(), entity))
             {
-                ScarlEnt::Registry::Instance().AddComponentToHandle(compName.c_str(), selected);
+                continue;
+            }
+
+            if (ImGui::MenuItem(componentName.c_str()))
+            {
+                ScarlEnt::Registry::Instance().AddComponentToHandle(componentName.c_str(), entity);
                 ImGui::CloseCurrentPopup();
             }
         }

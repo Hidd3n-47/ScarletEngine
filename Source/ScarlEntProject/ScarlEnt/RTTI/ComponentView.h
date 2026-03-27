@@ -31,7 +31,6 @@ public:
 private:
     ComponentId mComponentId;
     std::function<unordered_map<std::string, Property>* ()> mGetPropertyFunction;
-
 };
 
 } // Namespace ScarlEntt.
