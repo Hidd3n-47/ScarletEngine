@@ -22,6 +22,22 @@ class SCARLENT_API MutableEntityHandle : public IEntityHandle
 {
     friend class Scene;
 public:
+#ifdef DEV_CONFIGURATION
+    /**
+     * @brief Create an instance of an \ref MutableEntityHandle.
+     * @param parent The scene the entity is attached to.
+     * @param componentManagerRef A weak reference to the component manager responsible for the creation of the entity components.
+     * @remark Since the mutable entity handle holds a reference to the component manager, it is only valid if the component manager is valid. \\n
+     * The component manager is valid for the life-time of the scene. This coupling of lifetime is okay as entities are only valid for the life-time \\n
+     * of the scene.
+     */
+    MutableEntityHandle(const Scarlet::WeakHandle<Scene> parent, const Scarlet::WeakHandle<ComponentManager> componentManagerRef)
+        : mParent(parent)
+        , mComponentManagerRef(componentManagerRef)
+    {
+        mEntityId = mComponentManagerRef->AddMutableEntity();
+    }
+#endif // DEV_CONFIGURATION.
     /**
      * @brief Create an instance of an \ref MutableEntityHandle.
      * @param componentManagerRef A weak reference to the component manager responsible for the creation of the entity components.
@@ -64,13 +80,7 @@ public:
     /**
      * @brief Destroy and remove the entity from the scene.
      */
-    void DestroyEntity()
-    {
-        DEBUG(SCARLENT_ASSERT(mIsValid && "Trying to remove entity on mutable entity that has been marked as invalid."));
-        DEBUG(mIsValid = false);
-
-        mComponentManagerRef->RemoveMutableEntity(mEntityId.runtimeId);
-    }
+    void DestroyEntity();
 
     /**
      * @brief Get a component attached to an entity.
@@ -122,6 +132,7 @@ public:
 #endif // DEV_CONFIGURATION.
 private:
     MutableEntityId mEntityId;
+    DEBUG(Scarlet::WeakHandle<Scene> mParent);
     Scarlet::WeakHandle<ComponentManager> mComponentManagerRef;
 
     DEBUG(bool mIsValid = true);

@@ -76,8 +76,12 @@ public:
      */
     [[nodiscard]] inline IEntityHandle* GetCameraEntityHandle() const { return mCameraEntity; }
 
-    DEBUG([[nodiscard]] inline const vector<IEntityHandle*>& GetEntityHandles()        const { return mEntityHandles; })
-    DEBUG([[nodiscard]] inline const vector<IEntityHandle*>& GetMutableEntityHandles() const { return mMutableEntityHandles; })
+#ifdef DEV_CONFIGURATION
+    [[nodiscard]] inline const vector<IEntityHandle*>& GetEntityHandles()        const { return mEntityHandles; }
+    [[nodiscard]] inline const vector<IEntityHandle*>& GetMutableEntityHandles() const { return mMutableEntityHandles; }
+
+    void RemoveMutableHandle(const IEntityHandle* entity);
+#endif // DEV_CONFIGURATION.
 protected:
     Scene(const std::string_view friendlyName);
 #ifdef DEV_CONFIGURATION

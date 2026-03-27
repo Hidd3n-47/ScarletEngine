@@ -9,6 +9,7 @@
 #include <ScarletCoreEcs/Components/EditorInfo.h>
 #include <ScarletCoreEcs/Components/Transform.h>
 
+#include "ScarlEnt/MutableEntityHandle.h"
 #include "Views/EditorView/View/EditorView.h"
 
 #include "UI/UiControl.h"
@@ -85,6 +86,10 @@ void PropertiesPanel::Render()
     RenderAddComponentButton();
     RenderAddComponentDropdown(selected);
 
+    if (RenderRemoveEntityButton(selected))
+    {
+        selectionManager.SetSelectedEntity(nullptr);
+    }
 }
 
 void PropertiesPanel::RenderRemoveComponentButton(const std::string& componentName, ScarlEnt::IEntityHandle* entity) const
@@ -158,6 +163,21 @@ void PropertiesPanel::RenderAddComponentDropdown(ScarlEnt::IEntityHandle* entity
         ImGui::EndChild();
         ImGui::EndPopup();
     }
+}
+
+bool PropertiesPanel::RenderRemoveEntityButton(ScarlEnt::IEntityHandle* entity)
+{
+    const float     windowWidth = ImGui::GetWindowSize().x;
+    constexpr float buttonWidth = 150.0f;
+
+    ImGui::SetCursorPosX((windowWidth - buttonWidth) * 0.5f);
+
+    if (ImGui::Button("Remove Entity", { buttonWidth, 25.0f }))
+    {
+        reinterpret_cast<ScarlEnt::MutableEntityHandle*>(entity)->DestroyEntity();
+        return true;
+    }
+    return false;
 }
 
 } // Namespace Scarlet::Editor.

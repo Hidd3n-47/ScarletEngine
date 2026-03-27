@@ -17,12 +17,24 @@ Scene::~Scene()
         delete handle;
     }
 }
+
+void Scene::RemoveMutableHandle(const IEntityHandle* entity)
+{
+    for (auto it = mMutableEntityHandles.begin(); it != mMutableEntityHandles.end(); ++it)
+    {
+        if (*it == entity)
+        {
+            mMutableEntityHandles.erase(it);
+            return;
+        }
+    }
+}
 #endif // DEV_CONFIGURATION.
 
 MutableEntityHandle Scene::AddMutableEntity()
 {
 #ifdef DEV_CONFIGURATION
-    auto handle = MutableEntityHandle{ Scarlet::WeakHandle{ &mComponentManager } };
+    auto handle = MutableEntityHandle{ Scarlet::WeakHandle{ this }, Scarlet::WeakHandle{ &mComponentManager } };
     mMutableEntityHandles.emplace_back(new MutableEntityHandle(handle));
     return handle;
 #else // DEV_CONFIGURATION.

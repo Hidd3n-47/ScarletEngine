@@ -34,6 +34,7 @@ private:
     void RenderRemoveComponentButton(const std::string& componentName, ScarlEnt::IEntityHandle* entity) const;
     static void RenderAddComponentButton();
     static void RenderAddComponentDropdown(ScarlEnt::IEntityHandle* entity);
+    static bool RenderRemoveEntityButton(ScarlEnt::IEntityHandle* entity);
 
     unordered_set<std::string> mUnremovableComponents;
 };
