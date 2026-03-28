@@ -31,6 +31,8 @@ public:
      * @return The index count for the mesh.
      */
     [[nodiscard]] size_t GetIndexCount() const { return mMeshData.indices.size(); }
+
+    DEBUG(inline void GetBounds(Math::Vec3& lower, Math::Vec3& upper) const { lower = mMeshData.lowerBound; upper = mMeshData.upperBound; })
 private:
     MeshData      mMeshData;
     VertexArray*  mVertexArray;

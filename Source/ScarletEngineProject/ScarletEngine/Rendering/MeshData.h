@@ -11,6 +11,9 @@ struct MeshData
 {
     vector<Vertex> vertices;
     vector<uint32> indices;
+
+    DEBUG(Math::Vec3 lowerBound{ std::numeric_limits<float>::max() });
+    DEBUG(Math::Vec3 upperBound{ std::numeric_limits<float>::min() });
 };
 
 } // Namespace Scarlet::Resource.

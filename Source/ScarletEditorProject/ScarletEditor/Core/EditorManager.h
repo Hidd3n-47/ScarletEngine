@@ -91,6 +91,18 @@ public:
      * @return The name of the currently opened project.
      */
     inline std::string GetProjectName() const { return mProjectName; }
+    /**
+     * @brief Get the \ref Component::Camera of the viewport camera.
+     * @remark This function is here instead of getting the entity itself as it is an immutable entity, so saves the nasty casting from \ref IEntityHandle to \ref EntityHandle.
+     * @return The \ref Component::Camera of the viewport camera.
+     */
+    Component::Camera& GetViewportCamera();
+    /**
+     * @brief Get the \ref Component::Camera of the viewport camera.
+     * @remark This function is here instead of getting the entity itself as it is an immutable entity, so saves the nasty casting from \ref IEntityHandle to \ref EntityHandle.
+     * @return The \ref Component::Camera of the viewport camera.
+     */
+    Component::Transform& GetViewportCameraTransform();
 
     inline static constexpr Ulid BACK_ICON_ULID      { 1 };
     inline static constexpr Ulid DIRECTORY_ICON_ULID { 2 };

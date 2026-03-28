@@ -43,6 +43,11 @@ private:
      * @brief This function is called from the engine so that the framebuffer can be bound before the render begins.
      */
     void BeginRender() const;
+
+    /**
+     * @brief Handles viewport selection via ray-casting.
+     */
+    void ViewportSelection() const;
 };
 
 } // Namespace Scarlet::Editor.

@@ -437,6 +437,17 @@ void EditorManager::OpenGameProject()
     mProjectPathToOpen = "";
 }
 
+Component::Camera& EditorManager::GetViewportCamera()
+{
+    return mCameraEntity.GetComponent<Component::Camera>();
+}
+
+Component::Transform& EditorManager::GetViewportCameraTransform()
+{
+    return mCameraEntity.GetComponent<Component::Transform>();
+}
+
 } // Namespace Scarlet::Editor.
+
 
 #endif // DEV_CONFIGURATION.

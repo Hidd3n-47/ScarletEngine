@@ -14,22 +14,23 @@ public:
         testRegistry->AddTestCase("Bounding Box Intersection Tests", "BoundingBoxIntersectionOnTransformedBox", BoundingBoxIntersectionOnTransformedBox);
         testRegistry->AddTestCase("Bounding Box Intersection Tests", "BoundingBoxIntersectionOnTranslatedAndRotatedBox", BoundingBoxIntersectionOnTranslatedAndRotatedBox);
         testRegistry->AddTestCase("Bounding Box Intersection Tests", "BoundingBoxIntersectionOnRotatedBox", BoundingBoxIntersectionOnRotatedBox);
+        testRegistry->AddTestCase("Bounding Box Intersection Tests", "BoundingBoxIntersectionFailsWhenRayInFrontOfBox", BoundingBoxIntersectionFailsWhenRayInFrontOfBox);
     }
 
     inline static bool BoundingBoxIntersectionOnXAxis()
     {
         const Scarlet::Math::Ray ray { { 1.0f, 0.0f, 0.0f }, { -1.0f, 0.0f, 0.0f} };
-        const Scarlet::Math::BoundingBox box;
+        constexpr Scarlet::Math::BoundingBox box;
 
-        return Scarlet::Math::Ray::RayIntersectsWithBoundingBox(ray, box);
+        return Scarlet::Math::Ray::RayIntersectsWithBoundingBox(ray, box) > 0.0f;
     }
 
     inline static bool BoundingBoxIntersectionFails()
     {
         const Scarlet::Math::Ray ray { { 1.0f, 0.0f, 0.0f }, { 1.0f, 1.0f, 0.0f} };
-        const Scarlet::Math::BoundingBox box;
+        constexpr Scarlet::Math::BoundingBox box;
 
-        return !Scarlet::Math::Ray::RayIntersectsWithBoundingBox(ray, box);
+        return Scarlet::Math::Ray::RayIntersectsWithBoundingBox(ray, box) < 0.0f;
     }
 
     inline static bool BoundingBoxIntersectionOnTransformedBox()
@@ -38,7 +39,7 @@ public:
         Scarlet::Math::BoundingBox box;
         box.SetTranslation({0.0f, 1.0f, 0.0f});
 
-        return Scarlet::Math::Ray::RayIntersectsWithBoundingBox(ray, box);
+        return Scarlet::Math::Ray::RayIntersectsWithBoundingBox(ray, box) > 0.0f;
     }
 
     inline static bool BoundingBoxIntersectionOnTranslatedAndRotatedBox()
@@ -47,9 +48,9 @@ public:
 
         Scarlet::Math::BoundingBox box { { 0.0f, -1.0f, -1.0f}, { 0.5f, 1.0f, 1.0f} };
         box.SetTranslation({1.0f, 0.0f, 0.0f });
-        box.SetRotation(Scarlet::Math::Quat{ Scarlet::Math::Radians(90.f), 0.0f, 0.0f });
+        box.SetRotation(Scarlet::Math::Vec3{ Scarlet::Math::Radians(90.f), 0.0f, 0.0f });
 
-        return Scarlet::Math::Ray::RayIntersectsWithBoundingBox(ray, box);
+        return Scarlet::Math::Ray::RayIntersectsWithBoundingBox(ray, box) > 0.0f;
     }
 
     inline static bool BoundingBoxIntersectionOnRotatedBox()
@@ -59,8 +60,17 @@ public:
 
         Scarlet::Math::BoundingBox box;
         box.SetTranslation({0.5f, 0.5f, 0.0f});
-        box.SetRotation(Scarlet::Math::Quat{ Scarlet::Math::Radians(45.f), 0.0f, 0.0f });
+        box.SetRotation(Scarlet::Math::Vec3{ Scarlet::Math::Radians(45.f), 0.0f, 0.0f });
 
-        return Scarlet::Math::Ray::RayIntersectsWithBoundingBox(rayX, box) && Scarlet::Math::Ray::RayIntersectsWithBoundingBox(rayY, box);
+        return Scarlet::Math::Ray::RayIntersectsWithBoundingBox(rayX, box) > 0.0f && Scarlet::Math::Ray::RayIntersectsWithBoundingBox(rayY, box) > 0.0f;
+    }
+
+    inline static bool BoundingBoxIntersectionFailsWhenRayInFrontOfBox()
+    {
+        const Scarlet::Math::Ray ray{ { 1.5f, 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f} };
+
+        constexpr Scarlet::Math::BoundingBox box;
+
+        return Scarlet::Math::Ray::RayIntersectsWithBoundingBox(ray, box) < 0.0f;
     }
 };

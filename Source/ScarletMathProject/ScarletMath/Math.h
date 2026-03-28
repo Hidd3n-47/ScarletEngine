@@ -40,6 +40,11 @@ template <typename T>
     return glm::length(vector);
 }
 
+[[nodiscard]] static inline Mat4 Inverse(const Mat4& mat)
+{
+    return glm::inverse(mat);
+}
+
 [[nodiscard]] static inline Mat4 Perspective(const float fovDegrees, const float aspectRatio, const float zNear, const float zFar)
 {
     return glm::perspective(Radians(fovDegrees), aspectRatio, zNear, zFar);

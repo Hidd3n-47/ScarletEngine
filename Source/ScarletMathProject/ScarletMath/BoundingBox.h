@@ -49,7 +49,7 @@ public:
      * @remark The world rotation will have to be externally set before it can be correctly retrieved.
      * @return The rotation of the bounding box.
      */
-    [[nodiscard]] inline const Quat& GetRotation() const { return mRotation; }
+    [[nodiscard]] inline Vec3 GetRotation() const { return mRotation; }
 
     /**
      * @brief Set the world translation of the bounding box.
@@ -60,7 +60,7 @@ public:
      * @brief Set the world rotation of the bounding box.
      * @param rotation The value the rotation is being set to.
      */
-    void SetRotation(const Quat& rotation)          { mRotation     = rotation; }
+    void SetRotation(const Vec3 rotation)           { mRotation     = rotation; }
     /**
      * @brief Set the local minimum bound of the bounding box.
      * @param minimumBound The value that the minimum bound is being set to. Ensure that this value is local space and not world space.
@@ -73,10 +73,10 @@ public:
     void SetMaximumBound(const Vec3 maximumBound)   { mMaximumBound = maximumBound; }
 private:
     Vec3 mTranslation  = { 0.0f, 0.0f, 0.0f };
-    Quat mRotation     = Quat::Identity();
+    Vec3 mRotation     = { 0.0f, 0.0f, 0.0f };
 
-    Vec3 mMinimumBound = { -0.1f, -0.5f, -0.5f };
-    Vec3 mMaximumBound = {  0.1f,  0.5f,  0.5f };
+    Vec3 mMinimumBound = { -0.5f, -0.5f, -0.5f };
+    Vec3 mMaximumBound = {  0.5f,  0.5f,  0.5f };
 };
 
 } // Namespace Scarlet::Math.

@@ -1,6 +1,7 @@
 #include "ScarletEnginePch.h"
 #include "MeshLoader.h"
 
+#include <algorithm>
 #include <string>
 #include <sstream>
 #include <fstream>
@@ -126,6 +127,15 @@ void MeshLoader::LoadMesh(const char* filepath, Resource::MeshData& mesh)
             Math::Vec3 position;
             input >> position.x >> position.y >> position.z;
             mesh.vertices.emplace_back(position);
+#ifdef DEV_CONFIGURATION
+            mesh.lowerBound.x = std::min(position.x, mesh.lowerBound.x);
+            mesh.lowerBound.y = std::min(position.y, mesh.lowerBound.y);
+            mesh.lowerBound.z = std::min(position.z, mesh.lowerBound.z);
+
+            mesh.upperBound.x = std::max(position.x, mesh.upperBound.x);
+            mesh.upperBound.y = std::max(position.y, mesh.upperBound.y);
+            mesh.upperBound.z = std::max(position.z, mesh.upperBound.z);
+#endif // DEV_CONFIGURATION.
             break;
         }
         case ObjKeyword::FACE:

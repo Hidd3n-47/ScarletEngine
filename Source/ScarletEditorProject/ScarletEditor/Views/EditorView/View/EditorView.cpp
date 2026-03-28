@@ -51,6 +51,7 @@ EditorView::EditorView()
     WeakHandle<Window> window = Engine::Instance().GetMainWindow();
     window->SetSize(1920, 1080);
     window->SetPosition(-1, -1);
+    window->SetTitle("Scarlet Editor");
 }
 
 void EditorView::RenderMenuBar()

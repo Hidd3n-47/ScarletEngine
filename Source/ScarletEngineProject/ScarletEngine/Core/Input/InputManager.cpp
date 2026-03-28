@@ -17,10 +17,9 @@ void InputManager::OnEvent(Event& e)
 {
     EventDispatcher dispatcher(e);
 
-
     dispatcher.Dispatch<KeyPressedEvent>([](const KeyPressedEvent& event) {
         const uint32 keyCode = event.GetKeyCode();
-        if (!mKeyMap.contains(keyCode)) { mKeysDownThisFrame[keyCode] = true; }
+        if (!mKeyMap.contains(keyCode) || !mKeyMap[keyCode]) { mKeysDownThisFrame[keyCode] = true; }
         mKeyMap[keyCode] = true;
         return false;
     });
@@ -31,7 +30,9 @@ void InputManager::OnEvent(Event& e)
     });
 
     dispatcher.Dispatch<MouseButtonPressedEvent>([](const MouseButtonPressedEvent& event) {
-        mKeyMap[event.GetMouseButton()] = true;
+        const uint32 mouseCode = event.GetMouseButton();
+        if (!mKeyMap.contains(mouseCode) || !mKeyMap[mouseCode]) { mKeysDownThisFrame[mouseCode] = true; }
+        mKeyMap[mouseCode] = true;
         return false;
     });
 
