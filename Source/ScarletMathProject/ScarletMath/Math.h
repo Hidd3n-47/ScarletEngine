@@ -72,9 +72,9 @@ template <typename T>
 
 [[nodiscard]] static inline Mat4 LookAt(const Vec3 eye, const Vec3 center, const Vec3 up)
 {
-    Vec3 f = Normalize(center - eye);
-    Vec3 r = Normalize(Cross(f, up));
-    Vec3 u = Cross(r, f);
+    const Vec3 f = Normalize(center - eye);
+    const Vec3 r = Normalize(Cross(f, up));
+    const Vec3 u = Cross(r, f);
 
     Mat4 result{ 1.0f };
 

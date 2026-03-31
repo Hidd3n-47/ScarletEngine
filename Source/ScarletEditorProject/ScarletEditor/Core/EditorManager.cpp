@@ -186,7 +186,7 @@ void EditorManager::Init()
 
     ImGui::SetCurrentContext(static_cast<ImGuiContext*>(Engine::GetImGuiContext()));
 
-    ImGuiIO io = ImGui::GetIO();
+    ImGuiIO& io = ImGui::GetIO();
 
     ImGui::StyleColorsDark();
     ImGuiStyle& style = ImGui::GetStyle();
@@ -261,16 +261,15 @@ void EditorManager::RegisterEditorSystems()
         transform.rotation.z += -moveDelta.x * SPEED_SCALING_FACTOR_YAW;
         transform.rotation.x += -moveDelta.y * SPEED_SCALING_FACTOR_PITCH;
 
-        Math::Mat4 rotationMatrix = Math::Trig::RotationMatrix(transform.rotation.z, transform.rotation.x, transform.rotation.y);
+        const Math::Mat4 rotationMatrix = Math::Trig::RotationMatrix(transform.rotation);
 
-        viewportCamera.forwardVector = rotationMatrix[1];
-        viewportCamera.rightVector   = rotationMatrix[0];
-        viewportCamera.upVector      = rotationMatrix[2];
+        const Math::Vec3 forwardVector = rotationMatrix[1];
+        const Math::Vec3 rightVector   = rotationMatrix[0];
+        const Math::Vec3 upVector      = rotationMatrix[2];
 
-
-        transform.translation += viewportCamera.rightVector   * cameraHorizontalDirection * totalSpeedMultiplier
-                              -  viewportCamera.forwardVector * cameraForwardDirection    * totalSpeedMultiplier
-                              +  viewportCamera.upVector      * cameraVerticalDirection   * totalSpeedMultiplier;
+        transform.translation += rightVector   * cameraHorizontalDirection * totalSpeedMultiplier
+                              -  forwardVector * cameraForwardDirection    * totalSpeedMultiplier
+                              +  upVector      * cameraVerticalDirection   * totalSpeedMultiplier;
 
         // Todo [Bug 74]: Quaternion rotation with camera results in roll when only changing pitch and yaw.
         //constexpr float SPEED_SCALING_FACTOR_YAW   = 0.0040f;
@@ -288,6 +287,7 @@ void EditorManager::RegisterEditorSystems()
         //Math::Quat qPitch{ pitch, {1, 0, 0} };
 
         //transform.rotation =  qPitch * qYaw;
+        viewportCamera.dirty = true;
         };
 
     mEditorScene->RegisterSystem<Component::Transform, Component::Camera>(cameraMovementFunction);

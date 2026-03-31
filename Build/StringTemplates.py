@@ -30,20 +30,20 @@ template <typename T>
 static void RegisterComponentTypeAndFunctionPointer(ScarlEnt::Registry& registry)
 {{
     const std::string componentName = registry.GetOrRegisterComponentId<T>().name;
-    registry.RegisterComponent(componentName, { 
-        .addComponent = [](ScarlEnt::IEntityHandle* handle) {
+    registry.RegisterComponent(componentName, {{
+        .addComponent = [](ScarlEnt::IEntityHandle* handle) {{
             ScarlEnt::MutableEntityHandle* mutableHandle = reinterpret_cast<ScarlEnt::MutableEntityHandle*>(handle);
             return mutableHandle->AddComponent<T>().GetProperties();
-        },
-        .hasComponent = [](ScarlEnt::IEntityHandle* handle) {
+        }},
+        .hasComponent = [](ScarlEnt::IEntityHandle* handle) {{
             ScarlEnt::MutableEntityHandle* mutableHandle = reinterpret_cast<ScarlEnt::MutableEntityHandle*>(handle);
             return mutableHandle->HasComponent<T>();
-        },
-        .removeComponent = [](ScarlEnt::IEntityHandle* handle) {
+        }},
+        .removeComponent = [](ScarlEnt::IEntityHandle* handle) {{
             ScarlEnt::MutableEntityHandle* mutableHandle = reinterpret_cast<ScarlEnt::MutableEntityHandle*>(handle);
             return mutableHandle->RemoveComponent<T>();
-        }
-    });
+        }}
+    }});
 }}
 
 struct Register

@@ -46,6 +46,11 @@ public:
         return glm::mod(angle, 2 * std::numbers::pi);
     }
 
+    [[nodiscard]] inline static Mat4 RotationMatrix(const Vec3 rotationDegrees)
+    {
+        return RotationMatrixRadians(Radians(rotationDegrees.z), Radians(rotationDegrees.x), Radians(rotationDegrees.y));
+    }
+
     [[nodiscard]] inline static Mat4 RotationMatrix(const double yawDegrees, const double pitchDegrees, const double rollDegrees)
     {
         return RotationMatrixRadians(Radians(yawDegrees), Radians(pitchDegrees), Radians(rollDegrees));
@@ -82,6 +87,30 @@ public:
         };
 
         return rotateZ * rotateX * rotateY;
+    }
+
+    inline static void DecomposeTransformMatrixDegrees(const Mat4& transformMatrix, Vec3& translation, Vec3& rotation, Vec3& scale)
+    {
+        translation = Vec3{ transformMatrix[3] };
+
+        Vec3 xVector{ transformMatrix[0] };
+        Vec3 yVector{ transformMatrix[1] };
+        Vec3 zVector{ transformMatrix[2] };
+
+        scale.x = Magnitude(xVector);
+        scale.y = Magnitude(yVector);
+        scale.z = Magnitude(zVector);
+
+        xVector /= scale.x;
+        yVector /= scale.y;
+        zVector /= scale.z;
+
+        // Yaw.
+        rotation.z = Degrees(static_cast<float>(Atan2(yVector.x, yVector.y)));
+        // Pitch.
+        rotation.x = Degrees(static_cast<float>(Atan2(-yVector.z, Sqrt(yVector.x * yVector.x + yVector.y + yVector.y))));
+        // Roll.
+        rotation.y = Degrees(static_cast<float>(Atan2(xVector.z, zVector.z)));
     }
 };
 

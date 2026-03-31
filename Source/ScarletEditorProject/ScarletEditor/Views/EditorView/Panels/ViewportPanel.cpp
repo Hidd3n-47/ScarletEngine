@@ -5,6 +5,10 @@
 
 #include <glew/glew.h>
 
+#include <ImGuizmo/ImGuizmo.h>
+
+#include <ScarletMath/Ray.h>
+
 #include <ScarlEnt/Scene.h>
 
 #include <ScarletEngine/Core/Engine.h>
@@ -16,18 +20,21 @@
 
 #include <ScarletEngine/Rendering/Framebuffer.h>
 
+#include <ScarletCoreEcs/Components/Camera.h>
+#include <ScarletCoreEcs/Components/Transform.h>
+#include <ScarletCoreEcs/Components/StaticMesh.h>
+
 #include "Core/EditorManager.h"
-#include "ScarletCoreEcs/Components/StaticMesh.h"
-#include "ScarletCoreEcs/Components/Transform.h"
-#include "ScarletCoreEcs/Components/EditorInfo.h"
-#include "ScarletCoreEcs/Components/Camera.h"
-#include "ScarletMath/BoundingBox.h"
-#include "ScarletMath/Ray.h"
-#include "ScarletMath/Trig.h"
 #include "Views/EditorView/View/EditorView.h"
 
 namespace Scarlet::Editor
 {
+
+namespace
+{
+constexpr float VIEWPORT_TOOLBAR_HEIGHT = 30.0f;
+} // Anonymous Namespace.
+
 
 ViewportPanel::ViewportPanel(IView* view)
     : Panel{ view, {.title = "Viewport" } }
@@ -53,17 +60,51 @@ ViewportPanel::~ViewportPanel()
 
 void ViewportPanel::Render()
 {
+    SelectionManager& selectionManager = reinterpret_cast<EditorView*>(mView)->GetSelectionManager();
+
+    const ImVec2 viewportSize  = ImGui::GetWindowSize();
+
+    RenderViewportToolbar(selectionManager);
+
+    const ImVec2 remainingSize = ImVec2(viewportSize.x, viewportSize.y - VIEWPORT_TOOLBAR_HEIGHT);
+
+    const uint32 width  = static_cast<uint32>(remainingSize.x);
+    const uint32 height = static_cast<uint32>(remainingSize.y);
+
+    const bool resizing = mLastFrameWidth != width || mLastFrameHeight != height;
+
+    mLastFrameWidth  = width;
+    mLastFrameHeight = height;
+
+    if (!resizing)
+    {
+        ImGui::Image(mFramebuffer->GetColorAttachmentId(), ImGui::GetContentRegionAvail(), ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
+
+        if (width != mViewportWidth || height != mViewportHeight)
+        {
+            mFramebuffer->Resize(width, height);
+
+            mViewportWidth  = width;
+            mViewportHeight = height;
+        }
+    }
+
+    ViewportSelection(selectionManager);
+}
+
+void ViewportPanel::RenderViewportToolbar(SelectionManager& selectionManager)
+{
     const ImVec2 viewportSize = ImGui::GetWindowSize();
 
-    constexpr float toolbarHeight = 30.0f;
+    ImGui::BeginChild("ViewportToolbar", ImVec2{ viewportSize.x, VIEWPORT_TOOLBAR_HEIGHT }, 0, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
 
-    ImGui::BeginChild("ViewportToolbar", ImVec2(viewportSize.x, toolbarHeight), false, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+    ManipulatorScene& manipulatorScene = selectionManager.GetManipulatorScene();
 
-    if (ImGui::Button("Translate")) {}
+    RenderToolbarTransformOperation(manipulatorScene, "Translate", ManipulatorOperation::TRANSLATE, KeyCode::KEY_W);
     ImGui::SameLine();
-    if (ImGui::Button("Rotate")) {}
+    RenderToolbarTransformOperation(manipulatorScene, "Rotate", ManipulatorOperation::ROTATE, KeyCode::KEY_E);
     ImGui::SameLine();
-    if (ImGui::Button("Scale")) {}
+    RenderToolbarTransformOperation(manipulatorScene, "Scale", ManipulatorOperation::SCALE, KeyCode::KEY_R);
 
     AssetManager& assetManager = Engine::Instance().GetAssetManager();
     ResourceManager<Resource::Texture>& textureManager = Renderer::Instance().GetTextureManager();
@@ -86,8 +127,7 @@ void ViewportPanel::Render()
     ImGui::SameLine(viewportSize.x * 0.5f - 25.0f);
     if (ImGui::ImageButton("Stop", stopIconId, ImVec2{ iconWidth, iconWidth }, ImVec2{ 0.0f, 1.0f }, ImVec2{ 1.0f, 0.0f }) && mGameSimulating)
     {
-        EditorManager& instance           = EditorManager::Instance();
-        WeakHandle<ScarlEnt::Scene> scene = instance.GetGameScene();
+        const WeakHandle<ScarlEnt::Scene> scene = EditorManager::Instance().GetGameScene();
 
         ScarlEnt::Registry::Instance().RenameScene(scene, "Reloading...");
 
@@ -103,31 +143,28 @@ void ViewportPanel::Render()
     }
 
     ImGui::EndChild();
+}
 
-    const ImVec2 remainingSize = ImVec2(viewportSize.x, viewportSize.y - toolbarHeight);
 
-    const uint32 width  = static_cast<uint32>(remainingSize.x);
-    const uint32 height = static_cast<uint32>(remainingSize.y);
+void ViewportPanel::RenderToolbarTransformOperation(ManipulatorScene& manipulatorScene, const char* buttonLabel, const ManipulatorOperation buttonOperation, const uint16 shortcut)
+{
+    const bool enabledOperation = manipulatorScene.GetManipulatorOperation() == buttonOperation;
 
-    const bool resizing = mLastFrameWidth != width || mLastFrameHeight != height;
-
-    mLastFrameWidth  = width;
-    mLastFrameHeight = height;
-
-    if (!resizing)
+    if (enabledOperation)
     {
-        ImGui::Image(mFramebuffer->GetColorAttachmentId(), ImGui::GetContentRegionAvail(), ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
-
-        if (width != mViewportWidth || height != mViewportHeight)
-        {
-            mFramebuffer->Resize(width, height);
-
-            mViewportWidth = width;
-            mViewportHeight = height;
-        }
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.0f, 0.43f, 0.89f, 1.0f });
     }
-       
-    ViewportSelection();
+
+    const bool shortcutPressedWhilstNotFlying = InputManager::IsKeyPressed(shortcut) && !InputManager::IsKeyDown(KeyCode::MOUSE_BUTTON_2);
+    if (ImGui::Button(buttonLabel) || shortcutPressedWhilstNotFlying)
+    {
+        manipulatorScene.SetManipulatorOperation(buttonOperation);
+    }
+
+    if (enabledOperation)
+    {
+        ImGui::PopStyleColor();
+    }
 }
 
 void ViewportPanel::BeginRender() const
@@ -136,14 +173,28 @@ void ViewportPanel::BeginRender() const
     glViewport(0, 0, static_cast<int>(mViewportWidth), static_cast<int>(mViewportHeight));
 }
 
-void ViewportPanel::ViewportSelection() const
+void ViewportPanel::ViewportSelection(SelectionManager& selectionManager) const
 {
-    if (!InputManager::IsKeyPressed(KeyCode::MOUSE_BUTTON_1) || !mIsHovered)
+    const ImVec2 imagePosition  = ImGui::GetItemRectMin();
+    const ImVec2 imageDrawnSize = ImGui::GetItemRectSize();
+
+    ImGuizmo::BeginFrame();
+    ImGuizmo::SetDrawlist();
+    ImGuizmo::SetOrthographic(false);
+    ImGuizmo::AllowAxisFlip(false);
+
+    ImGuizmo::SetRect(imagePosition.x, imagePosition.y, imageDrawnSize.x, imageDrawnSize.y);
+
+    // If the manipulation is still occuring, early out as selection should not be altered mid transform.
+    if (selectionManager.ManipulatingSelected())
     {
         return;
     }
 
-    SelectionManager& selectionManager = reinterpret_cast<EditorView*>(mView)->GetSelectionManager();
+    if (!InputManager::IsKeyPressed(KeyCode::MOUSE_BUTTON_1) || !mIsHovered)
+    {
+        return;
+    }
 
     // If the user has pressed Escape, reset the selection.
     if (InputManager::IsKeyPressed(KeyCode::KEY_ESCAPE))
@@ -154,26 +205,25 @@ void ViewportPanel::ViewportSelection() const
 
     const ImVec2 mouse    = ImGui::GetMousePos();
     const ImVec2 imageMin = ImGui::GetItemRectMin();
-    const ImVec2 size     = ImGui::GetItemRectSize();
 
     const ImVec2 local{ mouse.x - imageMin.x, mouse.y - imageMin.y };
 
-    const float normalisedX = (2.0f * local.x) / size.x - 1.0f;
-    const float normalisedY = 1.0f - (2.0f * local.y) / size.y;
+    const float normalisedX = (2.0f * local.x) / imageDrawnSize.x - 1.0f;
+    const float normalisedY = 1.0f - (2.0f * local.y) / imageDrawnSize.y;
 
     Math::Vec4 farPoint{ normalisedX, normalisedY, 1.0f, 1.0f };
 
     Component::Camera& cam     = EditorManager::Instance().GetViewportCamera();
     Component::Transform& camT = EditorManager::Instance().GetViewportCameraTransform();
 
-    Math::Mat4 invViewProj = Math::Inverse(cam.projectionMatrix * cam.viewMatrix);
+    const Math::Mat4 invViewProj = Math::Inverse(cam.projectionMatrix * cam.viewMatrix);
 
     Math::Vec4 farWorld = invViewProj * farPoint;
     farWorld /= farWorld.w;
 
-    Math::Vec3 rayDir = Math::Normalize(Math::Vec3{ farWorld } - camT.translation);
+    const Math::Vec3 rayDir = Math::Normalize(Math::Vec3{ farWorld } - camT.translation);
 
-    Math::Ray ray{ camT.translation, rayDir };
+    const Math::Ray ray{ camT.translation, rayDir };
 
     ScarlEnt::IEntityHandle* newSelected = nullptr;
 

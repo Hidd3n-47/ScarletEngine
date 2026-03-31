@@ -137,8 +137,6 @@ void Renderer::Render()
     Component::Transform* cameraTransform;
     Component::DirectionLight* cameraDirectionLight;
 
-    ScarlEnt::IEntityHandle* cameraHandle = nullptr;
-
     const WeakHandle<ScarlEnt::Scene> scene = ScarlEnt::Registry::Instance().GetActiveScene();
 
     if (!scene.IsValid()) [[unlikely]]
@@ -146,7 +144,7 @@ void Renderer::Render()
         return;
     }
 
-    cameraHandle = scene->GetCameraEntityHandle();
+    ScarlEnt::IEntityHandle* cameraHandle = scene->GetCameraEntityHandle();
     if (!cameraHandle) [[unlikely]]
     {
         return;
@@ -167,10 +165,18 @@ void Renderer::Render()
         cameraDirectionLight = &cameraEntity->GetComponent<Component::DirectionLight>();
     }
 
-    // Todo [Bug 74]: Quaternion rotation with camera results in roll when only changing pitch and yaw.
-    //camera.UpdateViewAndProjectionMatrix(cameraTransform.translation, cameraTransform.rotation.GetRotationMatrix());
+    if (camera->dirty) [[likely]]
+    {
+        const Math::Mat4 rotationMatrix = Math::Trig::RotationMatrix(cameraTransform->rotation);
 
-    UpdateViewAndProjectionMatrix(*camera, cameraTransform->translation, Math::Trig::RotationMatrix(cameraTransform->rotation.z, cameraTransform->rotation.x, cameraTransform->rotation.y));
+        const Math::Vec3 forwardVector = rotationMatrix[1];
+        const Math::Vec3 upVector      = rotationMatrix[2];
+
+        camera->viewMatrix       = Math::LookAt(cameraTransform->translation, cameraTransform->translation+ forwardVector, upVector);
+        camera->projectionMatrix = Math::Perspective(camera->fov, camera->aspectRatio, camera->nearPlane, camera->farPlane);
+
+        camera->dirty = false;
+    }
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

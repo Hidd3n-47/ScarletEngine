@@ -33,6 +33,7 @@ project "ScarletEditor"
         "$(SolutionDir)Source/ScarletLoggerProject/",
 
         "$(SolutionDir)Deps/ImGui/",
+        "$(SolutionDir)Deps/ImGuizmo/",
     }
 
     libdirs
@@ -51,6 +52,7 @@ project "ScarletEditor"
         "ScarletLogger",
 
         "ImGui",
+        "ImGuizmo",
 
         "glfw3_mt.lib",
         "glew32s.lib",

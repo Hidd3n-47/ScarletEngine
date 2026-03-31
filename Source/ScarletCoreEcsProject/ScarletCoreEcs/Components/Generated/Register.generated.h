@@ -17,7 +17,7 @@ template <typename T>
 static void RegisterComponentTypeAndFunctionPointer(ScarlEnt::Registry& registry)
 {
     const std::string componentName = registry.GetOrRegisterComponentId<T>().name;
-    registry.RegisterComponent(componentName, { 
+    registry.RegisterComponent(componentName, {
         .addComponent = [](ScarlEnt::IEntityHandle* handle) {
             ScarlEnt::MutableEntityHandle* mutableHandle = reinterpret_cast<ScarlEnt::MutableEntityHandle*>(handle);
             return mutableHandle->AddComponent<T>().GetProperties();

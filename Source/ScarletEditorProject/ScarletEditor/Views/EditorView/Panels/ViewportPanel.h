@@ -4,6 +4,8 @@
 
 #include "UI/Panel.h"
 
+#include "Core/ManipulatorScene.h"
+
 namespace Scarlet
 {
 
@@ -13,6 +15,8 @@ class Framebuffer;
 
 namespace Scarlet::Editor
 {
+
+class SelectionManager;
 
 /**
  * @class ViewportPanel: A panel to render the viewport. This is what the runtime scene would look like.
@@ -45,9 +49,24 @@ private:
     void BeginRender() const;
 
     /**
+     * @brief Render the toolbar above the viewport. This contains some buttons for things like current transform gizmo, DLL hot-reloading etc.
+     * @param selectionManager The \ref SelectionManager of the editor to allow for setting the transform mode from UI.
+     */
+    void RenderViewportToolbar(SelectionManager& selectionManager);
+
+    /**
+     * @brief Render the toolbar transform button to allow for users to change transform mode via UI buttons.
+     * @param manipulatorScene The \ref ManipulatorScene responsible for manipulating the selected entity(ies).
+     * @param buttonLabel The label appearing on the button.
+     * @param buttonOperation The \ref ManipulatorOperation the button is responsible for.
+     * @param shortcut The \ref KeyCode used to change to this operation.
+     */
+    static void RenderToolbarTransformOperation(ManipulatorScene& manipulatorScene, const char* buttonLabel, const ManipulatorOperation buttonOperation, const uint16 shortcut);
+
+    /**
      * @brief Handles viewport selection via ray-casting.
      */
-    void ViewportSelection() const;
+    void ViewportSelection(SelectionManager& selectionManager) const;
 };
 
 } // Namespace Scarlet::Editor.

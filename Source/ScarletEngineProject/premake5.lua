@@ -32,6 +32,8 @@ project "ScarletEngine"
         "$(SolutionDir)Source/ScarlEntProject/",
 
         "$(SolutionDir)Deps/ImGui/",
+        "$(SolutionDir)Deps/ImGuizmo/",
+
         "$(SolutionDir)Deps/Include/",
     }
 
@@ -49,6 +51,7 @@ project "ScarletEngine"
         "ScarlEnt",
 
         "ImGui",
+        "ImGuizmo",
 
         "glfw3_mt.lib",
         "glew32s.lib",
