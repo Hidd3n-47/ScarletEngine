@@ -46,10 +46,8 @@ void NewProjectPanel::Render()
     RenderSceneName();
 
     RenderFolderPicker();
-    
 
     ImGui::SetCursorPos(ImVec2{ mProperties.width - 80.0f, mProperties.height - 40.0f });
-
 
     if (mProjectNameContainsSpace || mSceneNameContainsSpace)
     {

@@ -33,6 +33,7 @@ namespace Scarlet::Editor
 namespace
 {
 constexpr float VIEWPORT_TOOLBAR_HEIGHT = 30.0f;
+constexpr ImVec4 BLUE_COLOR{ 0.0f, 0.43f, 0.89f, 1.0f };
 } // Anonymous Namespace.
 
 
@@ -106,6 +107,8 @@ void ViewportPanel::RenderViewportToolbar(SelectionManager& selectionManager)
     ImGui::SameLine();
     RenderToolbarTransformOperation(manipulatorScene, "Scale", ManipulatorOperation::SCALE, KeyCode::KEY_R);
 
+    RenderSnappingInterface(manipulatorScene);
+
     AssetManager& assetManager = Engine::Instance().GetAssetManager();
     ResourceManager<Resource::Texture>& textureManager = Renderer::Instance().GetTextureManager();
 
@@ -145,6 +148,44 @@ void ViewportPanel::RenderViewportToolbar(SelectionManager& selectionManager)
     ImGui::EndChild();
 }
 
+void ViewportPanel::RenderSnappingInterface(ManipulatorScene& manipulatorScene)
+{
+    const bool  isSnapping     = manipulatorScene.GetIsSnapping();
+    const float snappingAmount = manipulatorScene.GetSnappingAmount();
+
+    ImGui::SameLine(210.0f);
+
+    if (isSnapping)
+    {
+        ImGui::PushStyleColor(ImGuiCol_Button, BLUE_COLOR);
+    }
+
+    if (ImGui::Button("Snapping"))
+    {
+        manipulatorScene.SetIsSnapping(!isSnapping);
+    }
+
+    if (isSnapping)
+    {
+        ImGui::PopStyleColor();
+    }
+
+    constexpr int maxAmountOfDigits = 4;
+
+    char amountCharArray[maxAmountOfDigits] = {};
+
+    const std::string snappingAmountAsString = std::format("{:g}", snappingAmount);
+    strcpy_s(amountCharArray, snappingAmountAsString.c_str());
+    amountCharArray[maxAmountOfDigits - 1] = '\0';
+
+    ImGui::PushItemWidth(50.0f);
+
+    ImGui::SameLine();
+    if (ImGui::InputText("##SnappingAmount", amountCharArray, maxAmountOfDigits, ImGuiInputTextFlags_EnterReturnsTrue))
+    {
+        manipulatorScene.SetSnappingAmount(std::stof(std::string{ amountCharArray }));
+    }
+}
 
 void ViewportPanel::RenderToolbarTransformOperation(ManipulatorScene& manipulatorScene, const char* buttonLabel, const ManipulatorOperation buttonOperation, const uint16 shortcut)
 {
@@ -152,7 +193,7 @@ void ViewportPanel::RenderToolbarTransformOperation(ManipulatorScene& manipulato
 
     if (enabledOperation)
     {
-        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.0f, 0.43f, 0.89f, 1.0f });
+        ImGui::PushStyleColor(ImGuiCol_Button, BLUE_COLOR);
     }
 
     const bool shortcutPressedWhilstNotFlying = InputManager::IsKeyPressed(shortcut) && !InputManager::IsKeyDown(KeyCode::MOUSE_BUTTON_2);

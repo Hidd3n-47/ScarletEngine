@@ -31,10 +31,17 @@ public:
      */
     bool Manipulate(ScarlEnt::IEntityHandle* selectedEntity) const;
 
+    inline bool  GetIsSnapping()     const               { return mIsSnapping; }
+    inline float GetSnappingAmount() const               { return mSnappingAmount; }
+    inline void  SetIsSnapping(const bool isSnapping)    { mIsSnapping = isSnapping; }
+    inline void  SetSnappingAmount(const float snapping) { mSnappingAmount = snapping; }
+
     inline ManipulatorOperation GetManipulatorOperation() const { return mOperation; }
     inline void SetManipulatorOperation(const ManipulatorOperation operation) { mOperation = operation; }
 private:
     ManipulatorOperation mOperation{ ManipulatorOperation::TRANSLATE };
+    float mSnappingAmount = 0.5f;
+    bool  mIsSnapping     = true;
 };
 
 } // Namespace Scarlet::Editor.

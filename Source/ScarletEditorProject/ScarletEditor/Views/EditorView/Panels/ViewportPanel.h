@@ -55,6 +55,12 @@ private:
     void RenderViewportToolbar(SelectionManager& selectionManager);
 
     /**
+     * @brief Render the UI for snapping: Button to enable/disable as well as input box to enter the snapping amount.
+     * @param manipulatorScene The \ref ManipulatorScene of the editor to allow for setting the transform snapping.
+     */
+    static void RenderSnappingInterface(ManipulatorScene& manipulatorScene);
+
+    /**
      * @brief Render the toolbar transform button to allow for users to change transform mode via UI buttons.
      * @param manipulatorScene The \ref ManipulatorScene responsible for manipulating the selected entity(ies).
      * @param buttonLabel The label appearing on the button.
