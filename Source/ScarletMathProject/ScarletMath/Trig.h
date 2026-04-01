@@ -106,11 +106,11 @@ public:
         zVector /= scale.z;
 
         // Yaw.
-        rotation.z = Degrees(static_cast<float>(Atan2(yVector.x, yVector.y)));
+        rotation.z = Degrees(static_cast<float>(CorrectAngleTo0To2PiRange(Atan2(yVector.x, yVector.y))));
         // Pitch.
-        rotation.x = Degrees(static_cast<float>(Atan2(-yVector.z, Sqrt(yVector.x * yVector.x + yVector.y + yVector.y))));
+        rotation.x = Degrees(static_cast<float>(CorrectAngleTo0To2PiRange(Atan2(zVector.y, zVector.z))));
         // Roll.
-        rotation.y = Degrees(static_cast<float>(Atan2(xVector.z, zVector.z)));
+        rotation.y = Degrees(static_cast<float>(CorrectAngleTo0To2PiRange(Atan2(xVector.z, zVector.z))));
     }
 };
 
