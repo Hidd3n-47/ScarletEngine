@@ -48,7 +48,9 @@ public:
 
 #ifdef DEV_CONFIGURATION
     inline void ReloadGameDll() const { if (mReloadDllFunction) mReloadDllFunction(); }
-    inline void SetReloadDllFunction(const std::function<void()>& reloadDll) { mReloadDllFunction = reloadDll; }
+    inline void ReloadGame   () const { if (mReloadGameFunction) mReloadGameFunction(); }
+    inline void SetReloadDllFunction (const std::function<void()>& reloadDll)  { mReloadDllFunction  = reloadDll; }
+    inline void SetReloadGameFunction(const std::function<void()>& reloadGame) { mReloadGameFunction = reloadGame; }
 
     static void* GetImGuiContext();
     inline void SetBeginRenderEvent(const std::function<void()>& beginRenderEvent) { mBeginRenderEvent      = beginRenderEvent; }
@@ -69,6 +71,7 @@ private:
 
 #ifdef DEV_CONFIGURATION
     std::function<void()> mReloadDllFunction;
+    std::function<void()> mReloadGameFunction;
     std::function<void()> mBeginRenderEvent;
     std::function<void()> mEndRenderEvent;
     std::function<void()> mEditorPostUpdateEvent;

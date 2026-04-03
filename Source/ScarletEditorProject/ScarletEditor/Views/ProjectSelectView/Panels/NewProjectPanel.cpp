@@ -212,13 +212,13 @@ void NewProjectPanel::Create()
 
     // ============================ Create C++ boiler plate:
     const std::string path = basePath.generic_string() + "/";
-    const std::string engineAssetPath = Filepath{ FilepathDirectory::ENGINE, "" }.GetAbsolutePath();
+    const std::string enginePath = Filepath{ FilepathDirectory::ENGINE, "" }.GetAbsolutePath();
 
     // The build folder is in the directory before the Engine assets.
-    system(std::format(R"(python {}/../Build/ProjectCreation/CreateProject.py "{}" "{}" "{}")", engineAssetPath, mNewProjName, path, mNewSceneName).c_str());
+    system(std::format(R"(python "{}Build/ProjectCreation/CreateProject.py" {} {} {} {})", enginePath, enginePath, mNewProjName, path, mNewSceneName).c_str());
 
     // ============================ Call premake5.exe to generate the game solution.
-    system(std::format("{}/../Deps/Premake/premake5.exe --file=\"{}/premake5.lua\" vs2026", engineAssetPath, path).c_str());
+    system(std::format("{}/Deps/Premake/premake5.exe --file=\"{}/premake5.lua\" vs2026", enginePath, path).c_str());
 
     mNewSceneName = SCENE_NAME_DEFAULT;
 

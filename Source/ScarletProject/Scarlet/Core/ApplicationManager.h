@@ -17,6 +17,7 @@ public:
 
     void LoadGameDll();
     void UnloadGameDll();
+    void ReloadGame() const;
 private:
     typedef IGame* (*CreateGameInstanceFunc)();
 

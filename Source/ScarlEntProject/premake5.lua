@@ -41,7 +41,11 @@ project "ScarlEnt"
         '{COPYFILE} "%{cfg.buildtarget.abspath}" "' .. testOutputPath .. '/ScarlEntTest/"',
 
         '{MKDIR} "' .. outputPath .. '/Scarlet/"',
-        '{COPYFILE} "%{cfg.buildtarget.abspath}" "' .. outputPath .. '/Scarlet/"'
+        '{COPYFILE} "%{cfg.buildtarget.abspath}" "' .. outputPath .. '/Scarlet/"',
+
+        '{MKDIR} "$(SolutionDir)Bin/"',
+        '{COPYFILE} "%{cfg.buildtarget.abspath}" "$(SolutionDir)Bin/"',
+        '{COPYFILE} "%{cfg.targetdir}/%{prj.name}.lib" "$(SolutionDir)Bin/"'
     }
 
     filter "system:windows"

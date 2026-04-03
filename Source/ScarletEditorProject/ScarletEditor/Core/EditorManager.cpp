@@ -340,10 +340,7 @@ void EditorManager::OpenScene(const std::string& filepath)
         }
     }
 
-    Component::Transform cameraTransform{ };
-    cameraTransform.translation = Math::Vec3{ 0.0f, -10.0f, 2.0f };
-    mCameraEntity = mEditorScene->AddEntity<Component::Transform, Component::Camera, Component::DirectionLight>(std::move(cameraTransform), Component::Camera{}, Component::DirectionLight{ });
-    mEditorScene->SetCameraEntityHandle(&mCameraEntity);
+    CreateViewportCameraEntity();
 
     RegisterEditorSystems();
 
@@ -368,7 +365,7 @@ void EditorManager::SaveSceneAs(const std::string& filepath)
 
     for (ScarlEnt::IEntityHandle* handle : entities)
     {
-        XmlElement entityNode{ "Entity", "Mutable=\"true\"" };
+        XmlElement entityNode{ "Entity" };
 
         for (auto& component : handle->GetComponentViews())
         {
@@ -410,6 +407,17 @@ void EditorManager::PostUpdate()
     {
         OpenGameProject();
     }
+
+    if (mShouldHotReloadGame)
+    {
+        Engine::Instance().ReloadGameDll();
+
+        OpenScene(mCurrentSceneFilepath);
+
+        CreateViewportCameraEntity();
+
+        mShouldHotReloadGame = false;
+     }
 }
 
 void EditorManager::OpenGameProject()
@@ -445,6 +453,14 @@ Component::Camera& EditorManager::GetViewportCamera()
 Component::Transform& EditorManager::GetViewportCameraTransform()
 {
     return mCameraEntity.GetComponent<Component::Transform>();
+}
+
+void EditorManager::CreateViewportCameraEntity()
+{
+    Component::Transform cameraTransform{ };
+    cameraTransform.translation = Math::Vec3{ 0.0f, -10.0f, 2.0f };
+    mCameraEntity = mEditorScene->AddEntity<Component::Transform, Component::Camera, Component::DirectionLight>(std::move(cameraTransform), Component::Camera{}, Component::DirectionLight{ });
+    mEditorScene->SetCameraEntityHandle(&mCameraEntity);
 }
 
 } // Namespace Scarlet::Editor.

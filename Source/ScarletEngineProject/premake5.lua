@@ -61,7 +61,11 @@ project "ScarletEngine"
     postbuildcommands
     {
         '{MKDIR} "' .. outputPath .. '/Scarlet/"',
-        '{COPYFILE} "%{cfg.buildtarget.abspath}" "' .. outputPath .. '/Scarlet/"'
+        '{COPYFILE} "%{cfg.buildtarget.abspath}" "' .. outputPath .. '/Scarlet/"',
+
+        '{MKDIR} "$(SolutionDir)Bin/"',
+        '{COPYFILE} "%{cfg.buildtarget.abspath}" "$(SolutionDir)Bin/"',
+        '{COPYFILE} "%{cfg.targetdir}/%{prj.name}.lib" "$(SolutionDir)Bin/"'
     }
 
     filter "system:windows"

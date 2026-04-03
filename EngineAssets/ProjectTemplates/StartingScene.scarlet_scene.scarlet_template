@@ -1,5 +1,9 @@
 <ScarletScene>
-	<Entity Mutable="true">
+	<Entity>
+		<Component typeId="EditorInfo">
+			<name type="string">Entity</name>
+			<isMutable type="bool">true</isMutable>
+		</Component>
 		<Component typeId="Transform">
 			<translation type="vec3">0.000000,0.000000,0.000000</translation>
 			<rotation type="vec3">0.000000,0.000000,0.000000</rotation>

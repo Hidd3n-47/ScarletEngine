@@ -21,11 +21,11 @@ void Game::Init()
 #endif // !DEV_CONFIGURATION.
 
     // Set the active scene. This can safely be done as this is the entry scene.
-    registry.SetActiveScene(baseScene)
+    registry.SetActiveScene(baseScene);
 }}
 
 void Game::Terminate()
 {{
     // Terminate and remove scenes added for the project.
-    ScarlEnt::Registry::Instance().RemoveScene("BaseScene");
+    ScarlEnt::Registry::Instance().RemoveScene("{starting_scene_name}");
 }}

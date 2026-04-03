@@ -130,9 +130,12 @@ void ViewportPanel::RenderViewportToolbar(SelectionManager& selectionManager)
     ImGui::SameLine(viewportSize.x * 0.5f - 25.0f);
     if (ImGui::ImageButton("Stop", stopIconId, ImVec2{ iconWidth, iconWidth }, ImVec2{ 0.0f, 1.0f }, ImVec2{ 1.0f, 0.0f }) && mGameSimulating)
     {
-        const WeakHandle<ScarlEnt::Scene> scene = EditorManager::Instance().GetGameScene();
+        const std::string renamedSceneName{ "Reloading..." };
 
-        ScarlEnt::Registry::Instance().RenameScene(scene, "Reloading...");
+        const WeakHandle<ScarlEnt::Scene> scene = EditorManager::Instance().GetGameScene();
+        const std::string activeSceneFriendlyName{ scene->GetFriendlyName() };
+
+        Engine::Instance().ReloadGame();
 
         EditorManager::Instance().OpenScene(EditorManager::Instance().GetCurrentScenePath());
 
@@ -142,7 +145,7 @@ void ViewportPanel::RenderViewportToolbar(SelectionManager& selectionManager)
     ImGui::SameLine(viewportSize.x - 150);
     if (ImGui::Button("Hot Reload DLL"))
     {
-        Engine::Instance().ReloadGameDll();
+        EditorManager::Instance().HotReloadGameDll();
     }
 
     ImGui::EndChild();

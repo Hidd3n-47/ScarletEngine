@@ -72,7 +72,7 @@ public:
      * @brief Get a \ref WeakHandle to the game scene.
      * @return A \ref WeakHandle to the game scene.
      */
-    [[nodiscard]] inline WeakHandle<ScarlEnt::Scene> GetGameScene() const { return mEditorScene;}
+    [[nodiscard]] inline WeakHandle<ScarlEnt::Scene> GetGameScene() const { return mGameScene;}
 
     /**
      * @brief Get the filepath to the currently open scene.
@@ -104,6 +104,8 @@ public:
      */
     Component::Transform& GetViewportCameraTransform();
 
+    inline void HotReloadGameDll() { mShouldHotReloadGame = true; }
+
     inline static constexpr Ulid BACK_ICON_ULID      { 1 };
     inline static constexpr Ulid DIRECTORY_ICON_ULID { 2 };
     inline static constexpr Ulid ASSET_ICON_ULID     { 3 };
@@ -116,7 +118,7 @@ private:
     ~EditorManager();
     inline static EditorManager* mInstance = nullptr;
 
-    WeakHandle<ScarlEnt::Scene> mEditorScene;
+    WeakHandle<ScarlEnt::Scene> mGameScene;
     std::string mCurrentSceneFilepath{};
     std::string mProjectPathToOpen{};
     std::string mProjectName{};
@@ -124,6 +126,8 @@ private:
     ScarlEnt::EntityHandle<Component::Transform, Component::Camera, Component::DirectionLight> mCameraEntity;
 
     IView* mEditorView = nullptr;
+
+    bool mShouldHotReloadGame{ false };
 
     /**
      * @brief A function called at the end of an update to safely clean-up or remove instances referenced in the update function.
@@ -134,6 +138,8 @@ private:
      * @brief Internal function to open a project. This opens the project set by the public mutator, this function must be called in post update to safely change.
      */
     void OpenGameProject();
+
+    void CreateViewportCameraEntity();
 };
 
 } // Namespace Scarlet::Editor.

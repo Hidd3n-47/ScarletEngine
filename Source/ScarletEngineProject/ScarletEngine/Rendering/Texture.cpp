@@ -29,6 +29,8 @@ Texture::Texture(const Filepath& filepath)
 
     glTextureParameteri(mId, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTextureParameteri(mId, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTextureParameteri(mId, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTextureParameteri(mId, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glGenerateTextureMipmap(mId);
 
     glTextureSubImage2D(mId, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, data);

@@ -24,8 +24,8 @@ project "ScarletMath"
 
     postbuildcommands
     {
-        --("{COPYFILE} %[%{cfg.buildtarget.abspath}] %[" .. outputPath .."ScarlettGameCore/]"),
-        --("{COPYFILE} %[%{cfg.buildtarget.abspath}] %[" .. outputPath .."ScarlettEditor/]")
+        '{MKDIR} "$(SolutionDir)Bin/"',
+        '{COPYFILE} "%{cfg.targetdir}/%{prj.name}.lib" "$(SolutionDir)Bin/"'
     }
 
     filter "system:windows"

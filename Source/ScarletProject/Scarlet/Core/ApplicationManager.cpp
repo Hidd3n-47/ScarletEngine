@@ -11,17 +11,17 @@
 #endif // DEV_CONFIGURATION.
 
 #include "IGame.h"
+#include "ScarletEngine/Core/Filepath.h"
 
 namespace Scarlet
 {
 
 void ApplicationManager::Init()
 {
-    LoadGameDll();
-
     DEBUG(Editor::EditorManager::Init());
 
-    DEBUG(Engine::Instance().SetReloadDllFunction([&] { LoadGameDll(); }));
+    DEBUG(Engine::Instance().SetReloadDllFunction ([&] { LoadGameDll(); }));
+    DEBUG(Engine::Instance().SetReloadGameFunction([&] { ReloadGame();  }));
 }
 
 void ApplicationManager::Terminate()
@@ -36,11 +36,11 @@ void ApplicationManager::LoadGameDll()
     UnloadGameDll();
 
 #ifdef DEV_CONFIGURATION
-    const std::string fileName = "ScarletTestGameProject.dll";
-    const std::string path     = "E:/Programming/ScarletEngine/Scratch/Bin/Dev/ScarletTestGameProject/";
-    const std::string tempPath = path + "Game_temp_" + std::to_string(mLoadedDlls - 1) + ".dll";
+    const std::string projectName = Editor::EditorManager::Instance().GetProjectName();
+    const std::string path        = Filepath{ FilepathDirectory::PROJECT, "Scratch/Bin/" + projectName + "/" }.GetAbsolutePath();
+    const std::string tempPath    = path + "Game_temp_" + std::to_string(mLoadedDlls - 1) + ".dll";
 
-    if (!CopyFileA((path + fileName).c_str(), tempPath.c_str(), FALSE))
+    if (!CopyFileA((path + projectName + ".dll").c_str(), tempPath.c_str(), FALSE))
     {
         SCARLET_ERROR("Failed to copy the game DLL to a temporary location.");
         return;
@@ -86,6 +86,15 @@ void ApplicationManager::UnloadGameDll()
         DeleteFileA(tempPath.c_str());
 #endif // DEV_CONFIGURATION.
 
+    }
+}
+
+void ApplicationManager::ReloadGame() const
+{
+    if (mGame)
+    {
+        mGame->Terminate();
+        mGame->Init();
     }
 }
 

@@ -80,7 +80,7 @@ void AssetBrowserPanel::RenderUnsearchedAssets(const array<FileTypes, 3>& fileTy
         if (asset.is_directory())
         {
             const std::string stem = asset.path().stem().string();
-            if (stem != "Core")
+            if (stem != "Core" && stem != ".vs" && stem != "Scratch")
             {
                 directories.emplace_back(asset.path());
             }

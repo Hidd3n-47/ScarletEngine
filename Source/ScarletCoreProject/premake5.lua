@@ -32,6 +32,8 @@ project "ScarletCore"
 
     postbuildcommands
     {
+        '{MKDIR} "$(SolutionDir)Bin/"',
+        '{COPYFILE} "%{cfg.targetdir}/%{prj.name}.lib" "$(SolutionDir)Bin/"'
     }
 
     filter "system:windows"

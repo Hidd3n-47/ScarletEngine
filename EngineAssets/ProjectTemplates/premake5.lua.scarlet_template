@@ -25,23 +25,25 @@ project "{project_name}"
 
     includedirs
     {{
-        "$(SolutionDir)Deps/Include/",
-        "$(SolutionDir)Source/ScarletProject/",
-        "$(SolutionDir)Source/ScarletProject/src/",
-        "$(SolutionDir)Source/ScarlEntProject/",
-        "$(SolutionDir)Source/ScarletMathProject/",
-        "$(SolutionDir)Source/ScarletCoreProject/",
-        "$(SolutionDir)Source/ScarletCoreEcsProject/",
-        "$(SolutionDir)Source/ScarletEngineProject/",
+        "{engine_path}Deps/Include/",
+        "{engine_path}Source/ScarletProject/",
+        "{engine_path}Source/ScarletProject/src/",
+        "{engine_path}Source/ScarlEntProject/",
+        "{engine_path}Source/ScarletMathProject/",
+        "{engine_path}Source/ScarletCoreProject/",
+        "{engine_path}Source/ScarletCoreEcsProject/",
+        "{engine_path}Source/ScarletEngineProject/",
     }}
 
     links
     {{
-        "ScarlEnt",
-        "ScarletMath",
-        "ScarletCore",
-        "ScarletCoreEcs",
-        "ScarletEngine"
+        "{engine_path}Bin/ScarlEnt.lib",
+        "{engine_path}Bin/ScarlEnt.dll",
+        "{engine_path}Bin/ScarletMath.lib",
+        "{engine_path}Bin/ScarletCore.lib",
+        "{engine_path}Bin/ScarletCoreEcs.lib",
+        "{engine_path}Bin/ScarletEngine.lib",
+        "{engine_path}Bin/ScarletEngine.dll"
     }}
 
     filter "system:windows"
