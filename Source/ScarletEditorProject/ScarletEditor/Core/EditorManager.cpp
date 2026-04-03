@@ -172,7 +172,7 @@ EditorManager::~EditorManager()
 {
     Engine::Instance().SetEndRenderEvent(nullptr);
 
-    if (mEditorScene.IsValid())
+    if (mGameScene.IsValid())
     {
         SaveCurrentScene();
     }
@@ -290,9 +290,9 @@ void EditorManager::RegisterEditorSystems()
         viewportCamera.dirty = true;
         };
 
-    mEditorScene->RegisterSystem<Component::Transform, Component::Camera>(cameraMovementFunction);
+    mGameScene->RegisterSystem<Component::Transform, Component::Camera>(cameraMovementFunction);
 
-    Engine::Instance().RegisterEngineSystems(mEditorScene);
+    Engine::Instance().RegisterEngineSystems(mGameScene);
 }
 
 void EditorManager::OpenScene(const std::string& filepath)
@@ -313,7 +313,7 @@ void EditorManager::OpenScene(const std::string& filepath)
         view->GetSelectionManager().SetSelectedEntity(nullptr);
     }
 
-    mEditorScene = ScarlEnt::Registry::Instance().GetOrCreateScene(newSceneFriendlyName);
+    mGameScene = ScarlEnt::Registry::Instance().GetOrCreateScene(newSceneFriendlyName);
 
     mCurrentSceneFilepath = filepath;
 
@@ -321,7 +321,7 @@ void EditorManager::OpenScene(const std::string& filepath)
     {
         if (entityNode.GetTagName() == "ProjectPath") continue;
 
-        ScarlEnt::MutableEntityHandle entity = mEditorScene->AddMutableEntity();
+        ScarlEnt::MutableEntityHandle entity = mGameScene->AddMutableEntity();
 
         for (const XmlElement& component : entityNode.GetChildElements())
         {
@@ -346,11 +346,11 @@ void EditorManager::OpenScene(const std::string& filepath)
 
     if (!ScarlEnt::Registry::Instance().GetActiveScene().IsValid()) [[unlikely]]
     {
-        ScarlEnt::Registry::Instance().SetActiveScene(mEditorScene);
+        ScarlEnt::Registry::Instance().SetActiveScene(mGameScene);
     }
     else [[likely]]
     {
-        ScarlEnt::Registry::Instance().ChangeScene(mEditorScene, true);
+        ScarlEnt::Registry::Instance().ChangeScene(mGameScene, true);
     }
 }
 
@@ -361,7 +361,7 @@ void EditorManager::SaveSceneAs(const std::string& filepath)
 
     XmlElement* sceneNode = new XmlElement("ScarletScene");
 
-    const vector<ScarlEnt::IEntityHandle*>& entities = mEditorScene->GetMutableEntityHandles();
+    const vector<ScarlEnt::IEntityHandle*>& entities = mGameScene->GetMutableEntityHandles();
 
     for (ScarlEnt::IEntityHandle* handle : entities)
     {
@@ -459,8 +459,8 @@ void EditorManager::CreateViewportCameraEntity()
 {
     Component::Transform cameraTransform{ };
     cameraTransform.translation = Math::Vec3{ 0.0f, -10.0f, 2.0f };
-    mCameraEntity = mEditorScene->AddEntity<Component::Transform, Component::Camera, Component::DirectionLight>(std::move(cameraTransform), Component::Camera{}, Component::DirectionLight{ });
-    mEditorScene->SetCameraEntityHandle(&mCameraEntity);
+    mCameraEntity = mGameScene->AddEntity<Component::Transform, Component::Camera, Component::DirectionLight>(std::move(cameraTransform), Component::Camera{}, Component::DirectionLight{ });
+    mGameScene->SetCameraEntityHandle(&mCameraEntity);
 }
 
 } // Namespace Scarlet::Editor.
