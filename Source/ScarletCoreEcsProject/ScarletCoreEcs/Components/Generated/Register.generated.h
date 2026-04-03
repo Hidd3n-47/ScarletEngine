@@ -33,9 +33,18 @@ static void RegisterComponentTypeAndFunctionPointer(ScarlEnt::Registry& registry
     });
 }
 
+template <typename T>
+static void UnregisterComponentType(ScarlEnt::Registry& registry)
+{
+    const std::string componentName = registry.GetOrRegisterComponentId<T>().name;
+    registry.UnregisterComponentType(componentName);
+}
+
+
 struct Register
 {
     static void RegisterComponents();
+    static void UnregisterComponents();
 };
 
 #endif // DEV_CONFIGURATION.

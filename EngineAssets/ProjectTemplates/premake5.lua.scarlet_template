@@ -31,8 +31,11 @@ project "{project_name}"
         "{engine_path}Source/ScarlEntProject/",
         "{engine_path}Source/ScarletMathProject/",
         "{engine_path}Source/ScarletCoreProject/",
+        "{engine_path}Source/ScarletReflectProject/",
         "{engine_path}Source/ScarletCoreEcsProject/",
         "{engine_path}Source/ScarletEngineProject/",
+
+        "$(SolutionDir)",
     }}
 
     links
@@ -41,6 +44,7 @@ project "{project_name}"
         "{engine_path}Bin/ScarlEnt.dll",
         "{engine_path}Bin/ScarletMath.lib",
         "{engine_path}Bin/ScarletCore.lib",
+        "{engine_path}Bin/ScarletReflect.lib",
         "{engine_path}Bin/ScarletCoreEcs.lib",
         "{engine_path}Bin/ScarletEngine.lib",
         "{engine_path}Bin/ScarletEngine.dll"

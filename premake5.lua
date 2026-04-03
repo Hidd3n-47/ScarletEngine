@@ -36,6 +36,3 @@ include "Tests/ScarlEntTestProject/"
 -- Dependency Projects.
 include "Deps/ImGui/"
 include "Deps/ImGuizmo/"
-
--- Project.
-include "ScarletProjects/ScarletTestGameProject/"

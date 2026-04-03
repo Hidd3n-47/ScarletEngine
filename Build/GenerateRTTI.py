@@ -1,5 +1,6 @@
 import os
 import re
+from sys import argv
 from typing import Optional, Match
 
 from ScarletTypes import types
@@ -10,9 +11,6 @@ from StringTemplates import (
     GENERATE_PROPERTY_TEMPLATE,
     END_TEMPLATE
 )
-
-ROOT_SEARCH_DIR = "E:/Programming/ScarletEngine/Source/ScarletCoreEcsProject/ScarletCoreEcs/Components/"
-GENERATED_RTTI_OUTPUT_DIR = os.path.join(ROOT_SEARCH_DIR, "Generated/")
 
 COMPONENT_MACRO = "SCARLET_COMPONENT("
 
@@ -35,14 +33,14 @@ def get_component_files(path):
     return result
 
 # Generate RTTI for each component's member variables
-def generate_rtti_for_component(struct_name, member_variables):
-    os.makedirs(GENERATED_RTTI_OUTPUT_DIR, exist_ok=True)
-    output_path = os.path.join(GENERATED_RTTI_OUTPUT_DIR, f"{struct_name}.generated.cpp")
+def generate_rtti_for_component(generated_path, struct_name, member_variables):
+    os.makedirs(generated_path, exist_ok=True)
+    output_path = os.path.join(generated_path, f"{struct_name}.generated.cpp")
 
     # Filter out member variables whose type is not in the 'types' dictionary
     filtered_member_variables = [
         variable for variable in member_variables
-        if types.get(variable[0]) != None
+        if types.get(variable[0]) is not None
     ]
 
     # Prepare the RTTI property string for valid types
@@ -61,31 +59,37 @@ def generate_rtti_for_component(struct_name, member_variables):
         f.write(END_TEMPLATE)
 
 # Register components in the generated header file
-def register_components():
-    os.makedirs(GENERATED_RTTI_OUTPUT_DIR, exist_ok=True)
-    header_output_path = os.path.join(GENERATED_RTTI_OUTPUT_DIR, "Register.generated.h")
-    source_output_path = os.path.join(GENERATED_RTTI_OUTPUT_DIR, "Register.generated.cpp")
+def register_components(generated_path, external_components):
+    os.makedirs(generated_path, exist_ok=True)
+    header_output_path = os.path.join(generated_path, "Register.generated.h")
+    source_output_path = os.path.join(generated_path, "Register.generated.cpp")
 
     with open(header_output_path, "w+") as f:
         component_include_string = ""
         for comp in components:
-            component_include_string += f'#include "ScarletCoreEcs/Components/{comp}.h"\n'
+            if external_components:
+                component_include_string += f'#include "Components/{comp}.h"\n'
+            else:
+                component_include_string += f'#include "ScarletCoreEcs/Components/{comp}.h"\n'
+
         f.write(REGISTER_COMPONENT_HEADER_TEMPLATE.format(component_includes=component_include_string))
 
     with open(source_output_path, "w+") as f:
-        component_registry_string = ""
+        component_registry_string   = ""
+        component_unregistry_string = ""
         for comp in components:
-            component_registry_string += f'    RegisterComponentTypeAndFunctionPointer<Scarlet::Component::{comp}>(registry);\n'
-        f.write(REGISTER_COMPONENT_SOURCE_TEMPLATE.format(components_registry=component_registry_string))
+            component_registry_string   += f'    RegisterComponentTypeAndFunctionPointer<Scarlet::Component::{comp}>(registry);\n'
+            component_unregistry_string += f'    UnregisterComponentType<Scarlet::Component::{comp}>(registry);\n'
+        f.write(REGISTER_COMPONENT_SOURCE_TEMPLATE.format(components_registry=component_registry_string, components_unregistry=component_unregistry_string))
 
 
 # Analyze components in source files
-def analyse_components():
+def analyse_components(components_search_path):
     struct_pattern = re.compile(r'^\s*struct\s+(?:\w+\s+)*(\w+)')
-    field_pattern = re.compile(r'^\s*(\w[\w\s*&:<>]*?)\s+(\w+)\b')
+    field_pattern  = re.compile(r'^\s*(\w[\w\s*&:<>]*?)\s+(\w+)\b')
 
     braces_level = 0
-    for component_lines in get_component_files(ROOT_SEARCH_DIR):
+    for component_lines in get_component_files(components_search_path):
         struct_name = None
         member_variables = []
 
@@ -116,8 +120,24 @@ def analyse_components():
                     print(f"Field: {member_name} -> [{member_type}]")
 
         components.append(struct_name)
-        generate_rtti_for_component(struct_name, member_variables)
+        generate_rtti_for_component(os.path.join(components_search_path, "Generated/"), struct_name, member_variables)
 
 # Run the analysis and component registration
-analyse_components()
-register_components()
+
+engine_path  = argv[1]
+project_path = argv[2]
+
+# ================= Engine Components.
+engine_component_search_path = os.path.join(engine_path, "Source/ScarletCoreEcsProject/ScarletCoreEcs/Components/")
+
+analyse_components(engine_component_search_path)
+register_components(os.path.join(engine_component_search_path, "Generated/"), external_components = False)
+
+# Reset the found components.
+components = []
+
+# ================= Project Components.
+project_component_search_path = os.path.join(project_path, "Components/")
+
+analyse_components(project_component_search_path)
+register_components(os.path.join(project_component_search_path, "Generated/"), external_components = True)

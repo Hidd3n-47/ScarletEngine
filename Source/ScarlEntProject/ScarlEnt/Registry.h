@@ -147,6 +147,7 @@ public:
 
 #ifdef DEV_CONFIGURATION
     void RegisterComponent(const std::string& componentName, const TypelessComponentFunctions& typelessFunctions) { mComponentToTypelessFunctionMap[componentName] = typelessFunctions; }
+    void UnregisterComponentType(const std::string& componentName) { mComponentToTypelessFunctionMap.erase(componentName); }
 
     PropertyMap* AddComponentToHandle(const char* componentType, IEntityHandle* handle);
     [[nodiscard]] bool HasHandleGotComponent(const char* componentType, IEntityHandle* handle);

@@ -6,10 +6,15 @@
 
 #ifndef DEV_CONFIGURATION
 #include "Build/SceneBuild.h"
+#include "Components/Generated/Register.generated.h"
 #endif // DEV_CONFIGURATION.
 
 void Game::Init()
 {{
+#ifdef DEV_CONFIGURATION
+    Register::RegisterComponents();
+#endif // DEV_CONFIGURATION
+
     ScarlEnt::Registry& registry = ScarlEnt::Registry::Instance();
 
     // Initialise and register scenes.
@@ -18,14 +23,19 @@ void Game::Init()
     // This will register and create the game scenes in release builds. This is generated from the built scenes.
 #ifndef DEV_CONFIGURATION
     Scarlet::InitGameScene();
-#endif // !DEV_CONFIGURATION.
 
     // Set the active scene. This can safely be done as this is the entry scene.
+    // Note: This only needs to be done for the runtime as the editor handles setting active scene.
     registry.SetActiveScene(baseScene);
+#endif // !DEV_CONFIGURATION.
 }}
 
 void Game::Terminate()
 {{
     // Terminate and remove scenes added for the project.
     ScarlEnt::Registry::Instance().RemoveScene("{starting_scene_name}");
+
+#ifdef DEV_CONFIGURATION
+    Register::UnregisterComponents();
+#endif // DEV_CONFIGURATION.
 }}

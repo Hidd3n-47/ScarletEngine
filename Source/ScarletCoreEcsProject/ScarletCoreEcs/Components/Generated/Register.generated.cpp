@@ -15,4 +15,17 @@ void Register::RegisterComponents()
 
 }
 
+void Register::UnregisterComponents()
+{
+    ScarlEnt::Registry& registry = ScarlEnt::Registry::Instance();
+
+    UnregisterComponentType<Scarlet::Component::BoundingBox>(registry);
+    UnregisterComponentType<Scarlet::Component::Camera>(registry);
+    UnregisterComponentType<Scarlet::Component::DirectionLight>(registry);
+    UnregisterComponentType<Scarlet::Component::EditorInfo>(registry);
+    UnregisterComponentType<Scarlet::Component::StaticMesh>(registry);
+    UnregisterComponentType<Scarlet::Component::Transform>(registry);
+
+}
+
 #endif // DEV_CONFIGURATION.

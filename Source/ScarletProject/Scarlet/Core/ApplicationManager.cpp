@@ -18,10 +18,10 @@ namespace Scarlet
 
 void ApplicationManager::Init()
 {
-    DEBUG(Editor::EditorManager::Init());
-
     DEBUG(Engine::Instance().SetReloadDllFunction ([&] { LoadGameDll(); }));
     DEBUG(Engine::Instance().SetReloadGameFunction([&] { ReloadGame();  }));
+
+    DEBUG(Editor::EditorManager::Init());
 }
 
 void ApplicationManager::Terminate()

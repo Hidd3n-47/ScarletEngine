@@ -142,6 +142,16 @@ void ViewportPanel::RenderViewportToolbar(SelectionManager& selectionManager)
         mGameSimulating = false;
     }
 
+    ImGui::SameLine(viewportSize.x - 250);
+    if (ImGui::Button("Generate"))
+    {
+        const std::string enginePath  = Filepath{ FilepathDirectory::ENGINE , "" }.GetAbsolutePath();
+        const std::string projectPath = Filepath{ FilepathDirectory::PROJECT, "" }.GetAbsolutePath();
+
+        system(std::format("python {}/Build/GenerateRtti.py {} {}", enginePath, enginePath, projectPath).c_str());
+        system(std::format("{}/Deps/Premake/premake5.exe --file=\"{}/premake5.lua\" vs2026", enginePath, projectPath).c_str());
+    }
+
     ImGui::SameLine(viewportSize.x - 150);
     if (ImGui::Button("Hot Reload DLL"))
     {

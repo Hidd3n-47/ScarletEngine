@@ -91,6 +91,8 @@ void Engine::Destroy() const noexcept
 
     delete mAssetManager;
 
+    DEBUG(Register::UnregisterComponents());
+
     Renderer::TerminateApi();
 
     ScarlEnt::Registry::Terminate();
