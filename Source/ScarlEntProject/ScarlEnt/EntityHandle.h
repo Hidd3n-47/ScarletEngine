@@ -76,6 +76,14 @@ public:
         return mComponentManagerRef->GetComponent<Component, ArchetypeComponents...>(mEntityId);
     }
 
+    /**
+     * @brief Remove the immutable entity from the scene.
+     */
+    inline void DestroyEntity()
+    {
+        mComponentManagerRef->RemoveEntity<ArchetypeComponents...>(mEntityId);
+    }
+
     DEBUG([[nodiscard]] inline uint64 GetRuntimeId() const override { return mEntityId; })
     DEBUG([[nodiscard]] inline const vector<ComponentView>& GetComponentViews() override { return mComponentManagerRef->GetEntityComponentView(mEntityId); })
 private:

@@ -288,7 +288,7 @@ void EditorManager::RegisterEditorSystems()
 
         //transform.rotation =  qPitch * qYaw;
         viewportCamera.dirty = true;
-        };
+    };
 
     mGameScene->RegisterSystem<Component::Transform, Component::Camera>(cameraMovementFunction);
 

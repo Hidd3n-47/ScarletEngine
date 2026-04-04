@@ -22,6 +22,8 @@ class SCARLENT_API MutableEntityHandle : public IEntityHandle
 {
     friend class Scene;
 public:
+    MutableEntityHandle() = default;
+
 #ifdef DEV_CONFIGURATION
     /**
      * @brief Create an instance of an \ref MutableEntityHandle.
@@ -31,9 +33,10 @@ public:
      * The component manager is valid for the life-time of the scene. This coupling of lifetime is okay as entities are only valid for the life-time \\n
      * of the scene.
      */
-    MutableEntityHandle(const Scarlet::WeakHandle<Scene> parent, const Scarlet::WeakHandle<ComponentManager> componentManagerRef)
+    inline MutableEntityHandle(const Scarlet::WeakHandle<Scene> parent, const Scarlet::WeakHandle<ComponentManager> componentManagerRef)
         : mParent(parent)
         , mComponentManagerRef(componentManagerRef)
+        , mIsValid(true)
     {
         mEntityId = mComponentManagerRef->AddMutableEntity();
     }
@@ -45,8 +48,9 @@ public:
      * The component manager is valid for the life-time of the scene. This coupling of lifetime is okay as entities are only valid for the life-time \\n
      * of the scene.
      */
-    MutableEntityHandle(const Scarlet::WeakHandle<ComponentManager> componentManagerRef)
+    inline MutableEntityHandle(const Scarlet::WeakHandle<ComponentManager> componentManagerRef)
         : mComponentManagerRef(componentManagerRef)
+        , mIsValid(true)
     {
         mEntityId = mComponentManagerRef->AddMutableEntity();
     }
@@ -58,7 +62,7 @@ public:
      * @param args The arguments forwarded to the constructor of the component.
      */
     template <typename T, typename...Args>
-    T& AddComponent(Args&&...args)
+    inline T& AddComponent(Args&&...args)
     {
         DEBUG(SCARLENT_ASSERT(mIsValid && "Trying to add component on mutable entity that has been marked as invalid."));
 
@@ -70,7 +74,7 @@ public:
      * @tparam T The component being removed from the entity.
      */
     template <typename T>
-    void RemoveComponent()
+    inline void RemoveComponent()
     {
         DEBUG(SCARLENT_ASSERT(mIsValid && "Trying to remove component on mutable entity that has been marked as invalid."));
 
@@ -88,7 +92,7 @@ public:
      * @return A reference to the component.
      */
     template <typename Component>
-    [[nodiscard]] Component& GetComponent()
+    [[nodiscard]] inline Component& GetComponent()
     {
         DEBUG(SCARLENT_ASSERT(mIsValid && "Trying to get component on mutable entity that has been marked as invalid."));
         return mComponentManagerRef->GetMutableEntityComponent<Component>(mEntityId.runtimeId);
@@ -100,7 +104,7 @@ public:
      * @return A constant reference to the component.
      */
     template <typename Component>
-    [[nodiscard]] const Component& GetComponent() const
+    [[nodiscard]] inline const Component& GetComponent() const
     {
         DEBUG(SCARLENT_ASSERT(mIsValid && "Trying to get component on mutable entity that has been marked as invalid."));
         return GetComponent<Component>();
@@ -123,9 +127,10 @@ public:
     [[nodiscard]] inline MutableEntityId GetId() const { return mEntityId; }
     [[nodiscard]] inline Scarlet::WeakHandle<ComponentManager> GetComponentManagerRef() const { return mComponentManagerRef; }
 #endif // SCARLENT_TEST.
-    [[nodiscard]] inline uint64 GetComponentBitset() { return mComponentManagerRef->GetMutableEntityComponentBitset(mEntityId.runtimeId); }
 
+    [[nodiscard]] inline uint64 GetComponentBitset() { return mComponentManagerRef->GetMutableEntityComponentBitset(mEntityId.runtimeId); }
     [[nodiscard]] inline bool IsMutable() const override { return true; }
+
 #ifdef DEV_CONFIGURATION
     [[nodiscard]] inline uint64 GetRuntimeId() const override { return mEntityId.runtimeId; }
     [[nodiscard]] inline const vector<ComponentView>& GetComponentViews() override { return mComponentManagerRef->GetMutableEntityComponentView(mEntityId.runtimeId); }
@@ -135,7 +140,7 @@ private:
     DEBUG(Scarlet::WeakHandle<Scene> mParent);
     Scarlet::WeakHandle<ComponentManager> mComponentManagerRef;
 
-    DEBUG(bool mIsValid = true);
+    DEBUG(bool mIsValid = false);
 };
 
 } // Namespace ScarlEnt.

@@ -40,6 +40,14 @@ public:
     /**
      * @brief Add an entity to the scene.
      * @tparam ArchetypeComponents The component types of the archetype.
+     * @return A \ref EntityHandle to the entity.
+     */
+    template <typename...ArchetypeComponents>
+    [[nodiscard]] EntityHandle<ArchetypeComponents...> AddEntity();
+
+    /**
+     * @brief Add an entity to the scene.
+     * @tparam ArchetypeComponents The component types of the archetype.
      * @tparam Args The argument types of the component constructors.
      * @param args The forwarded arguments passed to the constructors of the components.
      * @return A \ref EntityHandle to the entity.
@@ -107,6 +115,12 @@ template <typename...Components>
 inline void Scene::RegisterSystem(const std::function<void(Components&...)>& updateFunction)
 {
     mComponentManager.RegisterSystem<Components...>(updateFunction);
+}
+
+template <typename... ArchetypeComponents>
+inline EntityHandle<ArchetypeComponents...> Scene::AddEntity()
+{
+    return AddEntity<ArchetypeComponents...>(ArchetypeComponents{}...);
 }
 
 template <typename... ArchetypeComponents, typename... Args>

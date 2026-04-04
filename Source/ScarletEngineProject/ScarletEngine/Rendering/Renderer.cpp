@@ -4,8 +4,6 @@
 #define GLEW_STATIC
 #include <glew/glew.h>
 
-#include <algorithm>
-
 #include <ScarlEnt/Scene.h>
 #include <ScarlEnt/Registry.h>
 #include <ScarlEnt/IEntityHandle.h>
@@ -64,14 +62,6 @@ constexpr uint32 SKY_BOX_INDICES[SKY_BOX_INDEX_COUNT] =
     3, 7, 6,
     6, 2, 3
 };
-
-void UpdateViewAndProjectionMatrix(Scarlet::Component::Camera& camera, const Scarlet::Math::Vec3& eyePosition, const Scarlet::Math::Mat4& rotationMatrix)
-{
-    const Scarlet::Math::Vec3 forwardVector = rotationMatrix[1];
-    const Scarlet::Math::Vec3 upVector = rotationMatrix[2];
-    camera.viewMatrix = Scarlet::Math::LookAt(eyePosition, eyePosition + forwardVector, upVector);
-    camera.projectionMatrix = Scarlet::Math::Perspective(camera.fov, camera.aspectRatio, camera.nearPlane, camera.farPlane);
-}
 
 } // Anonymous namespace.
 
@@ -169,10 +159,11 @@ void Renderer::Render()
     {
         const Math::Mat4 rotationMatrix = Math::Trig::RotationMatrix(cameraTransform->rotation);
 
-        const Math::Vec3 forwardVector = rotationMatrix[1];
-        const Math::Vec3 upVector      = rotationMatrix[2];
+        camera->forwardVector = rotationMatrix[1];
+        camera->rightVector   = rotationMatrix[0];
+        camera->upVector      = rotationMatrix[2];
 
-        camera->viewMatrix       = Math::LookAt(cameraTransform->translation, cameraTransform->translation+ forwardVector, upVector);
+        camera->viewMatrix       = Math::LookAt(cameraTransform->translation, cameraTransform->translation + camera->forwardVector, camera->upVector);
         camera->projectionMatrix = Math::Perspective(camera->fov, camera->aspectRatio, camera->nearPlane, camera->farPlane);
 
         camera->dirty = false;

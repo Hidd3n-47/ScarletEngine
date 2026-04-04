@@ -123,7 +123,7 @@ inline void ReflectType::SetValueFromString<Math::Vec3>(Math::Vec3& value, const
 
     //todo assert on positions;
     const std::string value1 = std::string{ stringValue.substr(0, firstCommaPosition) };
-    const std::string value2 = std::string{ stringValue.substr(firstCommaPosition + 1, secondCommaPosition - firstCommaPosition - 2) };
+    const std::string value2 = std::string{ stringValue.substr(firstCommaPosition + 1, secondCommaPosition - firstCommaPosition - 1) };
     const std::string value3 = std::string{ stringValue.substr(secondCommaPosition + 1) };
 
     value = Math::Vec3(std::stof(value1), std::stof(value2), std::stof(value3));
