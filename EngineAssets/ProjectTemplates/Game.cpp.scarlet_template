@@ -4,10 +4,11 @@
 
 #include "Scenes/{starting_scene_name}.h"
 
-#ifndef DEV_CONFIGURATION
-#include "Build/SceneBuild.h"
+#ifdef DEV_CONFIGURATION
 #include "Components/Generated/Register.generated.h"
-#endif // DEV_CONFIGURATION.
+#else // DEV_CONFIGURATION
+#include "Build/SceneBuild.h"
+#endif // !DEV_CONFIGURATION.
 
 void Game::Init()
 {{
