@@ -25,12 +25,25 @@ public:
     inline void Update() { mComponentManager.Update(); }
 
     /**
+     * @brief Update the scene at a fixed timestep set in \ref Time.
+     */
+    inline void FixedUpdate() { mComponentManager.FixedUpdate(); }
+
+    /**
      * @brief Register a system that will act over a subset of components calling the update function.
      * @tparam Components The components the system acts on.
      * @param updateFunction The function acting on the components.
      */
     template <typename...Components>
     void RegisterSystem(const std::function<void(Components&...)>& updateFunction);
+
+    /**
+     * @brief Register a system that will act over a subset of components calling the update function in the fixed update.
+     * @tparam Components The components the system acts on.
+     * @param updateFunction The function acting on the components.
+     */
+    template <typename...Components>
+    void RegisterFixedUpdateSystem(const std::function<void(Components&...)>& updateFunction);
 
     /**
      * @brief Remove all the registered systems.
@@ -115,6 +128,12 @@ template <typename...Components>
 inline void Scene::RegisterSystem(const std::function<void(Components&...)>& updateFunction)
 {
     mComponentManager.RegisterSystem<Components...>(updateFunction);
+}
+
+template <typename...Components>
+inline void Scene::RegisterFixedUpdateSystem(const std::function<void(Components&...)>& updateFunction)
+{
+    mComponentManager.RegisterFixedUpdateSystem<Components...>(updateFunction);
 }
 
 template <typename... ArchetypeComponents>

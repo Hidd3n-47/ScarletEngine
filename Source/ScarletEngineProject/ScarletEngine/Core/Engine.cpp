@@ -19,6 +19,8 @@
 
 #include "AssetLoading/AssetManager.h"
 
+#include "Time.h"
+
 #ifdef DEV_CONFIGURATION
 #include <ScarletCoreEcs/Components/Generated/Register.generated.h>
 
@@ -62,6 +64,8 @@ void Engine::Init() noexcept
     DEBUG(Register::RegisterComponents());
 
     LoadScarletAssets();
+
+    Time::Init();
 
 #ifdef DEV_CONFIGURATION
     IMGUI_CHECKVERSION();
@@ -117,6 +121,11 @@ void Engine::Run() const
         if (WeakHandle<ScarlEnt::Scene> scene = ScarlEnt::Registry::Instance().GetActiveScene();  scene.IsValid()) [[unlikely]]
         {
             scene->Update();
+
+            if (Time::Tick())
+            {
+                scene->FixedUpdate();
+            }
         }
 
         if (mBeginRenderEvent) mBeginRenderEvent();
@@ -161,7 +170,7 @@ void Engine::RegisterEngineSystems(WeakHandle<ScarlEnt::Scene> scene)
         Renderer::Instance().AddRenderCommand(materialAsset, meshAsset,
             Math::TransformAsMatrix(transform.translation,
                 Math::Trig::RotationMatrix(transform.rotation.z, transform.rotation.x, transform.rotation.y), transform.scale));
-        });
+    });
 }
 
 void Engine::LoadScarletAssets()

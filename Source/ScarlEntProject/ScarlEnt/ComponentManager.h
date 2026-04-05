@@ -40,29 +40,32 @@ public:
      * @param updateFunction A function pointer to the function acting on the components.
      */
     template <typename...Components>
-    void RegisterSystem(const std::function<void(Components&...)>& updateFunction)
-    {
-        mSystems.emplace_back(new System<Components...>(updateFunction));
-    }
+    void RegisterSystem(const std::function<void(Components&...)>& updateFunction);
 
     /**
-     * @brief Remove all the registered systems.
+     * @brief Register a system that will act over a subset of components calling the update function in the fixed update.
+     * @tparam Components The components the system acts on.
+     * @param updateFunction A function pointer to the function acting on the components.
      */
-    void RemoveAllSystems()
-    {
-        for (const ISystem* system : mSystems)
-        {
-            delete system;
-        }
+    template <typename...Components>
+    void RegisterFixedUpdateSystem(const std::function<void(Components&...)>& updateFunction);
 
-        mSystems.clear();
-    }
+    /**
+     * @brief Remove all the registered systems - fixed as well as normal systems.
+     */
+    void RemoveAllSystems();
 
     /**
      * @brief Go through each registered system and update. Each archetype will be iterated over and compared to the required components of the system, updating the components \\n
      * based on the registered update function if so.
      */
     void Update();
+
+    /**
+     * @brief Go through each registered system and update at a fixed frame rate. Each archetype will be iterated over and compared to the required components of the system, \\n
+     * updating the components based on the registered update function if so.
+     */
+    void FixedUpdate();
 
     /**
      * @brief Add an entity to an Archetype defined by the components from the templated arguments.
@@ -158,9 +161,22 @@ private:
 
     // Systems.
     vector<ISystem*> mSystems;
+    vector<ISystem*> mFixedSystems;
 };
 
 /* ============================================================================================================================== */
+
+template <typename...Components>
+void ComponentManager::RegisterSystem(const std::function<void(Components&...)>& updateFunction)
+{
+    mSystems.emplace_back(new System<Components...>(updateFunction));
+}
+
+template <typename...Components>
+void ComponentManager::RegisterFixedUpdateSystem(const std::function<void(Components&...)>& updateFunction)
+{
+    mFixedSystems.emplace_back(new System<Components...>(updateFunction));
+}
 
 template <typename... ArchetypeComponents>
 inline Scarlet::Ulid ComponentManager::AddEntity(ArchetypeComponents&&... values)

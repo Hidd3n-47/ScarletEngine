@@ -26,9 +26,48 @@ ComponentManager::~ComponentManager()
     }
 }
 
+void ComponentManager::RemoveAllSystems()
+{
+    for (const ISystem* system : mSystems)
+    {
+        delete system;
+    }
+
+    for (const ISystem* system : mFixedSystems)
+    {
+        delete system;
+    }
+
+    mSystems.clear();
+    mFixedSystems.clear();
+}
+
 void ComponentManager::Update()
 {
     for (ISystem* system : mSystems)
+    {
+        for (auto& [bitset, archetype] : mArchetypeComponents)
+        {
+            if ((bitset & system->componentBitset) == system->componentBitset)
+            {
+                system->UpdateArchetype(archetype);
+            }
+        }
+
+        for (auto& [bitset, sparseSetEntities] : mComponentBitsetToMutableEntities)
+        {
+            if ((bitset & system->componentBitset) == system->componentBitset)
+            {
+                system->UpdateSparseSet(sparseSetEntities, mComponentIdToSparseSetArray);
+            }
+        }
+
+    }
+}
+
+void ComponentManager::FixedUpdate()
+{
+    for (ISystem* system : mFixedSystems)
     {
         for (auto& [bitset, archetype] : mArchetypeComponents)
         {
