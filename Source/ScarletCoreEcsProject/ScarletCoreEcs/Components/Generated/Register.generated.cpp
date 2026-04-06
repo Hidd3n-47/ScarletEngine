@@ -10,6 +10,7 @@ void Register::RegisterComponents()
     RegisterComponentTypeAndFunctionPointer<Scarlet::Component::Camera>(registry);
     RegisterComponentTypeAndFunctionPointer<Scarlet::Component::DirectionLight>(registry);
     RegisterComponentTypeAndFunctionPointer<Scarlet::Component::EditorInfo>(registry);
+    RegisterComponentTypeAndFunctionPointer<Scarlet::Component::SphereCollider>(registry);
     RegisterComponentTypeAndFunctionPointer<Scarlet::Component::StaticMesh>(registry);
     RegisterComponentTypeAndFunctionPointer<Scarlet::Component::Transform>(registry);
 
@@ -23,6 +24,7 @@ void Register::UnregisterComponents()
     UnregisterComponentType<Scarlet::Component::Camera>(registry);
     UnregisterComponentType<Scarlet::Component::DirectionLight>(registry);
     UnregisterComponentType<Scarlet::Component::EditorInfo>(registry);
+    UnregisterComponentType<Scarlet::Component::SphereCollider>(registry);
     UnregisterComponentType<Scarlet::Component::StaticMesh>(registry);
     UnregisterComponentType<Scarlet::Component::Transform>(registry);
 

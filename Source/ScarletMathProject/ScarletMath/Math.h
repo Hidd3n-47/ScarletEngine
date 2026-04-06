@@ -50,7 +50,8 @@ template <typename T>
     return glm::perspective(Radians(fovDegrees), aspectRatio, zNear, zFar);
 }
 
-[[nodiscard]] static double Sqrt(const double number)
+template <typename T>
+[[nodiscard]] static T Sqrt(const T number)
 {
     return glm::sqrt(number);
 }
@@ -68,6 +69,11 @@ template <typename T>
 [[nodiscard]] static inline float Dot(const Vec3 v1, const Vec3 v2)
 {
     return glm::dot(v1, v2);
+}
+
+[[nodiscard]] static inline float MagnitudeSquared(const Vec3 vector)
+{
+    return Dot(vector, vector);
 }
 
 [[nodiscard]] static inline Mat4 LookAt(const Vec3 eye, const Vec3 center, const Vec3 up)

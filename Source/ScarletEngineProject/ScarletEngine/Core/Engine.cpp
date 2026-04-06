@@ -125,6 +125,8 @@ void Engine::Run() const
             if (Time::Tick())
             {
                 scene->FixedUpdate();
+
+                ApplySpherePhysics();
             }
         }
 
@@ -165,12 +167,23 @@ void Engine::RegisterEngineSystems(WeakHandle<ScarlEnt::Scene> scene)
 {
     // Rendering System.
     scene->RegisterSystem<Component::Transform, Component::StaticMesh>([&](Component::Transform& transform, Component::StaticMesh& mesh) {
-        WeakHandle<Resource::ILazyLoadAsset> meshAsset     = mAssetManager->GetAsset(mesh.mesh.assetType    , Ulid{ mesh.mesh.assetUlid     });
-        WeakHandle<Resource::ILazyLoadAsset> materialAsset = mAssetManager->GetAsset(mesh.material.assetType, Ulid{ mesh.material.assetUlid });
+        const WeakHandle<Resource::ILazyLoadAsset> meshAsset     = mAssetManager->GetAsset(mesh.mesh.assetType    , Ulid{ mesh.mesh.assetUlid     });
+        const WeakHandle<Resource::ILazyLoadAsset> materialAsset = mAssetManager->GetAsset(mesh.material.assetType, Ulid{ mesh.material.assetUlid });
         Renderer::Instance().AddRenderCommand(materialAsset, meshAsset,
             Math::TransformAsMatrix(transform.translation,
                 Math::Trig::RotationMatrix(transform.rotation.z, transform.rotation.x, transform.rotation.y), transform.scale));
     });
+
+#ifdef DEV_CONFIGURATION
+    scene->RegisterSystem<Component::Transform, Component::SphereCollider>([&](Component::Transform& transform, Component::SphereCollider& sphere) {
+        const WeakHandle<Resource::ILazyLoadAsset> meshAsset     = mAssetManager->GetAsset(AssetType::MESH, Ulid{ 4 });
+        const WeakHandle<Resource::ILazyLoadAsset> materialAsset = mAssetManager->GetAsset(AssetType::MATERIAL, AssetManager::INVALID_ULID);
+        Renderer::Instance().AddRenderCommand(materialAsset, meshAsset,
+            Math::TransformAsMatrix(transform.translation,
+                Math::Trig::RotationMatrix(transform.rotation.z, transform.rotation.x, transform.rotation.y),
+                Math::Vec3{ sphere.radius * 2.0f * transform.scale.x }));
+    });
+#endif // DEV_CONFIGURATION.
 }
 
 void Engine::LoadScarletAssets()
@@ -200,6 +213,50 @@ void Engine::OnEvent(Event& event)
     dispatcher.Dispatch<WindowClosedEvent>([&](const WindowClosedEvent&) { mRunning = false; return true; });
 
     InputManager::OnEvent(event);
+}
+
+// Todo Christian: We should have a proper physics manager and physics system instead of just simply sphere collision. This ideally should be in its own project as well - not in the engine.cpp.
+void Engine::ApplySpherePhysics()
+{
+    WeakHandle<ScarlEnt::Scene> currentScene = ScarlEnt::Registry::Instance().GetActiveScene();
+
+    if (!currentScene.IsValid()) [[unlikely]]
+    {
+        return;
+    }
+
+    auto sphereEntities = currentScene->GetComponents<Component::Transform, Component::SphereCollider>();
+
+    for (size_t i{ 0 }; i < sphereEntities.size(); ++i)
+    {
+        for (size_t j{ 0 }; j < sphereEntities.size(); ++j)
+        {
+            if (i == j)
+            {
+                continue;
+            }
+
+            const Math::Vec3 directionVector = std::get<Component::Transform&>(sphereEntities[j]).translation - std::get<Component::Transform&>(sphereEntities[i]).translation;
+            const float distSquared = Math::MagnitudeSquared(directionVector);
+
+            const float radiusI = std::get<Component::SphereCollider&>(sphereEntities[i]).radius * std::get<Component::Transform&>(sphereEntities[i]).scale.x;
+            const float radiusJ = std::get<Component::SphereCollider&>(sphereEntities[j]).radius * std::get<Component::Transform&>(sphereEntities[j]).scale.x;
+            const float minDistanceSquared = static_cast<float>(std::pow(radiusI + radiusJ, 2));
+
+            if (distSquared >= minDistanceSquared)
+            {
+                continue;
+            }
+
+            const float dist    = Math::Sqrt(distSquared);
+            const float minDist = Math::Sqrt(minDistanceSquared);
+            const float halfDifference = (minDist - dist) * 0.5f;
+
+            const Math::Vec3 movement = directionVector / dist * halfDifference;
+            std::get<Component::Transform&>(sphereEntities[j]).translation += movement;
+            std::get<Component::Transform&>(sphereEntities[i]).translation -= movement;
+        }
+    }
 }
 
 } // Namespace Scarlet.

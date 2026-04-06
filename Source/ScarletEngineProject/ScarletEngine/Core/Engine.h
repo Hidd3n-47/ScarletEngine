@@ -78,6 +78,8 @@ private:
 #endif // DEV_CONFIGURATION.
 
     void OnEvent(Event& event);
+
+    static void ApplySpherePhysics();
 };
 
 } // Namespace Scarlet.
