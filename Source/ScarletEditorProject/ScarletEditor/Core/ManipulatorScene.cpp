@@ -46,8 +46,8 @@ bool ManipulatorScene::Manipulate(ScarlEnt::IEntityHandle* selectedEntity) const
         break;
     }
 
-    const float snappingAmount = mIsSnapping ? mSnappingAmount : 0.0f;
-    if (ImGuizmo::Manipulate(&camera.viewMatrix[0][0], &camera.projectionMatrix[0][0], operation, ImGuizmo::WORLD, &matrix[0][0], nullptr, &snappingAmount))
+    const Math::Vec3 snappingAmount{ mIsSnapping ? mSnappingAmount : 0.0f };
+    if (ImGuizmo::Manipulate(&camera.viewMatrix[0][0], &camera.projectionMatrix[0][0], operation, ImGuizmo::WORLD, &matrix[0][0], nullptr, &snappingAmount.x))
     {
         Math::Trig::DecomposeTransformMatrixDegrees(matrix, transform.translation, transform.rotation, transform.scale);
     }
