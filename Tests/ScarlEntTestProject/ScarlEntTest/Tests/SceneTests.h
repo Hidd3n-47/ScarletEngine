@@ -48,6 +48,15 @@ public:
         testRegistry->AddTestCase("SceneTests", "NoAssertsWhenRemovingMutableEntity", NoAssertsWhenRemovingMutableEntity);
         testRegistry->AddTestCase("SceneTests", "NoAssertsWhenRemovingMutableEntityWithComponents", NoAssertsWhenRemovingMutableEntityWithComponents);
         testRegistry->AddTestCase("SceneTests", "RemovesComponentsOnMutableEntityWhenRemoved", RemovesComponentsOnMutableEntityWhenRemoved);
+        testRegistry->AddTestCase("SceneTests", "GetComponentsReturnAllComponentsWhenOnlyArchetypeSingleComponent", GetComponentsReturnAllComponentsWhenOnlyArchetypeSingleComponent);
+        testRegistry->AddTestCase("SceneTests", "GetComponentsReturnAllComponentsWhenOnlyArchetypeMultipleComponent", GetComponentsReturnAllComponentsWhenOnlyArchetypeMultipleComponent);
+        testRegistry->AddTestCase("SceneTests", "GetComponentsReturnAllComponentsWhenOnlyArchetypeMultipleComponentMultipleSubsets", GetComponentsReturnAllComponentsWhenOnlyArchetypeMultipleComponentMultipleSubsets);
+        testRegistry->AddTestCase("SceneTests", "GetComponentsReturnAllComponentsWhenOnlySparseSetSingleComponent", GetComponentsReturnAllComponentsWhenOnlySparseSetSingleComponent);
+        testRegistry->AddTestCase("SceneTests", "GetComponentsReturnAllComponentsWhenOnlySparseSetMultipleComponent", GetComponentsReturnAllComponentsWhenOnlySparseSetMultipleComponent);
+        testRegistry->AddTestCase("SceneTests", "GetComponentsReturnAllComponentsWhenOnlySparseSetMultipleComponentMultipleSubsets", GetComponentsReturnAllComponentsWhenOnlySparseSetMultipleComponentMultipleSubsets);
+        testRegistry->AddTestCase("SceneTests", "GetComponentsReturnAllComponentsWhenOnlySparseSetSingleComponent", GetComponentsReturnAllComponentsWhenCombinedSingleComponent);
+        testRegistry->AddTestCase("SceneTests", "GetComponentsReturnAllComponentsWhenOnlySparseSetMultipleComponent", GetComponentsReturnAllComponentsWhenCombinedMultipleComponent);
+        testRegistry->AddTestCase("SceneTests", "GetComponentsReturnAllComponentsWhenOnlySparseSetMultipleComponentMultipleSubsets", GetComponentsReturnAllComponentsWhenCombinedMultipleComponentMultipleSubsets);
 
 #ifdef DEV_CONFIGURATION
         testRegistry->AddTestCase("SceneTests", "AssertsWhenTryingToUseMutableEntityAfterRemovalInDebugMode", AssertsWhenTryingToUseMutableEntityAfterRemovalInDebugMode);
@@ -901,6 +910,189 @@ public:
         {
             passed = true;
         }
+
+        ScarlEnt::Registry::Instance().RemoveScene(scene);
+
+        return passed;
+    }
+
+    static bool GetComponentsReturnAllComponentsWhenOnlyArchetypeSingleComponent()
+    {
+        bool passed = true;
+
+        Scarlet::WeakHandle<ScarlEnt::Scene> scene = ScarlEnt::Registry::Instance().GetOrCreateScene("Testing");
+        auto entity = scene->AddEntity<Vec2>(std::move(Vec2{ 1, 2 }));
+
+        const auto result = scene->GetComponents<Vec2>();
+
+        passed &= result.size() == 1;
+        passed &= std::get<Vec2&>(result[0]) == Vec2{ 1, 2 };
+
+        ScarlEnt::Registry::Instance().RemoveScene(scene);
+
+        return passed;
+    }
+
+    static bool GetComponentsReturnAllComponentsWhenOnlyArchetypeMultipleComponent()
+    {
+        bool passed = true;
+
+        Scarlet::WeakHandle<ScarlEnt::Scene> scene = ScarlEnt::Registry::Instance().GetOrCreateScene("Testing");
+        auto entity = scene->AddEntity<Vec2, Vec3>(std::move(Vec2{ 1, 2 }), std::move(Vec3{ 1, 2, 3 }));
+
+        const auto result = scene->GetComponents<Vec2, Vec3>();
+
+        passed &= result.size() == 1;
+        passed &= std::get<Vec2&>(result[0]) == Vec2{ 1, 2 };
+        passed &= std::get<Vec3&>(result[0]) == Vec3{ 1, 2, 3 };
+
+        ScarlEnt::Registry::Instance().RemoveScene(scene);
+
+        return passed;
+    }
+
+    static bool GetComponentsReturnAllComponentsWhenOnlyArchetypeMultipleComponentMultipleSubsets()
+    {
+        bool passed = true;
+
+        Scarlet::WeakHandle<ScarlEnt::Scene> scene = ScarlEnt::Registry::Instance().GetOrCreateScene("Testing");
+        auto entity1 = scene->AddEntity<Vec2>(std::move(Vec2{ 1, 2 }));
+        auto entity2 = scene->AddEntity<Vec2, Vec3>(std::move(Vec2{ 12, 22 }), std::move(Vec3{ 1, 2, 3 }));
+
+        const auto result = scene->GetComponents<Vec2>();
+
+        passed &= result.size() == 2;
+        passed &= std::get<Vec2&>(result[0]) == Vec2{  1,  2 };
+        passed &= std::get<Vec2&>(result[1]) == Vec2{ 12, 22 };
+
+        ScarlEnt::Registry::Instance().RemoveScene(scene);
+
+        return passed;
+    }
+
+    static bool GetComponentsReturnAllComponentsWhenOnlySparseSetSingleComponent()
+    {
+        bool passed = true;
+
+        Scarlet::WeakHandle<ScarlEnt::Scene> scene = ScarlEnt::Registry::Instance().GetOrCreateScene("Testing");
+        auto entity = scene->AddMutableEntity();
+        entity.AddComponent<Vec2>(std::move(Vec2{ 1, 2 }));
+
+        const auto result = scene->GetComponents<Vec2>();
+
+        passed &= result.size() == 1;
+        passed &= std::get<Vec2&>(result[0]) == Vec2{ 1, 2 };
+
+        ScarlEnt::Registry::Instance().RemoveScene(scene);
+
+        return passed;
+    }
+
+    static bool GetComponentsReturnAllComponentsWhenOnlySparseSetMultipleComponent()
+    {
+        bool passed = true;
+
+        Scarlet::WeakHandle<ScarlEnt::Scene> scene = ScarlEnt::Registry::Instance().GetOrCreateScene("Testing");
+        auto entity = scene->AddMutableEntity();
+        entity.AddComponent<Vec2>(std::move(Vec2{ 1, 2 }));
+        entity.AddComponent<Vec3>(std::move(Vec3{ 1, 2, 3 }));
+
+        const auto result = scene->GetComponents<Vec2, Vec3>();
+
+        passed &= result.size() == 1;
+        passed &= std::get<Vec2&>(result[0]) == Vec2{ 1, 2 };
+        passed &= std::get<Vec3&>(result[0]) == Vec3{ 1, 2, 3 };
+
+        ScarlEnt::Registry::Instance().RemoveScene(scene);
+
+        return passed;
+    }
+
+    static bool GetComponentsReturnAllComponentsWhenOnlySparseSetMultipleComponentMultipleSubsets()
+    {
+        bool passed = true;
+
+        Scarlet::WeakHandle<ScarlEnt::Scene> scene = ScarlEnt::Registry::Instance().GetOrCreateScene("Testing");
+        auto entity1 = scene->AddMutableEntity();
+        entity1.AddComponent<Vec2>(std::move(Vec2{  1,  2 }));
+        auto entity2 = scene->AddMutableEntity();
+        entity2.AddComponent<Vec2>(std::move(Vec2{ 12, 22 }));
+        entity2.AddComponent<Vec3>(std::move(Vec3{  1,  2, 3 }));
+
+        const auto result = scene->GetComponents<Vec2>();
+
+        passed &= result.size() == 2;
+        passed &= std::get<Vec2&>(result[0]) == Vec2{ 1,  2 };
+        passed &= std::get<Vec2&>(result[1]) == Vec2{ 12, 22 };
+
+        ScarlEnt::Registry::Instance().RemoveScene(scene);
+
+        return passed;
+    }
+
+    static bool GetComponentsReturnAllComponentsWhenCombinedSingleComponent()
+    {
+        bool passed = true;
+
+        Scarlet::WeakHandle<ScarlEnt::Scene> scene = ScarlEnt::Registry::Instance().GetOrCreateScene("Testing");
+        auto entityA = scene->AddEntity<Vec2>(std::move(Vec2{ 1, 2 }));
+        auto entityM = scene->AddMutableEntity();
+        entityM.AddComponent<Vec2>(std::move(Vec2{ 3, 4 }));
+
+        const auto result = scene->GetComponents<Vec2>();
+
+        passed &= result.size() == 2;
+        passed &= std::get<Vec2&>(result[0]) == Vec2{ 1, 2 };
+        passed &= std::get<Vec2&>(result[1]) == Vec2{ 3, 4 };
+
+        ScarlEnt::Registry::Instance().RemoveScene(scene);
+
+        return passed;
+    }
+
+    static bool GetComponentsReturnAllComponentsWhenCombinedMultipleComponent()
+    {
+        bool passed = true;
+
+        Scarlet::WeakHandle<ScarlEnt::Scene> scene = ScarlEnt::Registry::Instance().GetOrCreateScene("Testing");
+        auto entityA = scene->AddEntity<Vec2, Vec3>(std::move(Vec2{ 1, 2 }), std::move(Vec3{ 1, 2, 3 }));
+        auto entityM = scene->AddMutableEntity();
+        entityM.AddComponent<Vec2>(std::move(Vec2{ 11, 21 }));
+        entityM.AddComponent<Vec3>(std::move(Vec3{ 11, 21, 31 }));
+
+        const auto result = scene->GetComponents<Vec2, Vec3>();
+
+        passed &= result.size() == 2;
+        passed &= std::get<Vec2&>(result[0]) == Vec2{  1,  2 };
+        passed &= std::get<Vec3&>(result[0]) == Vec3{  1,  2,  3 };
+        passed &= std::get<Vec2&>(result[1]) == Vec2{ 11, 21 };
+        passed &= std::get<Vec3&>(result[1]) == Vec3{ 11, 21, 31 };
+
+        ScarlEnt::Registry::Instance().RemoveScene(scene);
+
+        return passed;
+    }
+
+    static bool GetComponentsReturnAllComponentsWhenCombinedMultipleComponentMultipleSubsets()
+    {
+        bool passed = true;
+
+        Scarlet::WeakHandle<ScarlEnt::Scene> scene = ScarlEnt::Registry::Instance().GetOrCreateScene("Testing");
+        auto entity1A = scene->AddEntity<Vec2>(std::move(Vec2{ 1, 2 }));
+        auto entity2A = scene->AddEntity<Vec2, Vec3>(std::move(Vec2{ 2, 3 }), std::move(Vec3{ 1, 2, 3 }));
+        auto entity1M = scene->AddMutableEntity();
+        entity1M.AddComponent<Vec2>(std::move(Vec2{ 11, 21 }));
+        auto entity2M = scene->AddMutableEntity();
+        entity2M.AddComponent<Vec2>(std::move(Vec2{ 21, 31 }));
+        entity2M.AddComponent<Vec3>(std::move(Vec3{ 11, 21, 31 }));
+
+        const auto result = scene->GetComponents<Vec2>();
+
+        passed &= result.size() == 4;
+        passed &= std::get<Vec2&>(result[0]) == Vec2{  1,  2 };
+        passed &= std::get<Vec2&>(result[1]) == Vec2{  2,  3 };
+        passed &= std::get<Vec2&>(result[2]) == Vec2{ 11, 21 };
+        passed &= std::get<Vec2&>(result[3]) == Vec2{ 21, 31 };
 
         ScarlEnt::Registry::Instance().RemoveScene(scene);
 

@@ -131,6 +131,15 @@ public:
     template <typename Component, typename...ArchetypeComponents>
     [[nodiscard]] Component& GetComponent(const Scarlet::Ulid entityId);
 
+    /**
+     * @brief Get all subset of components that have all the requested components.
+     * @tparam Components The subset of components that an entity has to have to be included in this filter.
+     * @remark This is auto return type so that the returned vector uses move semantics instead of copied each time.
+     * @return A vector of a tuples (tuple of component references of those components requested).
+     */
+    template <typename...Components>
+    [[nodiscard]] auto GetComponents();
+
 #ifdef SCARLENT_TEST
     [[nodiscard]] inline uint64 GetMutableEntityComponentBitset(const uint32 runtimeMutableId) { return mMutableEntityToComponentBitset[runtimeMutableId]; }
     [[nodiscard]] inline const SparseSet<ISparseComponentArray*, Registry::COMPONENTS_PAGE_SIZE>& GetMutableComponentArrays() const { return mComponentIdToSparseSetArray; }
@@ -297,6 +306,47 @@ inline void ComponentManager::RemoveEntity(Scarlet::Ulid entityId)
 #ifdef DEV_CONFIGURATION
     mEntityIdToComponentViews.erase(entityId);
 #endif // DEV_CONFIGURATION.
+}
+
+template <typename...Components>
+inline auto ComponentManager::GetComponents()
+{
+    std::vector<std::tuple<Components&...>> result;
+
+    const uint64 componentsBitset = (Registry::Instance().GetOrRegisterComponentId<Components>().bitmask | ...);
+
+    for (auto& [bitset, archetype] : mArchetypeComponents)
+    {
+        if ((bitset & componentsBitset) == componentsBitset)
+        {
+            auto archetypeArrays = archetype->GetComponentArrays<Components...>();
+
+            for (size_t i = 0; i < std::get<0>(archetypeArrays)->componentArray.size(); ++i)
+            {
+                result.emplace_back(
+                    std::apply([i](auto*... arrays) { return std::tie(arrays->componentArray[i]...); }, archetypeArrays)
+                );
+            }
+        }
+    }
+
+    for (auto& [bitset, sparseSetEntities] : mComponentBitsetToMutableEntities)
+    {
+        if ((bitset & componentsBitset) == componentsBitset)
+        {
+            auto components = std::forward_as_tuple<SparseSet<Components, Registry::COMPONENT_BITSET_PAGE_SIZE>&...>(
+                *static_cast<SparseSet<Components, Registry::COMPONENT_BITSET_PAGE_SIZE>*>(mComponentIdToSparseSetArray[Registry::Instance().GetOrRegisterComponentId<Components>().id])...);
+
+            for (const uint32_t entityId : sparseSetEntities)
+            {
+                result.emplace_back(
+                    std::apply([entityId](auto&... sets) { return std::tie(sets[entityId]...); }, components)
+                );
+            }
+        }
+    }
+
+    return result;
 }
 
 template <typename Component, typename...ArchetypeComponents>

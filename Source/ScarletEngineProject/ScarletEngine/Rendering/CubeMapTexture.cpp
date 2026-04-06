@@ -39,8 +39,8 @@ CubeMapTexture::CubeMapTexture(const Filepath& filepath)
 
     stbi_uc* data = stbi_load(filepaths[0].c_str(), &width, &height, &channels, 0);
 
-    SCARLET_ASSERT(data && "Failed to load image at the given path: {}", filepaths[0].c_str());
-    SCARLET_ASSERT(channels == 4 && "Incorrect number of channels for the image at the given path: {}", filepaths[0].c_str());
+    SCARLET_ASSERT(data && "Failed to load image at the given path.");
+    SCARLET_ASSERT(channels == 4 && "Incorrect number of channels for the image at the given path.");
 
     glTextureStorage2D(mId, 1, GL_RGBA8, width, height);
     glTextureSubImage3D(mId, 0, 0, 0, 0, width, height, 1, GL_RGBA, GL_UNSIGNED_BYTE, data);
@@ -54,8 +54,8 @@ CubeMapTexture::CubeMapTexture(const Filepath& filepath)
     {
         data = stbi_load(filepaths[i].c_str(), &width, &height, &channels, 0);
 
-        SCARLET_ASSERT(data && "Failed to load image at the given path: {}", filepaths[i].c_str());
-        SCARLET_ASSERT(channels == 4 && "Incorrect number of channels for the image at the given path: {}", filepaths[i].c_str());
+        SCARLET_ASSERT(data && "Failed to load image at the given path.");
+        SCARLET_ASSERT(channels == 4 && "Incorrect number of channels for the image at the given path.");
 
         glTextureSubImage3D(mId, 0, 0, 0, i, width, height, 1, GL_RGBA, GL_UNSIGNED_BYTE, data);
 

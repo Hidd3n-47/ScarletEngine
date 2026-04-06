@@ -9,7 +9,6 @@ namespace Scarlet
 double Time::mSimulationFrameRate    = 0.0;
 uint64 Time::mPreviousTimeSinceEpoch = 0;
 uint64 Time::mTargetFrameTime        = 0;
-double Time::mFrameDeltaMs           = 0.0f;
 
 void Time::Init(const double simulationFrameRate)
 {

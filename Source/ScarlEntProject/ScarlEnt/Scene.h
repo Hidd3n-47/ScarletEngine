@@ -97,6 +97,18 @@ public:
      */
     [[nodiscard]] inline IEntityHandle* GetCameraEntityHandle() const { return mCameraEntity; }
 
+    /**
+     * @brief Get all subset of components that have all the requested components.
+     * @tparam Components The subset of components that an entity has to have to be included in this filter.
+     * @remark This is auto return type so that the returned vector uses move semantics instead of copied each time.
+     * @return A vector of a tuples (tuple of component references of those components requested).
+     */
+    template <typename...Components>
+    [[nodiscard]] inline auto GetComponents()
+    {
+        return mComponentManager.GetComponents<Components...>();
+    }
+
 #ifdef DEV_CONFIGURATION
     [[nodiscard]] inline const vector<IEntityHandle*>& GetEntityHandles()        const { return mEntityHandles; }
     [[nodiscard]] inline const vector<IEntityHandle*>& GetMutableEntityHandles() const { return mMutableEntityHandles; }
