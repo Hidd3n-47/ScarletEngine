@@ -1,12 +1,14 @@
 #pragma once
 
+#include "Defines.h"
+
 namespace Scarlet
 {
 
 /**
  * @class Time: A static class responsible for handling time and fixed update.
  */
-class Time
+class ENGINE_API Time
 {
 public:
     /**
