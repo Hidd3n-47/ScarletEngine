@@ -33,6 +33,12 @@ public:
      */
     static void RenderStringPropertyControl(const ScarlEnt::Property& property, const UiControlProperties& controlProperties = {});
     /**
+     * @brief Add a property control for an unsigned 32-bit int.
+     * @param property The property the control is for.
+     * @param controlProperties The properties of the control.
+     */
+    static void RenderUint32PropertyControl(const ScarlEnt::Property& property, const UiControlProperties& controlProperties = {});
+    /**
      * @brief Add a property control for a float.
      * @param property The property the control is for.
      * @param controlProperties The properties of the control.

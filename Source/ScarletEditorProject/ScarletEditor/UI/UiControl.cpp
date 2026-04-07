@@ -72,6 +72,29 @@ void UiControl::RenderStringPropertyControl(const ScarlEnt::Property& property, 
     property.SetPropertyValue(value);
 }
 
+void UiControl::RenderUint32PropertyControl(const ScarlEnt::Property& property, const UiControlProperties& controlProperties /* = {} */)
+{
+    uint32 value;
+    ReflectType::SetValueFromString(value, property.GetPropertyValue());
+
+    float lineHeight;
+    std::string propertyId;
+    RenderTwoColumnPropertyControl(lineHeight, propertyId, controlProperties);
+
+    ImGui::PushMultiItemsWidths(3, ImGui::CalcItemWidth());
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0.0f, 4.0f });
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 4);
+
+    int intValue = value;
+    ImGui::DragInt(("##Value" + propertyId).c_str(), &intValue, controlProperties.dragSpeed);
+
+    ImGui::PopStyleVar(2);
+    ImGui::PopItemWidth();
+    ImGui::Columns(1);
+
+    property.SetPropertyValue(ReflectType::GetStringFromValue(static_cast<uint32>(std::max(intValue, 0))));
+}
+
 void UiControl::RenderFloatPropertyControl(const ScarlEnt::Property& property, const UiControlProperties& controlProperties /* = {} */)
 {
     float value;

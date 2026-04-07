@@ -53,6 +53,12 @@ inline std::string ReflectType::GetStringFromValue<bool>(const bool value)
 }
 
 template <>
+inline std::string ReflectType::GetStringFromValue<uint32>(const uint32 value)
+{
+    return std::to_string(value);
+}
+
+template <>
 inline std::string ReflectType::GetStringFromValue<float>(const float value)
 {
     return std::to_string(value);
@@ -100,6 +106,13 @@ inline void ReflectType::SetValueFromString<bool>(bool& value, const std::string
 {
     const std::string str = std::string{ stringValue };
     value = str == "true";
+}
+
+template <>
+inline void ReflectType::SetValueFromString<uint32>(uint32& value, const std::string_view& stringValue)
+{
+    const std::string str = std::string{ stringValue };
+    value = std::stoi(str);
 }
 
 template <>

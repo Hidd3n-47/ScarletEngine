@@ -9,6 +9,7 @@ namespace ScarlEnt
 enum class PropertyType : unsigned char
 {
     FLOAT,
+    UINT32,
     BOOL,
     STRING,
     VEC3,

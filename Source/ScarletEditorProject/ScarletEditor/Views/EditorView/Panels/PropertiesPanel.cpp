@@ -43,33 +43,34 @@ void PropertiesPanel::Render()
         {
             for (auto& [propertyName, property] : *componentView.GetProperties())
             {
-                const std::string entityName = "Entity";
-
                 switch (property.GetType())
                 {
                 case ScarlEnt::PropertyType::BOOL:
-                    UiControl::RenderBoolPropertyControl(property, { .propertyName = propertyName, .propertyId = entityName });
+                    UiControl::RenderBoolPropertyControl(property, { .propertyName = propertyName, .propertyId = componentName });
                     break;
                 case ScarlEnt::PropertyType::STRING:
-                    UiControl::RenderStringPropertyControl(property, { .propertyName = propertyName, .propertyId = entityName });
+                    UiControl::RenderStringPropertyControl(property, { .propertyName = propertyName, .propertyId = componentName });
+                    break;
+                case ScarlEnt::PropertyType::UINT32:
+                    UiControl::RenderUint32PropertyControl(property, { .propertyName = propertyName, .propertyId = componentName });
                     break;
                 case ScarlEnt::PropertyType::FLOAT:
-                    UiControl::RenderFloatPropertyControl(property, { .propertyName = propertyName, .propertyId = entityName });
+                    UiControl::RenderFloatPropertyControl(property, { .propertyName = propertyName, .propertyId = componentName });
                     break;
                 case ScarlEnt::PropertyType::VEC3:
-                    UiControl::RenderVec3PropertyControl(property, { .propertyName = propertyName, .propertyId = entityName });
+                    UiControl::RenderVec3PropertyControl(property, { .propertyName = propertyName, .propertyId = componentName });
                     break;
                 case ScarlEnt::PropertyType::VEC4:
-                    UiControl::RenderVec4PropertyControl(property, { .propertyName = propertyName, .propertyId = entityName });
+                    UiControl::RenderVec4PropertyControl(property, { .propertyName = propertyName, .propertyId = componentName });
                     break;
                 case ScarlEnt::PropertyType::QUAT:
                 {
                     // Todo Christian Change this to render as a vec 3 using yaw, pitch and roll.
-                    UiControl::RenderAngle(property, { .propertyName = propertyName, .propertyId = entityName });
+                    UiControl::RenderAngle(property, { .propertyName = propertyName, .propertyId = componentName });
                     break;
                 }
                 case ScarlEnt::PropertyType::ASSET:
-                    UiControl::RenderAssetPropertyControl(property, { .propertyName = propertyName, .propertyId = entityName });
+                    UiControl::RenderAssetPropertyControl(property, { .propertyName = propertyName, .propertyId = componentName });
                     break;
                 default:
                     SCARLET_ERROR("Failed to create a UI Control for the reflected type: {} on component {}", property.GetTypeAsString(), componentName);
