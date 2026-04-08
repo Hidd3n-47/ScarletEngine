@@ -37,6 +37,7 @@ public:
     template <typename...Args>
     EntityHandle(const Scarlet::WeakHandle<ComponentManager> componentManagerRef, Args&&...args)
         : mComponentManagerRef(componentManagerRef)
+        , mIsValid(true)
     {
         mEntityId = mComponentManagerRef->AddEntity<ArchetypeComponents...>(std::forward<Args>(args)...);
     }
@@ -50,6 +51,7 @@ public:
      */
     EntityHandle(const Scarlet::WeakHandle<ComponentManager> componentManagerRef)
         : mComponentManagerRef(componentManagerRef)
+        , mIsValid(true)
     {
         mEntityId = mComponentManagerRef->AddEntity<ArchetypeComponents...>((ArchetypeComponents{}, ...));
     }
@@ -66,29 +68,23 @@ public:
     }
 
     /**
-     * @brief Get a constance reference to a component attached to an entity.
-     * @tparam Component The type of the component being requested.
-     * @return A constant reference to the component.
-     */
-    template <typename Component>
-    const Component& GetComponent() const
-    {
-        return mComponentManagerRef->GetComponent<Component, ArchetypeComponents...>(mEntityId);
-    }
-
-    /**
      * @brief Remove the immutable entity from the scene.
      */
     inline void DestroyEntity()
     {
+        mIsValid = false;
         mComponentManagerRef->RemoveEntity<ArchetypeComponents...>(mEntityId);
     }
 
-    DEBUG([[nodiscard]] inline uint64 GetRuntimeId() const override { return mEntityId; })
+    [[nodiscard]] inline uint64 GetRuntimeId() const DEBUG(override) { return mEntityId; }
+    [[nodiscard]] inline bool   IsValid()      const { return mIsValid; }
+
     DEBUG([[nodiscard]] inline const vector<ComponentView>& GetComponentViews() override { return mComponentManagerRef->GetEntityComponentView(mEntityId); })
 private:
     Scarlet::Ulid mEntityId;
     Scarlet::WeakHandle<ComponentManager> mComponentManagerRef;
+
+    bool mIsValid = false;
 };
 
 } // Namespace ScarlEnt.

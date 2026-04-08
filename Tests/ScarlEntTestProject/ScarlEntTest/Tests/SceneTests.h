@@ -140,10 +140,12 @@ public:
 
         const ScarlEnt::EntityHandle entity = scene->AddEntity<Vec2>(Vec2{ 0, 0 });
         scene->RemoveEntity(entity);
+        scene->PostUpdate();
 
         try
         {
             scene->RemoveEntity(entity);
+            scene->PostUpdate();
         }
         catch (std::runtime_error&)
         {
@@ -508,9 +510,11 @@ public:
         try
         {
             handle.RemoveComponent<Vec2>();
+            scene->PostUpdate();
         }
         catch (const std::runtime_error&)
         {
+            ScarlEnt::Registry::Instance().RemoveScene(scene);
             passed = true;
         }
 
@@ -554,6 +558,8 @@ public:
         handle.AddComponent<Vec2>();
         handle.RemoveComponent<Vec2>();
 
+        scene->PostUpdate();
+
         passed &= !handle.HasComponent<Vec2>();
 
         return passed;
@@ -570,6 +576,9 @@ public:
         passed &= handle.HasComponent<Vec2>();
 
         handle.RemoveComponent<Vec2>();
+
+        scene->PostUpdate();
+
         passed &= !handle.HasComponent<Vec2>();
 
         return passed;
@@ -584,10 +593,12 @@ public:
 
         handle.AddComponent<Vec2>();
         handle.RemoveComponent<Vec2>();
+        scene->PostUpdate();
 
         try
         {
             handle.RemoveComponent<Vec2>();
+            scene->PostUpdate();
         }
         catch (const std::runtime_error&)
         {
@@ -819,6 +830,7 @@ public:
         // Since the entity contains a vec3 each vector component is going to be multiplied by 2, 3, and 4 respectively.
 
         mutableEntity.RemoveComponent<Vec2>();
+        scene->PostUpdate();
 
         scene->Update();
         // Scene update should only multiply each vec3 vector component by 2, 3, and 4 respectively.
@@ -879,6 +891,7 @@ public:
         mutableEntity.AddComponent<Vec3>();
 
         mutableEntity.DestroyEntity();
+        scene->PostUpdate();
 
         auto componentArrays = componentManager->GetMutableComponentArrays();
 

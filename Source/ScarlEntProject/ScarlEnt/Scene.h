@@ -30,6 +30,11 @@ public:
     inline void FixedUpdate() { mComponentManager.FixedUpdate(); }
 
     /**
+     * @brief Called after the update to safely perform operations that could cause movement in the components and issues if called mid scene update.
+     */
+    inline void PostUpdate() { mComponentManager.PostUpdate(); }
+
+    /**
      * @brief Register a system that will act over a subset of components calling the update function.
      * @tparam Components The components the system acts on.
      * @param updateFunction The function acting on the components.

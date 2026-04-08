@@ -26,7 +26,7 @@ public:
      * @brief Get the delta time in seconds of the fixed update.
      * @return The fixed delta time in seconds.
      */
-    [[nodiscard]] inline static double GetFixedFrameDelta() { return 1'000.0 / static_cast<double>(mTargetFrameTime); }
+    [[nodiscard]] inline static double GetFixedFrameDelta() { return static_cast<double>(mTargetFrameTime) / 1'000; }
 private:
     static double mSimulationFrameRate;
     static uint64 mPreviousTimeSinceEpoch;

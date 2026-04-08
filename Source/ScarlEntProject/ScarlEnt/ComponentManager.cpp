@@ -65,6 +65,16 @@ void ComponentManager::Update()
     }
 }
 
+void ComponentManager::PostUpdate()
+{
+    for (const std::function<void()>& func : mFunctionsToExecutePostUpdate)
+    {
+        func();
+    }
+
+    mFunctionsToExecutePostUpdate.clear();
+}
+
 void ComponentManager::FixedUpdate()
 {
     for (ISystem* system : mFixedSystems)
@@ -101,24 +111,27 @@ MutableEntityId ComponentManager::AddMutableEntity()
 
 void ComponentManager::RemoveMutableEntity(const uint32 mutableEntityRuntimeId)
 {
-    const uint64 bitset = mMutableEntityToComponentBitset[mutableEntityRuntimeId];
-
-    for (uint32 i{ 0 }; i < sizeof(bitset); ++i)
+    mFunctionsToExecutePostUpdate.emplace_back([&, mutableEntityRuntimeId]
     {
-        if (const uint64 bitmask = (1ull << i) & bitset; bitmask)
+        const uint64 bitset = mMutableEntityToComponentBitset[mutableEntityRuntimeId];
+
+        for (uint32 i{ 0 }; i < sizeof(bitset); ++i)
         {
-            const uint32 componentId = Registry::Instance().GetComponentIdFromBitmask(bitmask);
+            if (const uint64 bitmask = (1ull << i) & bitset; bitmask)
+            {
+                const uint32 componentId = Registry::Instance().GetComponentIdFromBitmask(bitmask);
 
-            mComponentIdToSparseSetArray[componentId]->Remove(mutableEntityRuntimeId);
+                mComponentIdToSparseSetArray[componentId]->Remove(mutableEntityRuntimeId);
+            }
         }
-    }
 
-    mComponentBitsetToMutableEntities[bitset].erase(mutableEntityRuntimeId);
-    mMutableEntityToComponentBitset.Remove(mutableEntityRuntimeId);
+        mComponentBitsetToMutableEntities[bitset].erase(mutableEntityRuntimeId);
+        mMutableEntityToComponentBitset.Remove(mutableEntityRuntimeId);
 
 #ifdef DEV_CONFIGURATION
-    mMutableEntityIdToComponentViews.erase(mutableEntityRuntimeId);
+        mMutableEntityIdToComponentViews.erase(mutableEntityRuntimeId);
 #endif // DEV_CONFIGURATION.
+    });
 }
 
 } // Namespace ScarlEnt.

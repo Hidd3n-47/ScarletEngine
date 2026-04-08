@@ -1,13 +1,20 @@
 #pragma once
 
+#include <functional>
+
 #include <ScarlEnt/RTTI/Rtti.h>
+
+#include <ScarletCore/PrimitiveTypes.h>
 
 namespace Scarlet::Component
 {
 
 struct SphereCollider
 {
-    float radius = 0.5f;
+    float  radius = 0.5f;
+    uint32 layer  = 0;
+
+    std::function<void(uint32)> onCollisionCallback;
 
     SCARLET_COMPONENT(SphereCollider)
 };

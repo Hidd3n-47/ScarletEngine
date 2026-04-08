@@ -6,6 +6,8 @@
 #include <ScarletMath/Math.h>
 #include <ScarletMath/Trig.h>
 
+#ifdef DEV_CONFIGURATION
+
 #include <ScarlEnt/MutableEntityHandle.h>
 
 #include <ScarletCoreEcs/Components/Camera.h>
@@ -61,3 +63,5 @@ bool ManipulatorScene::Manipulate(ScarlEnt::IEntityHandle* selectedEntity) const
 }
 
 } // Namespace Scarlet::Editor.
+
+#endif // DEV_CONFIGURATION.

@@ -18,6 +18,13 @@ void SphereCollider::GenerateProperties()
         [this] { return ReflectType::GetStringFromValue(this->radius); },
         [this](const std::string_view& stringValue) { ReflectType::SetValueFromString(this->radius, stringValue); }
     };
+
+    mProperties["layer"] = ScarlEnt::Property {
+        ScarlEnt::PropertyType::UINT32,
+        ScarlEnt::Registry::Instance().GetOrRegisterComponentId<SphereCollider>(),
+        [this] { return ReflectType::GetStringFromValue(this->layer); },
+        [this](const std::string_view& stringValue) { ReflectType::SetValueFromString(this->layer, stringValue); }
+    };
 };
 
 #endif // DEV_CONFIGURATION.

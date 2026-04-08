@@ -62,6 +62,11 @@ public:
     void Update();
 
     /**
+     * @brief Post update is called after all the systems have been iterated through, allowing for safe removal of components.
+     */
+    void PostUpdate();
+
+    /**
      * @brief Go through each registered system and update at a fixed frame rate. Each archetype will be iterated over and compared to the required components of the system, \\n
      * updating the components based on the registered update function if so.
      */
@@ -171,6 +176,8 @@ private:
     // Systems.
     vector<ISystem*> mSystems;
     vector<ISystem*> mFixedSystems;
+
+    vector<std::function<void()>> mFunctionsToExecutePostUpdate;
 };
 
 /* ============================================================================================================================== */
@@ -251,37 +258,40 @@ inline Component& ComponentManager::AddComponent(const uint32 mutableEntityRunti
 template <typename Component>
 inline void ComponentManager::RemoveComponent(const uint32 mutableEntityRuntimeId)
 {
-    const ComponentId componentId = Registry::Instance().GetOrRegisterComponentId<Component>();
-
-    SCARLENT_ASSERT(mComponentIdToSparseSetArray.Contains(componentId.id) && "Trying to remove a component that hasn't been added.");
-
-    const uint64 entityBitset = mMutableEntityToComponentBitset.Pop(mutableEntityRuntimeId);
-    const uint64 newBitset = entityBitset & ~componentId.bitmask;
-
-    if (!mMutableEntityToComponentBitset.Contains(mutableEntityRuntimeId))
+    mFunctionsToExecutePostUpdate.emplace_back([&, mutableEntityRuntimeId]
     {
-        mMutableEntityToComponentBitset.Add(mutableEntityRuntimeId, newBitset);
-    }
+        const ComponentId componentId = Registry::Instance().GetOrRegisterComponentId<Component>();
 
-    mMutableEntityToComponentBitset[mutableEntityRuntimeId] = newBitset;
+        SCARLENT_ASSERT(mComponentIdToSparseSetArray.Contains(componentId.id) && "Trying to remove a component that hasn't been added.");
 
-    mComponentBitsetToMutableEntities[entityBitset].erase(mutableEntityRuntimeId);
-    mComponentBitsetToMutableEntities[newBitset].emplace(mutableEntityRuntimeId);
+        const uint64 entityBitset = mMutableEntityToComponentBitset.Pop(mutableEntityRuntimeId);
+        const uint64 newBitset    = entityBitset & ~componentId.bitmask;
 
-    SCARLENT_ASSERT(static_cast<MutableComponentArray<Component>*>(mComponentIdToSparseSetArray[componentId.id])->Contains(mutableEntityRuntimeId) && "Trying to remove a component that hasn't been added to entity.");
-    static_cast<MutableComponentArray<Component>*>(mComponentIdToSparseSetArray[componentId.id])->Remove(mutableEntityRuntimeId);
+        if (!mMutableEntityToComponentBitset.Contains(mutableEntityRuntimeId))
+        {
+            mMutableEntityToComponentBitset.Add(mutableEntityRuntimeId, newBitset);
+        }
+
+        mMutableEntityToComponentBitset[mutableEntityRuntimeId] = newBitset;
+
+        mComponentBitsetToMutableEntities[entityBitset].erase(mutableEntityRuntimeId);
+        mComponentBitsetToMutableEntities[newBitset].emplace(mutableEntityRuntimeId);
+
+        SCARLENT_ASSERT(static_cast<MutableComponentArray<Component>*>(mComponentIdToSparseSetArray[componentId.id])->Contains(mutableEntityRuntimeId) && "Trying to remove a component that hasn't been added to entity.");
+        static_cast<MutableComponentArray<Component>*>(mComponentIdToSparseSetArray[componentId.id])->Remove(mutableEntityRuntimeId);
 
 #ifdef DEV_CONFIGURATION
-    auto& vector = mMutableEntityIdToComponentViews[mutableEntityRuntimeId];
-    for (auto it = vector.begin(); it != vector.end(); ++it)
-    {
-        if (it->GetComponentId().id == componentId.id) 
+        auto& vector = mMutableEntityIdToComponentViews[mutableEntityRuntimeId];
+        for (auto it = vector.begin(); it != vector.end(); ++it)
         {
-            vector.erase(it);
-            return;
+            if (it->GetComponentId().id == componentId.id) 
+            {
+                vector.erase(it);
+                return;
+            }
         }
-    }
 #endif // DEV_CONFIGURATION.
+    });
 }
 
 template <typename Component>
@@ -296,16 +306,19 @@ inline Component& ComponentManager::GetMutableEntityComponent(const uint32 mutab
 template <typename... ArchetypeComponents>
 inline void ComponentManager::RemoveEntity(Scarlet::Ulid entityId)
 {
-    SCARLENT_ASSERT(mEntityIdToArchetypeComponentArray.contains(entityId) && "Trying to remove an entity that has not been created.");
+    mFunctionsToExecutePostUpdate.emplace_back([&, entityId]
+    {
+        SCARLENT_ASSERT(mEntityIdToArchetypeComponentArray.contains(entityId) && "Trying to remove an entity that has not been created.");
 
-    Archetype* array = mEntityIdToArchetypeComponentArray[entityId];
-    mEntityIdToArchetypeComponentArray.erase(entityId);
+        Archetype* array = mEntityIdToArchetypeComponentArray[entityId];
+        mEntityIdToArchetypeComponentArray.erase(entityId);
 
-    array->RemoveEntity(entityId);
+        array->RemoveEntity(entityId);
 
 #ifdef DEV_CONFIGURATION
-    mEntityIdToComponentViews.erase(entityId);
+        mEntityIdToComponentViews.erase(entityId);
 #endif // DEV_CONFIGURATION.
+    });
 }
 
 template <typename...Components>

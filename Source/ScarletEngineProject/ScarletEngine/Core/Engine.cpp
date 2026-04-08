@@ -5,8 +5,9 @@
 
 #include <ScarlEnt/Scene.h>
 
-#include <ScarletCoreEcs/Components/StaticMesh.h>
 #include <ScarletCoreEcs/Components/Transform.h>
+#include <ScarletCoreEcs/Components/StaticMesh.h>
+#include <ScarletCoreEcs/Components/SphereCollider.h>
 
 #include "Events/Event.h"
 #include "Events/ApplicationEvents.h"
@@ -118,7 +119,8 @@ void Engine::Run() const
         WindowManager::ApiPoll();
 
 #ifdef DEV_CONFIGURATION
-        if (WeakHandle<ScarlEnt::Scene> scene = ScarlEnt::Registry::Instance().GetActiveScene();  scene.IsValid()) [[unlikely]]
+        WeakHandle<ScarlEnt::Scene> scene = ScarlEnt::Registry::Instance().GetActiveScene();
+        if (scene.IsValid()) [[likely]]
         {
             scene->Update();
 
@@ -132,7 +134,8 @@ void Engine::Run() const
 
         if (mBeginRenderEvent) mBeginRenderEvent();
 #else // DEV_CONFIGURATION.
-        ScarlEnt::Registry::Instance().GetActiveScene()->Update();
+        WeakHandle<ScarlEnt::Scene> scene = ScarlEnt::Registry::Instance().GetActiveScene();
+        scene->Update();
 #endif // !DEV_CONFIGURATION.
 
         Renderer::Instance().Render();
@@ -156,7 +159,10 @@ void Engine::Run() const
 #endif // DEV_CONFIGURATION.
 
         mMainWindow->Update();
-
+#ifdef DEV_CONFIGURATION
+        if (scene.IsValid()) [[likely]]
+#endif // DEV_CONFIGURATION.
+            scene->PostUpdate();
         ScarlEnt::Registry::Instance().PostUpdate();
 
         DEBUG(if (mEditorPostUpdateEvent) mEditorPostUpdateEvent());
@@ -236,11 +242,17 @@ void Engine::ApplySpherePhysics()
                 continue;
             }
 
-            const Math::Vec3 directionVector = std::get<Component::Transform&>(sphereEntities[j]).translation - std::get<Component::Transform&>(sphereEntities[i]).translation;
+            Component::Transform& transformI   = std::get<Component::Transform&>(sphereEntities[i]);
+            Component::Transform& transformJ   = std::get<Component::Transform&>(sphereEntities[j]);
+
+            Component::SphereCollider& sphereI = std::get<Component::SphereCollider&>(sphereEntities[i]);
+            Component::SphereCollider& sphereJ = std::get<Component::SphereCollider&>(sphereEntities[j]);
+
+            const Math::Vec3 directionVector = transformJ.translation - transformI.translation;
             const float distSquared = Math::MagnitudeSquared(directionVector);
 
-            const float radiusI = std::get<Component::SphereCollider&>(sphereEntities[i]).radius * std::get<Component::Transform&>(sphereEntities[i]).scale.x;
-            const float radiusJ = std::get<Component::SphereCollider&>(sphereEntities[j]).radius * std::get<Component::Transform&>(sphereEntities[j]).scale.x;
+            const float radiusI = sphereI.radius * transformI.scale.x;
+            const float radiusJ = sphereJ.radius * transformJ.scale.x;
             const float minDistanceSquared = static_cast<float>(std::pow(radiusI + radiusJ, 2));
 
             if (distSquared >= minDistanceSquared)
@@ -253,8 +265,17 @@ void Engine::ApplySpherePhysics()
             const float halfDifference = (minDist - dist) * 0.5f;
 
             const Math::Vec3 movement = directionVector / dist * halfDifference;
-            std::get<Component::Transform&>(sphereEntities[j]).translation += movement;
-            std::get<Component::Transform&>(sphereEntities[i]).translation -= movement;
+            transformJ.translation += movement;
+            transformI.translation -= movement;
+
+            if (sphereI.onCollisionCallback)
+            {
+                sphereI.onCollisionCallback(sphereJ.layer);
+            }
+            if (sphereJ.onCollisionCallback)
+            {
+                sphereJ.onCollisionCallback(sphereI.layer);
+            }
         }
     }
 }

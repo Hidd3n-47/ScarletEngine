@@ -64,7 +64,7 @@ public:
     template <typename T, typename...Args>
     inline T& AddComponent(Args&&...args)
     {
-        DEBUG(SCARLENT_ASSERT(mIsValid && "Trying to add component on mutable entity that has been marked as invalid."));
+        SCARLENT_ASSERT(mIsValid && "Trying to add component on mutable entity that has been marked as invalid.");
 
         return mComponentManagerRef->AddComponent<T>(mEntityId.runtimeId, std::forward<Args>(args)...);
     }
@@ -76,7 +76,7 @@ public:
     template <typename T>
     inline void RemoveComponent()
     {
-        DEBUG(SCARLENT_ASSERT(mIsValid && "Trying to remove component on mutable entity that has been marked as invalid."));
+        SCARLENT_ASSERT(mIsValid && "Trying to remove component on mutable entity that has been marked as invalid.");
 
         mComponentManagerRef->RemoveComponent<T>(mEntityId.runtimeId);
     }
@@ -94,7 +94,7 @@ public:
     template <typename Component>
     [[nodiscard]] inline Component& GetComponent()
     {
-        DEBUG(SCARLENT_ASSERT(mIsValid && "Trying to get component on mutable entity that has been marked as invalid."));
+        SCARLENT_ASSERT(mIsValid && "Trying to get component on mutable entity that has been marked as invalid.");
         return mComponentManagerRef->GetMutableEntityComponent<Component>(mEntityId.runtimeId);
     }
 
@@ -130,9 +130,10 @@ public:
 
     [[nodiscard]] inline uint64 GetComponentBitset() { return mComponentManagerRef->GetMutableEntityComponentBitset(mEntityId.runtimeId); }
     [[nodiscard]] inline bool IsMutable() const override { return true; }
+    [[nodiscard]] inline bool IsValid()   const { return mIsValid; }
+    [[nodiscard]] inline uint64 GetRuntimeId() const DEBUG(override) { return mEntityId.runtimeId; }
 
 #ifdef DEV_CONFIGURATION
-    [[nodiscard]] inline uint64 GetRuntimeId() const override { return mEntityId.runtimeId; }
     [[nodiscard]] inline const vector<ComponentView>& GetComponentViews() override { return mComponentManagerRef->GetMutableEntityComponentView(mEntityId.runtimeId); }
 #endif // DEV_CONFIGURATION.
 private:
@@ -140,7 +141,7 @@ private:
     DEBUG(Scarlet::WeakHandle<Scene> mParent);
     Scarlet::WeakHandle<ComponentManager> mComponentManagerRef;
 
-    DEBUG(bool mIsValid = false);
+    bool mIsValid = false;
 };
 
 } // Namespace ScarlEnt.

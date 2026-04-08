@@ -78,5 +78,5 @@ project "ScarletEngine"
 
     filter "configurations:Release"
         runtime "Release"
-        defines "ENGINE_BUILD"
+        defines { "ENGINE_BUILD", "SCARLET_ENGINE_PATH=R\"($(SolutionDir))\"" }
         optimize "On"

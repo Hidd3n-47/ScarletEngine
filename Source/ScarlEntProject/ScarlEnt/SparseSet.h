@@ -71,6 +71,7 @@ public:
      * @tparam Args The argument types used to construct \c T.
      * @param id The unique ID of the item being added to the \ref SparseSet.
      * @param args The arguments forwarded to construct type \c T.
+     * @return A reference to the object added to the \ref SparseSet.
      */
     template <typename...Args>
     inline T& Add(const uint64 id, Args&&...args)
