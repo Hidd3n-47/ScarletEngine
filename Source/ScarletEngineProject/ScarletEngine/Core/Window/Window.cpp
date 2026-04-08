@@ -18,6 +18,11 @@ void Window::Update() const
     glfwSwapBuffers(mWindowHandle);
 }
 
+void Window::SetShowCursor(const bool showCursor) const
+{
+    glfwSetInputMode(mWindowHandle, GLFW_CURSOR, showCursor ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
+}
+
 void Window::SetPosition(const int positionX, const int positionY) const
 {
     if (positionX == positionY && positionX == -1)

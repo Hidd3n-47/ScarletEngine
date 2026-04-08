@@ -121,14 +121,17 @@ void ViewportPanel::RenderViewportToolbar(SelectionManager& selectionManager)
     if (ImGui::ImageButton("Play", playIconId, ImVec2{ iconWidth, iconWidth }, ImVec2{ 0.0f, 1.0f }, ImVec2{ 1.0f, 0.0f }) && !mGameSimulating)
     {
         mGameSimulating = true;
-        WeakHandle<ScarlEnt::Scene> scene = EditorManager::Instance().GetGameScene();
 
+        Engine::Instance().GetMainWindow()->SetShowCursor(false);
+
+        WeakHandle<ScarlEnt::Scene> scene = EditorManager::Instance().GetGameScene();
         scene->RemoveAllSystems();
         scene->Init();
     }
 
     ImGui::SameLine(viewportSize.x * 0.5f - 25.0f);
-    if (ImGui::ImageButton("Stop", stopIconId, ImVec2{ iconWidth, iconWidth }, ImVec2{ 0.0f, 1.0f }, ImVec2{ 1.0f, 0.0f }) && mGameSimulating)
+    if (ImGui::ImageButton("Stop", stopIconId, ImVec2{ iconWidth, iconWidth }, ImVec2{ 0.0f, 1.0f }, ImVec2{ 1.0f, 0.0f }) && mGameSimulating ||
+        InputManager::IsKeyPressed(KeyCode::KEY_ESCAPE) && mGameSimulating)
     {
         const std::string renamedSceneName{ "Reloading..." };
 
@@ -138,6 +141,8 @@ void ViewportPanel::RenderViewportToolbar(SelectionManager& selectionManager)
         Engine::Instance().ReloadGame();
 
         EditorManager::Instance().OpenScene(EditorManager::Instance().GetCurrentScenePath());
+
+        Engine::Instance().GetMainWindow()->SetShowCursor(true);
 
         mGameSimulating = false;
     }

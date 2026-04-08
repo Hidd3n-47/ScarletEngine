@@ -46,6 +46,11 @@ public:
     void Update() const;
 
     /**
+     * @brief Set if the cursor is visible or not. This doesn't force the cursor to be at a location, meaning mouse moves still occur.
+     * @param showCursor \c true if the cursor is visible, \c false otherwise.
+     */
+    void SetShowCursor(const bool showCursor) const;
+    /**
      * @brief Set the position of the window. Both -1 on \c positionX and \c positionY will center the window.
      * @param positionX The position relative to the x-axis.
      * @param positionY The position relative to the y-axis.
