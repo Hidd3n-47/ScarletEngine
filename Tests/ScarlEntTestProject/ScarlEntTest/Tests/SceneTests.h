@@ -369,7 +369,7 @@ public:
 
         ScarlEnt::MutableEntityHandle handle = scene->AddMutableEntity();
 
-        passed &= handle.GetId().runtimeId == 0;
+        passed &= handle.GetEntityId().runtimeId == 0;
 
         ScarlEnt::Registry::Instance().RemoveScene(scene);
 
@@ -386,9 +386,9 @@ public:
         ScarlEnt::MutableEntityHandle handle1 = scene->AddMutableEntity();
         ScarlEnt::MutableEntityHandle handle2 = scene->AddMutableEntity();
 
-        passed &= handle0.GetId().runtimeId == 0;
-        passed &= handle1.GetId().runtimeId == 1;
-        passed &= handle2.GetId().runtimeId == 2;
+        passed &= handle0.GetEntityId().runtimeId == 0;
+        passed &= handle1.GetEntityId().runtimeId == 1;
+        passed &= handle2.GetEntityId().runtimeId == 2;
 
         return passed;
     }

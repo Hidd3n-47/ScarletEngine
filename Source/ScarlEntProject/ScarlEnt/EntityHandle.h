@@ -64,7 +64,7 @@ public:
     template <typename Component>
     Component& GetComponent()
     {
-        return mComponentManagerRef->GetComponent<Component, ArchetypeComponents...>(mEntityId);
+        return mComponentManagerRef->GetComponent<Component, ArchetypeComponents...>(mEntityId.uniqueId);
     }
 
     /**
@@ -76,12 +76,12 @@ public:
         mComponentManagerRef->RemoveEntity<ArchetypeComponents...>(mEntityId);
     }
 
-    [[nodiscard]] inline uint64 GetRuntimeId() const DEBUG(override) { return mEntityId; }
-    [[nodiscard]] inline bool   IsValid()      const { return mIsValid; }
+    [[nodiscard]] inline EntityId GetEntityId() const final { return mEntityId; }
+    [[nodiscard]] inline bool     IsValid()     const       { return mIsValid;  }
 
-    DEBUG([[nodiscard]] inline const vector<ComponentView>& GetComponentViews() override { return mComponentManagerRef->GetEntityComponentView(mEntityId); })
+    DEBUG([[nodiscard]] inline const vector<ComponentView>& GetComponentViews() override { return mComponentManagerRef->GetEntityComponentView(mEntityId.uniqueId); })
 private:
-    Scarlet::Ulid mEntityId;
+    EntityId mEntityId;
     Scarlet::WeakHandle<ComponentManager> mComponentManagerRef;
 
     bool mIsValid = false;

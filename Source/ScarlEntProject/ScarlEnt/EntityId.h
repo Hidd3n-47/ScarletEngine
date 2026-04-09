@@ -6,10 +6,10 @@
 namespace ScarlEnt
 {
 
-struct MutableEntityId
+struct EntityId
 {
-    uint32        runtimeId{};
-    Scarlet::Ulid uniqueId{};
+    uint64        runtimeId{};
+    Scarlet::Ulid uniqueId {};
 };
 
 } // Namespace ScarlEnt.

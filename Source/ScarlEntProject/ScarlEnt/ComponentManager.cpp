@@ -98,18 +98,18 @@ void ComponentManager::FixedUpdate()
     }
 }
 
-MutableEntityId ComponentManager::AddMutableEntity()
+EntityId ComponentManager::AddMutableEntity()
 {
     constexpr uint64 noComponentBitset = 0;
-    const uint32 runtimeId = mMutableEntitiesId++;
+    const uint64 runtimeId = mMutableEntitiesId++;
 
     mComponentBitsetToMutableEntities[noComponentBitset].emplace(runtimeId);
     mMutableEntityToComponentBitset.Add(runtimeId, noComponentBitset);
 
-    return MutableEntityId{ .runtimeId = runtimeId, .uniqueId = Scarlet::Ulid{} };
+    return EntityId{ .runtimeId = runtimeId, .uniqueId = Scarlet::Ulid{} };
 }
 
-void ComponentManager::RemoveMutableEntity(const uint32 mutableEntityRuntimeId)
+void ComponentManager::RemoveMutableEntity(const uint64 mutableEntityRuntimeId)
 {
     mFunctionsToExecutePostUpdate.emplace_back([&, mutableEntityRuntimeId]
     {

@@ -1,5 +1,7 @@
 #include "Scene.h"
 
+#include <ranges>
+
 namespace ScarlEnt
 {
 
@@ -12,7 +14,7 @@ Scene::Scene(const std::string_view friendlyName)
 #ifdef DEV_CONFIGURATION
 Scene::~Scene()
 {
-    for (const IEntityHandle* handle : mEntityHandles)
+    for (const IEntityHandle* handle : mEntityIdToHandleMap | std::views::values)
     {
         delete handle;
     }
@@ -35,11 +37,19 @@ MutableEntityHandle Scene::AddMutableEntity()
 {
 #ifdef DEV_CONFIGURATION
     auto handle = MutableEntityHandle{ Scarlet::WeakHandle{ this }, Scarlet::WeakHandle{ &mComponentManager } };
-    mMutableEntityHandles.emplace_back(new MutableEntityHandle(handle));
+#else // ^^^ DEV_CONFIGURATION ^^^ | vvv !DEV_CONFIGURATION vvv
+    auto handle = MutableEntityHandle{ Scarlet::WeakHandle{ &mComponentManager } };
+#endif // ^^^ !DEV_CONFIGURATION ^^^
+
+    const Scarlet::Ulid entityId{ handle.GetEntityId().uniqueId };
+
+    mEntityIdToHandleMap[entityId] = new MutableEntityHandle(handle);
+
+#ifdef DEV_CONFIGURATION
+    mMutableEntityHandles.emplace_back(mEntityIdToHandleMap[entityId]);
+#endif // ^^^ DEV_CONFIGURATION ^^^
+
     return handle;
-#else // DEV_CONFIGURATION.
-    return MutableEntityHandle{ Scarlet::WeakHandle{ &mComponentManager } };
-#endif // !DEV_CONFIGURATION
 }
 
 } // Namespace ScarlEnt.

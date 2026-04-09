@@ -2,6 +2,7 @@
 
 #include <ScarletCore/WeakHandle.h>
 
+#include "Defines.h"
 #include "IEntityhandle.h"
 #include "ComponentManager.h"
 
@@ -124,20 +125,19 @@ public:
     }
 
 #ifdef SCARLENT_TEST
-    [[nodiscard]] inline MutableEntityId GetId() const { return mEntityId; }
     [[nodiscard]] inline Scarlet::WeakHandle<ComponentManager> GetComponentManagerRef() const { return mComponentManagerRef; }
 #endif // SCARLENT_TEST.
 
-    [[nodiscard]] inline uint64 GetComponentBitset() { return mComponentManagerRef->GetMutableEntityComponentBitset(mEntityId.runtimeId); }
-    [[nodiscard]] inline bool IsMutable() const override { return true; }
-    [[nodiscard]] inline bool IsValid()   const { return mIsValid; }
-    [[nodiscard]] inline uint64 GetRuntimeId() const DEBUG(override) { return mEntityId.runtimeId; }
+    [[nodiscard]] inline uint64   GetComponentBitset()      { return mComponentManagerRef->GetMutableEntityComponentBitset(mEntityId.runtimeId); }
+    [[nodiscard]] inline bool     IsValid()     const       { return mIsValid; }
+    [[nodiscard]] inline bool     IsMutable()   const final { return true; }
+    [[nodiscard]] inline EntityId GetEntityId() const final { return mEntityId; }
 
 #ifdef DEV_CONFIGURATION
-    [[nodiscard]] inline const vector<ComponentView>& GetComponentViews() override { return mComponentManagerRef->GetMutableEntityComponentView(mEntityId.runtimeId); }
+    [[nodiscard]] inline const vector<ComponentView>& GetComponentViews() final { return mComponentManagerRef->GetMutableEntityComponentView(mEntityId.runtimeId); }
 #endif // DEV_CONFIGURATION.
 private:
-    MutableEntityId mEntityId;
+    EntityId mEntityId;
     DEBUG(Scarlet::WeakHandle<Scene> mParent);
     Scarlet::WeakHandle<ComponentManager> mComponentManagerRef;
 

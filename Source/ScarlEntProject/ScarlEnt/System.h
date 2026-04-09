@@ -32,7 +32,7 @@ struct ISystem
      * @param entityIds The runtime entity identifiers of mutable entities with the subset of components.
      * @param componentSparseSet The \ref SparseSet to the component arrays.
      */
-    virtual void UpdateSparseSet(const std::unordered_set<uint32>& entityIds, SparseSet<ISparseComponentArray*, Registry::COMPONENTS_PAGE_SIZE>& componentSparseSet) = 0;
+    virtual void UpdateSparseSet(const std::unordered_set<uint64>& entityIds, SparseSet<ISparseComponentArray*, Registry::COMPONENTS_PAGE_SIZE>& componentSparseSet) = 0;
 
     uint64 componentBitset = 0;
 };
@@ -74,7 +74,7 @@ struct System : ISystem
     /**
      * @copydoc ISystem::UpdateSparseSet
      */
-    void UpdateSparseSet(const std::unordered_set<uint32>& entityIds, SparseSet<ISparseComponentArray*, Registry::COMPONENTS_PAGE_SIZE>& componentSparseSet) override
+    void UpdateSparseSet(const std::unordered_set<uint64>& entityIds, SparseSet<ISparseComponentArray*, Registry::COMPONENTS_PAGE_SIZE>& componentSparseSet) override
     {
         auto components = std::forward_as_tuple<SparseSet<Components, Registry::COMPONENT_BITSET_PAGE_SIZE>&...>(
             *static_cast<SparseSet<Components, Registry::COMPONENT_BITSET_PAGE_SIZE>*>(componentSparseSet[Registry::Instance().GetOrRegisterComponentId<Components>().id])...);

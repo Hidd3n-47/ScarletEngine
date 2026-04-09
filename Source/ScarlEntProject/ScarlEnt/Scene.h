@@ -114,6 +114,8 @@ public:
         return mComponentManager.GetComponents<Components...>();
     }
 
+    [[nodiscard]] inline IEntityHandle* GetIEntityHandle(const Scarlet::Ulid uniqueId) const { return mEntityIdToHandleMap.at(uniqueId); }
+
 #ifdef DEV_CONFIGURATION
     [[nodiscard]] inline const vector<IEntityHandle*>& GetEntityHandles()        const { return mEntityHandles; }
     [[nodiscard]] inline const vector<IEntityHandle*>& GetMutableEntityHandles() const { return mMutableEntityHandles; }
@@ -137,6 +139,8 @@ private:
 
     DEBUG(vector<IEntityHandle*> mEntityHandles;)
     DEBUG(vector<IEntityHandle*> mMutableEntityHandles;)
+
+    unordered_map<Scarlet::Ulid, IEntityHandle*> mEntityIdToHandleMap;
 };
 
 /* ============================================================================================================================== */
@@ -162,19 +166,23 @@ inline EntityHandle<ArchetypeComponents...> Scene::AddEntity()
 template <typename... ArchetypeComponents, typename... Args>
 inline EntityHandle<ArchetypeComponents...> Scene::AddEntity(Args&&... args)
 {
-#ifdef DEV_CONFIGURATION
     auto handle = EntityHandle<ArchetypeComponents...>{ Scarlet::WeakHandle{ &mComponentManager }, std::forward<Args>(args)... };
-    mEntityHandles.emplace_back(new EntityHandle<ArchetypeComponents...>(handle));
+
+    const Scarlet::Ulid entityId{ handle.GetEntityId().uniqueId };
+
+    mEntityIdToHandleMap[entityId] = new EntityHandle<ArchetypeComponents...>(handle);
+
+#ifdef DEV_CONFIGURATION
+    mEntityHandles.emplace_back(mEntityIdToHandleMap[entityId]);
+#endif // DEV_CONFIGURATION
+
     return handle;
-#else // DEV_CONFIGURATION.
-    return EntityHandle<ArchetypeComponents...>{ Scarlet::WeakHandle{ &mComponentManager }, std::forward<Args>(args)... };
-#endif // !DEV_CONFIGURATION
 }
 
 template <typename...ArchetypeComponents>
 void Scene::RemoveEntity(const EntityHandle<ArchetypeComponents...> entity)
 {
-    mComponentManager.RemoveEntity<ArchetypeComponents...>(entity.mEntityId);
+    mComponentManager.RemoveEntity<ArchetypeComponents...>(entity.mEntityId.uniqueId);
 }
 
 } // Namespace ScarlEnt.
