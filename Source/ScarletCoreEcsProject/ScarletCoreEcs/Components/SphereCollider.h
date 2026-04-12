@@ -14,7 +14,7 @@ struct SphereCollider
     float  radius = 0.5f;
     uint32 layer  = 0;
 
-    std::function<void(uint32)> onCollisionCallback;
+    std::function<void(SphereCollider&)> onCollisionCallback;
 
     SCARLET_COMPONENT(SphereCollider)
 };

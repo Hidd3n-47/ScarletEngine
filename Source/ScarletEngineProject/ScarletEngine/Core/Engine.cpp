@@ -270,11 +270,11 @@ void Engine::ApplySpherePhysics()
 
             if (sphereI.onCollisionCallback)
             {
-                sphereI.onCollisionCallback(sphereJ.layer);
+                sphereI.onCollisionCallback(sphereJ);
             }
             if (sphereJ.onCollisionCallback)
             {
-                sphereJ.onCollisionCallback(sphereI.layer);
+                sphereJ.onCollisionCallback(sphereI);
             }
         }
     }
