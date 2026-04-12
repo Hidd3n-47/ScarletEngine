@@ -39,6 +39,8 @@ public:
         testRegistry->AddTestCase("SceneTests", "HasComponentFalseAfterRemovingComponent", HasComponentFalseAfterRemovingComponent);
         testRegistry->AddTestCase("SceneTests", "CanRemoveComponentAdded", CanRemoveComponentAdded);
         testRegistry->AddTestCase("SceneTests", "AssertWhenTryingToRemoveComponentTwice", AssertWhenTryingToRemoveComponentTwice);
+        testRegistry->AddTestCase("SceneTests", "AddedMutableComponentHasEntityUlid", AddedMutableComponentHasEntityUlid);
+        testRegistry->AddTestCase("SceneTests", "AddedImmutableComponentHasEntityUlid", AddedImmutableComponentHasEntityUlid);
         testRegistry->AddTestCase("SceneTests", "MutableEntityUpdatesWhenSceneUpdates", MutableEntityUpdatesWhenSceneUpdates);
         testRegistry->AddTestCase("SceneTests", "SceneUpdateIteratesThroughAllSparseSetsWithSameSubset", SceneUpdateIteratesThroughAllSparseSetsWithSameSubset);
         testRegistry->AddTestCase("SceneTests", "SceneUpdateChangedEntitiesCorrectlyWithMultipleComponentsSparseSet", SceneUpdateChangedEntitiesCorrectlyWithMultipleComponentsSparseSet);
@@ -521,7 +523,6 @@ public:
         return passed;
     }
 
-
     static bool HasComponentIsFalseWithNoComponents()
     {
         bool passed = true;
@@ -604,6 +605,38 @@ public:
         {
             passed = true;
         }
+
+        ScarlEnt::Registry::Instance().RemoveScene(scene);
+
+        return passed;
+    }
+
+    static bool AddedMutableComponentHasEntityUlid()
+    {
+        bool passed = true;
+
+        Scarlet::WeakHandle<ScarlEnt::Scene> scene = ScarlEnt::Registry::Instance().GetOrCreateScene("Testing");
+        ScarlEnt::MutableEntityHandle handle = scene->AddMutableEntity();
+
+        handle.AddComponent<Vec2>();
+
+        passed &= handle.GetComponent<Vec2>().GetEntityUniqueId() == handle.GetEntityId().uniqueId;
+
+        ScarlEnt::Registry::Instance().RemoveScene(scene);
+
+        return passed;
+    }
+
+    static bool AddedImmutableComponentHasEntityUlid()
+    {
+        bool passed = true;
+
+        Scarlet::WeakHandle<ScarlEnt::Scene> scene = ScarlEnt::Registry::Instance().GetOrCreateScene("Testing");
+        ScarlEnt::EntityHandle<Vec2> handle = scene->AddEntity<Vec2>();
+
+        passed &= handle.GetComponent<Vec2>().GetEntityUniqueId() == handle.GetEntityId().uniqueId;
+
+        ScarlEnt::Registry::Instance().RemoveScene(scene);
 
         return passed;
     }

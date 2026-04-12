@@ -119,7 +119,7 @@ inline void Archetype::AddEntity(const Scarlet::Ulid entityId, Components&&... c
     mEntityIdToIndex[entityId] = mEntityIds.size() - 1;
 
     ((static_cast<ComponentArray<Components>*>(mComponents[mComponentIdToArrayIndex[Registry::GetComponentTypeId<Components>()]])
-        ->AddComponent(std::forward<Components>(componentValues))), ...);
+        ->AddComponent(std::forward<Components>(componentValues)).SetEntityUniqueId(entityId)), ...);
 }
 
 inline void Archetype::RemoveEntity(const Scarlet::Ulid entityId)

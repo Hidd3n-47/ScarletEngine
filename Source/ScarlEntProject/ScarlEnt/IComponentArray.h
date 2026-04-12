@@ -28,9 +28,10 @@ struct ComponentArray : IComponentArray
      * @brief Add a component to the array.
      * @param data The component data cast to a void pointer to remove type information.
      */
-    inline void AddComponent(T&& data)
+    inline T& AddComponent(T&& data)
     {
         componentArray.emplace_back(std::move(data));
+        return componentArray.back();
     }
 
     /**

@@ -67,7 +67,10 @@ public:
     {
         SCARLENT_ASSERT(mIsValid && "Trying to add component on mutable entity that has been marked as invalid.");
 
-        return mComponentManagerRef->AddComponent<T>(mEntityId.runtimeId, std::forward<Args>(args)...);
+        T& component = mComponentManagerRef->AddComponent<T>(mEntityId.runtimeId, std::forward<Args>(args)...);
+        component.SetEntityUniqueId(mEntityId.uniqueId);
+
+        return component;
     }
 
     /**

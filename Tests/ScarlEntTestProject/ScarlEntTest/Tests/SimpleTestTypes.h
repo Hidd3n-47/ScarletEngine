@@ -2,6 +2,9 @@
 
 struct Int
 {
+    Int() = default;
+    Int(const int x) : x(x) { }
+
     int x = 0;
 
     bool operator==(const Int& other) const
@@ -11,10 +14,17 @@ struct Int
 
     inline unordered_map<std::string, ScarlEnt::Property>* GetProperties() const { return nullptr; }
     inline static std::string ComponentTypeName() { return "Int"; }
+    inline void SetEntityUniqueId(const Scarlet::Ulid id) { mEntityId = id; }
+    inline Scarlet::Ulid GetEntityUniqueId() const { return mEntityId; }
+private:
+    Scarlet::Ulid mEntityId;
 };
 
 struct Char
 {
+    Char() = default;
+    Char(const char x) : x(x) { }
+
     char x = 0;
 
     bool operator==(const Char& other) const
@@ -24,10 +34,17 @@ struct Char
 
     inline unordered_map<std::string, ScarlEnt::Property>* GetProperties() const { return nullptr; }
     inline static std::string ComponentTypeName() { return "Char"; }
+    inline void SetEntityUniqueId(const Scarlet::Ulid id) { mEntityId = id; }
+    inline Scarlet::Ulid GetEntityUniqueId() const { return mEntityId; }
+private:
+    Scarlet::Ulid mEntityId;
 };
 
 struct Vec2
 {
+    Vec2() = default;
+    Vec2(const int x, const int y) : x(x), y(y) { }
+
     int x = 0;
     int y = 0;
 
@@ -46,10 +63,17 @@ struct Vec2
 
     inline unordered_map<std::string, ScarlEnt::Property>* GetProperties() const { return nullptr; }
     inline static std::string ComponentTypeName() { return "Vec2"; }
+    inline void SetEntityUniqueId(const Scarlet::Ulid id) { mEntityId = id; }
+    inline Scarlet::Ulid GetEntityUniqueId() const { return mEntityId; }
+private:
+    Scarlet::Ulid mEntityId;
 };
 
 struct Vec3
 {
+    Vec3() = default;
+    Vec3(const int x, const int y, const int z) : x(x), y(y), z(z) {}
+
     int x = 0;
     int y = 0;
     int z = 0;
@@ -61,4 +85,8 @@ struct Vec3
 
     inline unordered_map<std::string, ScarlEnt::Property>* GetProperties() const { return nullptr; }
     inline static std::string ComponentTypeName() { return "Vec3"; }
+    inline void SetEntityUniqueId(const Scarlet::Ulid id) { mEntityId = id; }
+    inline Scarlet::Ulid GetEntityUniqueId() const { return mEntityId; }
+private:
+    Scarlet::Ulid mEntityId;
 };

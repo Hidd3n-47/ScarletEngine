@@ -73,7 +73,7 @@ public:
     inline void DestroyEntity()
     {
         mIsValid = false;
-        mComponentManagerRef->RemoveEntity<ArchetypeComponents...>(mEntityId);
+        mComponentManagerRef->RemoveEntity<ArchetypeComponents...>(mEntityId.uniqueId);
     }
 
     [[nodiscard]] inline EntityId GetEntityId() const final { return mEntityId; }

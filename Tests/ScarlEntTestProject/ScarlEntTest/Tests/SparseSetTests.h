@@ -64,7 +64,7 @@ public:
         bool passed = true;
 
         static constexpr uint64 id = 475;
-        constexpr Vec2 solution{ number, number * number };
+        const Vec2 solution{ number, number * number };
 
         ScarlEnt::SparseSet<Vec2, page_size> ss;
         ss.Add(id, number, number * number);
@@ -114,8 +114,8 @@ public:
         bool passed = true;
 
         static constexpr uint64 id = 475;
-        constexpr Vec2 solution1{ number, number * number };
-        constexpr Vec2 solution2{ number * number, number / number };
+        const Vec2 solution1{ number, number * number };
+        const Vec2 solution2{ number * number, number / number };
 
         ScarlEnt::SparseSet<Vec2, page_size> ss;
         ss.Add(id, number, number * number);
@@ -144,8 +144,8 @@ public:
         bool passed = true;
 
         static constexpr uint64 id = page_size / 2 + 20;
-        constexpr Vec2 solution1{ number, number * number };
-        constexpr Vec2 solution2{ number * number, number / number };
+        const Vec2 solution1{ number, number * number };
+        const Vec2 solution2{ number * number, number / number };
 
         ScarlEnt::SparseSet<Vec2, page_size> ss;
         ss.Add(id, number, number * number);
