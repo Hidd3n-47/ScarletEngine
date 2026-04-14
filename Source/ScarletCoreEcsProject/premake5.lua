@@ -43,15 +43,6 @@ project "ScarletCoreEcs"
         "ScarletLogger",
     }
 
-    postbuildcommands
-    {
-        '{MKDIR} "' .. outputPath .. '/Scarlet/"',
-        '{COPYFILE} "%{cfg.buildtarget.abspath}" "' .. outputPath .. '/Scarlet/"',
-
-        '{MKDIR} "$(SolutionDir)Bin/"',
-        '{COPYFILE} "%{cfg.targetdir}/%{prj.name}.lib" "$(SolutionDir)Bin/"'
-    }
-
     filter "system:windows"
         systemversion "latest"
 
@@ -59,8 +50,18 @@ project "ScarletCoreEcs"
         runtime "Debug"
         defines { "COMPONENTS_BUILD", "DEV_CONFIGURATION"}
         symbols "On"
+        postbuildcommands
+        {
+            '{MKDIR} "$(SolutionDir)Bin/"',
+            '{COPYFILE} "%{cfg.targetdir}/%{prj.name}.lib" "$(SolutionDir)Bin/"'
+        }
 
     filter "configurations:Release"
         runtime "Release"
         defines "COMPONENTS_BUILD"
         optimize "On"
+        postbuildcommands
+        {
+            '{MKDIR} "$(SolutionDir)Build/Bin/"',
+            '{COPYFILE} "%{cfg.targetdir}/%{prj.name}.lib" "$(SolutionDir)Build/Bin/"'
+        }

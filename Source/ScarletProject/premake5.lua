@@ -29,10 +29,6 @@ project "Scarlet"
         "$(SolutionDir)Source/ScarlEntProject/",
     }
 
-    libdirs
-    {
-    }
-
     links
     {
         "ScarletCore",
@@ -52,3 +48,8 @@ project "Scarlet"
     filter "configurations:Release"
         runtime "Release"
         optimize "On"
+        postbuildcommands
+        {
+            '{MKDIR} "$(SolutionDir)Build/Bin/"',
+            '{COPYFILE} "%{cfg.targetdir}/%{prj.name}.exe" "$(SolutionDir)Build/Bin/"'
+        }

@@ -35,12 +35,6 @@ project "ScarletReflect"
         "ScarletCore",
     }
 
-    postbuildcommands
-    {
-        '{MKDIR} "$(SolutionDir)Bin/"',
-        '{COPYFILE} "%{cfg.targetdir}/%{prj.name}.lib" "$(SolutionDir)Bin/"'
-    }
-
     filter "system:windows"
         systemversion "latest"
 
@@ -48,7 +42,17 @@ project "ScarletReflect"
         runtime "Debug"
         defines "DEV_CONFIGURATION"
         symbols "On"
+        postbuildcommands
+        {
+            '{MKDIR} "$(SolutionDir)Bin/"',
+            '{COPYFILE} "%{cfg.targetdir}/%{prj.name}.lib" "$(SolutionDir)Bin/"'
+        }
 
     filter "configurations:Release"
         runtime "Release"
         optimize "On"
+        postbuildcommands
+        {
+            '{MKDIR} "$(SolutionDir)Build/Bin/"',
+            '{COPYFILE} "%{cfg.targetdir}/%{prj.name}.lib" "$(SolutionDir)Build/Bin/"'
+        }

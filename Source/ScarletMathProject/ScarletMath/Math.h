@@ -76,6 +76,16 @@ template <typename T>
     return Dot(vector, vector);
 }
 
+[[nodiscard]] static inline float Dot(const Vec2 v1, const Vec2 v2)
+{
+    return glm::dot(v1, v2);
+}
+
+[[nodiscard]] static inline float MagnitudeSquared(const Vec2 vector)
+{
+    return Dot(vector, vector);
+}
+
 [[nodiscard]] static inline Mat4 LookAt(const Vec3 eye, const Vec3 center, const Vec3 up)
 {
     const Vec3 f = Normalize(center - eye);

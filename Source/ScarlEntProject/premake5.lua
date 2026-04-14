@@ -35,19 +35,6 @@ project "ScarlEnt"
         "ScarletCore"
     }
 
-    postbuildcommands
-    {
-        '{MKDIR} "' .. testOutputPath .. '/ScarlEntTest/"',
-        '{COPYFILE} "%{cfg.buildtarget.abspath}" "' .. testOutputPath .. '/ScarlEntTest/"',
-
-        '{MKDIR} "' .. outputPath .. '/Scarlet/"',
-        '{COPYFILE} "%{cfg.buildtarget.abspath}" "' .. outputPath .. '/Scarlet/"',
-
-        '{MKDIR} "$(SolutionDir)Bin/"',
-        '{COPYFILE} "%{cfg.buildtarget.abspath}" "$(SolutionDir)Bin/"',
-        '{COPYFILE} "%{cfg.targetdir}/%{prj.name}.lib" "$(SolutionDir)Bin/"'
-    }
-
     filter "system:windows"
         systemversion "latest"
 
@@ -55,8 +42,29 @@ project "ScarlEnt"
         runtime "Debug"
         defines { "DEV_CONFIGURATION", "SCARLENT" }
         symbols "On"
+        postbuildcommands
+        {
+            '{MKDIR} "' .. testOutputPath .. '/ScarlEntTest/"',
+            '{COPYFILE} "%{cfg.buildtarget.abspath}" "' .. testOutputPath .. '/ScarlEntTest/"',
+
+            '{MKDIR} "' .. outputPath .. '/Scarlet/"',
+            '{COPYFILE} "%{cfg.buildtarget.abspath}" "' .. outputPath .. '/Scarlet/"',
+
+            '{MKDIR} "$(SolutionDir)Bin/"',
+            '{COPYFILE} "%{cfg.buildtarget.abspath}" "$(SolutionDir)Bin/"',
+            '{COPYFILE} "%{cfg.targetdir}/%{prj.name}.lib" "$(SolutionDir)Bin/"'
+        }
 
     filter "configurations:Release"
         runtime "Release"
         defines "SCARLENT"
         optimize "On"
+        postbuildcommands
+        {
+            '{MKDIR} "' .. testOutputPath .. '/ScarlEntTest/"',
+            '{COPYFILE} "%{cfg.buildtarget.abspath}" "' .. testOutputPath .. '/ScarlEntTest/"',
+
+            '{MKDIR} "$(SolutionDir)Bin/"',
+            '{COPYFILE} "%{cfg.buildtarget.abspath}" "$(SolutionDir)Build/Bin/"',
+            '{COPYFILE} "%{cfg.targetdir}/%{prj.name}.lib" "$(SolutionDir)Build/Bin/"'
+        }

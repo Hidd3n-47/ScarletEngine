@@ -51,8 +51,9 @@ public:
      */
     [[nodiscard]] inline std::string GetTypeAsString() const
     {
-        // todo try make constexpr
+        // Todo Christian try make constexpr
         if (mType == PropertyType::FLOAT)    return "float";
+        if (mType == PropertyType::UINT32)   return "uint32";
         if (mType == PropertyType::BOOL)     return "bool";
         if (mType == PropertyType::STRING)   return "string";
         if (mType == PropertyType::VEC3)     return "vec3";

@@ -14,8 +14,8 @@ project "{project_name}"
     staticruntime "Off"
     cppdialect "C++20"
 
-    targetdir(path.join("{project_path}", "Scratch/Bin/", "%{{prj.name}}"))
-    objdir(path.join("{project_path}", "Scratch/Bin-Int/", "%{{prj.name}}"))
+    targetdir(path.join("{project_path}", "Scratch", "Bin", "%{{cfg.buildcfg}}", "%{{prj.name}}"))
+    objdir(path.join("{project_path}", "Scratch", "Bin-Int", "%{{cfg.buildcfg}}", "%{{prj.name}}"))
 
     files
     {{
@@ -38,18 +38,6 @@ project "{project_name}"
         "$(SolutionDir)",
     }}
 
-    links
-    {{
-        "{engine_path}Bin/ScarlEnt.lib",
-        "{engine_path}Bin/ScarlEnt.dll",
-        "{engine_path}Bin/ScarletMath.lib",
-        "{engine_path}Bin/ScarletCore.lib",
-        "{engine_path}Bin/ScarletReflect.lib",
-        "{engine_path}Bin/ScarletCoreEcs.lib",
-        "{engine_path}Bin/ScarletEngine.lib",
-        "{engine_path}Bin/ScarletEngine.dll"
-    }}
-
     filter "system:windows"
         systemversion "latest"
 
@@ -57,8 +45,30 @@ project "{project_name}"
         runtime "Debug"
         defines {{ "DEV_CONFIGURATION", "GAME_DLL_BUILD" }}
         symbols "On"
+        links
+        {{
+            "{engine_path}Bin/ScarlEnt.lib",
+            "{engine_path}Bin/ScarlEnt.dll",
+            "{engine_path}Bin/ScarletMath.lib",
+            "{engine_path}Bin/ScarletCore.lib",
+            "{engine_path}Bin/ScarletReflect.lib",
+            "{engine_path}Bin/ScarletCoreEcs.lib",
+            "{engine_path}Bin/ScarletEngine.lib",
+            "{engine_path}Bin/ScarletEngine.dll"
+        }}
 
     filter "configurations:Release"
         runtime "Release"
         defines "GAME_DLL_BUILD"
         optimize "On"
+        links
+        {{
+            "{engine_path}Build/Bin/ScarlEnt.lib",
+            "{engine_path}Build/Bin/ScarlEnt.dll",
+            "{engine_path}Build/Bin/ScarletMath.lib",
+            "{engine_path}Build/Bin/ScarletCore.lib",
+            "{engine_path}Build/Bin/ScarletReflect.lib",
+            "{engine_path}Build/Bin/ScarletCoreEcs.lib",
+            "{engine_path}Build/Bin/ScarletEngine.lib",
+            "{engine_path}Build/Bin/ScarletEngine.dll"
+        }}

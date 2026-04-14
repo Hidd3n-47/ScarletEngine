@@ -118,9 +118,10 @@ void Engine::Run() const
 
         WindowManager::ApiPoll();
 
-#ifdef DEV_CONFIGURATION
         WeakHandle<ScarlEnt::Scene> scene = ScarlEnt::Registry::Instance().GetActiveScene();
+#ifdef DEV_CONFIGURATION
         if (scene.IsValid()) [[likely]]
+#endif // ^^^ DEV_CONFIGURATION. ^^^
         {
             scene->Update();
 
@@ -132,11 +133,9 @@ void Engine::Run() const
             }
         }
 
+#ifdef DEV_CONFIGURATION
         if (mBeginRenderEvent) mBeginRenderEvent();
-#else // DEV_CONFIGURATION.
-        WeakHandle<ScarlEnt::Scene> scene = ScarlEnt::Registry::Instance().GetActiveScene();
-        scene->Update();
-#endif // !DEV_CONFIGURATION.
+#endif // ^^^ DEV_CONFIGURATION. ^^^
 
         Renderer::Instance().Render();
 

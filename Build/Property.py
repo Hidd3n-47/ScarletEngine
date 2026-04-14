@@ -2,6 +2,6 @@ from dataclasses import dataclass
 
 @dataclass
 class Property:
-    type: str = ""
-    name: str = ""
+    type:  str = ""
+    name:  str = ""
     value: str = ""

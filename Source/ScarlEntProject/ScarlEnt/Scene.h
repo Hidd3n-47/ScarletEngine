@@ -61,7 +61,7 @@ public:
      * @return A \ref EntityHandle to the entity.
      */
     template <typename...ArchetypeComponents>
-    [[nodiscard]] EntityHandle<ArchetypeComponents...> AddEntity();
+    EntityHandle<ArchetypeComponents...> AddEntity();
 
     /**
      * @brief Add an entity to the scene.
@@ -71,7 +71,7 @@ public:
      * @return A \ref EntityHandle to the entity.
      */
     template <typename...ArchetypeComponents, typename...Args>
-    [[nodiscard]] EntityHandle<ArchetypeComponents...> AddEntity(Args&& ...args);
+    EntityHandle<ArchetypeComponents...> AddEntity(Args&& ...args);
 
     /**
      * @brief Create and add a mutable entity to the scene.

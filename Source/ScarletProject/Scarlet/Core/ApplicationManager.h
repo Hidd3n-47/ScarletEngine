@@ -27,6 +27,9 @@ private:
     HMODULE mGameDll = nullptr;
 
     CreateGameInstanceFunc  CreateGameInstanceFunctionPointer;
+#ifdef DEV_CONFIGURATION
+    std::string mTempDllPath = "";
+#endif // ^^^ DEV_CONFIGURATION ^^^
 };
 
 } // Namespace Scarlet.

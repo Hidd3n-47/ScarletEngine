@@ -22,12 +22,6 @@ project "ScarletMath"
         "$(SolutionDir)Deps/include/",
     }
 
-    postbuildcommands
-    {
-        '{MKDIR} "$(SolutionDir)Bin/"',
-        '{COPYFILE} "%{cfg.targetdir}/%{prj.name}.lib" "$(SolutionDir)Bin/"'
-    }
-
     filter "system:windows"
         systemversion "latest"
 
@@ -35,8 +29,18 @@ project "ScarletMath"
         defines "SCARLETT_MATH_DEBUG"
         symbols "On"
         runtime "Debug"
+        postbuildcommands
+        {
+            '{MKDIR} "$(SolutionDir)Bin/"',
+            '{COPYFILE} "%{cfg.targetdir}/%{prj.name}.lib" "$(SolutionDir)Bin/"'
+        }
 
     filter "configurations:Release"
         defines "SCARLETT_MATH_RELEASE"
         optimize "On"
         runtime "Release"
+        postbuildcommands
+        {
+            '{MKDIR} "$(SolutionDir)Build/Bin/"',
+            '{COPYFILE} "%{cfg.targetdir}/%{prj.name}.lib" "$(SolutionDir)Build/Bin/"'
+        }

@@ -436,7 +436,7 @@ void AssetBrowserPanel::CreateMaterial()
     ImGui::Text("%s", popupTitle.c_str());
 
     constexpr uint32 assetNameLength = 50;
-    char assetName[assetNameLength] = { };
+    char assetName[assetNameLength]  = { };
 
     if (!enteredAssetName.empty())
     {
@@ -506,7 +506,6 @@ void AssetBrowserPanel::CreateMaterial()
     ImGui::SameLine(130.0f);
     ImGui::DragFloat3("##diffuse", &diffuse.x, 0.001f, 0.0f, 1.0f, "%.3f");
 
-
     ImGui::SetCursorPosY(CREATE_ASSET_HEIGHT - 35.0f);
     if (ImGui::Button("Cancel"))
     {
@@ -535,7 +534,6 @@ void AssetBrowserPanel::CreateMaterial()
         ClosePopupFunc();
     }
 }
-
 
 void AssetBrowserPanel::CreateMesh()
 {

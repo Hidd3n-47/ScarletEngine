@@ -162,7 +162,7 @@ void NewProjectPanel::RenderFolderPicker()
 
     constexpr uint32 maxCharactersDisplayed = 30;
 
-    const size_t pathCharacters = mNewProjPath.length();
+    const size_t pathCharacters  = mNewProjPath.length();
     const std::string pathCapped = pathCharacters >= maxCharactersDisplayed
         ? mNewProjPath.substr(0, 3) + "..." + mNewProjPath.substr(pathCharacters - maxCharactersDisplayed)
         : mNewProjPath;

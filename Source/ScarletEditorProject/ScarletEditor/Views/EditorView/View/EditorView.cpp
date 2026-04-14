@@ -85,7 +85,6 @@ void EditorView::RenderMenuBar()
                 }
             }
 
-            if (ImGui::MenuItem("Settings")) {}
             ImGui::Separator();
 
             if (ImGui::MenuItem("Close")) { Engine::Instance().CloseEngine(); }
@@ -103,6 +102,24 @@ void EditorView::RenderMenuBar()
 
             ImGui::EndMenu();
         }
+
+        if (ImGui::BeginMenu("Build"))
+        {
+            if (ImGui::MenuItem("Build Game"))
+            {
+                const std::string gameBuildPath = FileDialog::OpenFolder();
+
+                if (!gameBuildPath.empty())
+                {
+                    const std::string projectName = EditorManager::Instance().GetProjectName();
+                    const std::string enginePath  = Filepath{ FilepathDirectory::ENGINE , "" }.GetAbsolutePath();
+                    const std::string projectPath = Filepath{ FilepathDirectory::PROJECT, "" }.GetAbsolutePath();
+                    system(std::format("python \"{}Build/BuildScene.py\" {} {} {} {}", enginePath, projectName, projectPath, enginePath, gameBuildPath).c_str());
+                }
+            }
+            ImGui::EndMenu();
+        }
+
         ImGui::EndMenuBar();
     }
 }

@@ -58,16 +58,6 @@ project "ScarletEngine"
         "opengl32.lib"
     }
 
-    postbuildcommands
-    {
-        '{MKDIR} "' .. outputPath .. '/Scarlet/"',
-        '{COPYFILE} "%{cfg.buildtarget.abspath}" "' .. outputPath .. '/Scarlet/"',
-
-        '{MKDIR} "$(SolutionDir)Bin/"',
-        '{COPYFILE} "%{cfg.buildtarget.abspath}" "$(SolutionDir)Bin/"',
-        '{COPYFILE} "%{cfg.targetdir}/%{prj.name}.lib" "$(SolutionDir)Bin/"'
-    }
-
     filter "system:windows"
         systemversion "latest"
 
@@ -75,8 +65,23 @@ project "ScarletEngine"
         runtime "Debug"
         defines { "ENGINE_BUILD", "DEV_CONFIGURATION", "SCARLET_ENGINE_PATH=R\"($(SolutionDir))\"" }
         symbols "On"
+        postbuildcommands
+        {
+            '{MKDIR} "' .. outputPath .. '/Scarlet/"',
+            '{COPYFILE} "%{cfg.buildtarget.abspath}" "' .. outputPath .. '/Scarlet/"',
+
+            '{MKDIR} "$(SolutionDir)Bin/"',
+            '{COPYFILE} "%{cfg.buildtarget.abspath}" "$(SolutionDir)Bin/"',
+            '{COPYFILE} "%{cfg.targetdir}/%{prj.name}.lib" "$(SolutionDir)Bin/"'
+        }
 
     filter "configurations:Release"
         runtime "Release"
         defines { "ENGINE_BUILD", "SCARLET_ENGINE_PATH=R\"($(SolutionDir))\"" }
         optimize "On"
+        postbuildcommands
+        {
+            '{MKDIR} "$(SolutionDir)Build/Bin/"',
+            '{COPYFILE} "%{cfg.buildtarget.abspath}" "$(SolutionDir)Build/Bin/"',
+            '{COPYFILE} "%{cfg.targetdir}/%{prj.name}.lib" "$(SolutionDir)Build/Bin/"'
+        }

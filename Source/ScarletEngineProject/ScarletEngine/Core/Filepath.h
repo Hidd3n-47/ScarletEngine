@@ -47,7 +47,7 @@ public:
     [[nodiscard]] inline std::string GetAbsolutePath() const
     {
         return ((mDirectory == FilepathDirectory::ENGINE ?
-                SCARLET_ENGINE_DIRECTORY : mScarletProjectDirectory) / mRelativePath).string();
+                 mScarletEngineDirectory : mScarletProjectDirectory) / mRelativePath).string();
     }
 
     /**
@@ -92,13 +92,14 @@ public:
     }
 
     inline static const std::filesystem::path& GetProjectDirectory() { return mScarletProjectDirectory; }
+    inline static void SetEngineDirectory (const std::filesystem::path& engineDirectory ) { mScarletEngineDirectory = engineDirectory; }
     inline static void SetProjectDirectory(const std::filesystem::path& projectDirectory) { SCARLET_INFO("Project path set to: {}", projectDirectory.string()); mScarletProjectDirectory = projectDirectory; }
 
-    static const std::filesystem::path SCARLET_ENGINE_DIRECTORY;
 private:
     std::filesystem::path mRelativePath{ };
     FilepathDirectory     mDirectory   { FilepathDirectory::ENGINE };
 
+    static std::filesystem::path mScarletEngineDirectory;
     static std::filesystem::path mScarletProjectDirectory;
 };
 

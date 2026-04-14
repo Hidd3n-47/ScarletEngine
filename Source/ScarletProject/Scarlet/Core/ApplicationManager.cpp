@@ -18,6 +18,10 @@ namespace Scarlet
 
 void ApplicationManager::Init()
 {
+#ifndef DEV_CONFIGURATION
+    LoadGameDll();
+#endif // ^^^ !DEV_CONFIGURATION. ^^^
+
     DEBUG(Engine::Instance().SetReloadDllFunction ([&] { LoadGameDll(); }));
     DEBUG(Engine::Instance().SetReloadGameFunction([&] { ReloadGame();  }));
 
@@ -37,18 +41,18 @@ void ApplicationManager::LoadGameDll()
 
 #ifdef DEV_CONFIGURATION
     const std::string projectName = Editor::EditorManager::Instance().GetProjectName();
-    const std::string path        = Filepath{ FilepathDirectory::PROJECT, "Scratch/Bin/" + projectName + "/" }.GetAbsolutePath();
-    const std::string tempPath    = path + "Game_temp_" + std::to_string(mLoadedDlls - 1) + ".dll";
+    const std::string path        = Filepath{ FilepathDirectory::PROJECT, "Scratch/Bin/Dev/" + projectName + "/" }.GetAbsolutePath();
+    mTempDllPath = path + "Game_temp_" + std::to_string(mLoadedDlls++) + ".dll";
 
-    if (!CopyFileA((path + projectName + ".dll").c_str(), tempPath.c_str(), FALSE))
+    if (!CopyFileA((path + projectName + ".dll").c_str(), mTempDllPath.c_str(), FALSE))
     {
         SCARLET_ERROR("Failed to copy the game DLL to a temporary location.");
         return;
     }
 
-    mGameDll = LoadLibraryA(tempPath.c_str());
+    mGameDll = LoadLibraryA(mTempDllPath.c_str());
 #else // DEV_CONFIGURATION.
-    mGameDll = LoadLibrary(L"E:/Programming/ScarletEngine/Scratch/Bin/Release/ScarletTestGameProject/ScarletTestGameProject.dll");
+    mGameDll = LoadLibrary(L"Game.dll");
 #endif // !DEV_CONFIGURATION.
 
     if (!mGameDll)
@@ -81,9 +85,12 @@ void ApplicationManager::UnloadGameDll()
         FreeLibrary(mGameDll);
 
 #ifdef DEV_CONFIGURATION
-        const std::string path     = "E:/Programming/ScarletEngine/Scratch/Bin/Dev/ScarletTestGameProject/";
-        const std::string tempPath = path + "Game_temp_" + std::to_string(mLoadedDlls - 1) + ".dll";
-        DeleteFileA(tempPath.c_str());
+        if (!mTempDllPath.empty())
+        {
+            DeleteFileA(mTempDllPath.c_str());
+        }
+
+        mTempDllPath = "";
 #endif // DEV_CONFIGURATION.
 
     }
