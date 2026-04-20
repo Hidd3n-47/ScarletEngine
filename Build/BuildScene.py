@@ -19,7 +19,7 @@ build_output_directory = os.path.join(build_path, project_name)
 if os.path.exists(build_output_directory):
     shutil.rmtree(build_output_directory)
 
-tree = et.parse(os.path.join(project_path,"Content/Scenes/GameScene.scarlet_scene"))
+tree = et.parse(os.path.join(project_path,f"Content/Scenes/{project_name}.scarlet_scene"))
 
 scene_element = tree.getroot()
 
@@ -35,7 +35,7 @@ for entity_element in scene_element:
 
         # If this is editor only, grab the information required and don't add it as its editor only.
         if component.type == "EditorInfo":
-            mutableElements = component_element.findall("isMutable");
+            mutableElements = component_element.findall("isMutable")
             if len(mutableElements) == 0:
                 ent.mutable = False
             else:

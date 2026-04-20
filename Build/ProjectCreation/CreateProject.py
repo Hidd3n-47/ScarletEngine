@@ -54,8 +54,8 @@ def create_project_files(engine_path, project_name, project_path, starting_scene
     with (open(os.path.join(project_template_path, "GenerateSolution.bat.scarlet_template"), "r") as f):
         file_template_str = f.read()
 
-    with open(project_path, "w+") as f:
-        f.write(file_template_str.formate(engine_path=engine_path))
+    with open(os.path.join(project_path, "GenerateSolution.bat"), "w+") as f:
+        f.write(file_template_str.format(engine_path=engine_path))
 
 # Arguments passed in: 1: EnginePath, 2: ProjectName, 3: ProjectPath, 4: StartingSceneName
 create_project_files(sys.argv[1].replace('\\','/'), sys.argv[2], sys.argv[3], sys.argv[4])

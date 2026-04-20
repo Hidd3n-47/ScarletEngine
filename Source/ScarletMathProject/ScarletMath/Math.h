@@ -17,6 +17,11 @@ typedef glm::vec4 Vec4;
 typedef glm::mat3 Mat3;
 typedef glm::mat4 Mat4;
 
+[[nodiscard]] static inline float Lerp(const float startingValue, const float endValue, const float t)
+{
+    return t * (endValue - startingValue) + startingValue;
+}
+
 template <typename T>
 [[nodiscard]] static inline T Abs(const T value)
 {

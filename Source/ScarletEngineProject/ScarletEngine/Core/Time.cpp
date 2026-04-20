@@ -16,6 +16,7 @@ void Time::Init(const double simulationFrameRate)
 {
     mSimulationFrameRate = simulationFrameRate;
     mTargetFrameTime     = static_cast<uint64>(1'000.0 / simulationFrameRate);
+    mFrameDeltaMs        = mTargetFrameTime;
 }
 
 bool Time::Tick()
