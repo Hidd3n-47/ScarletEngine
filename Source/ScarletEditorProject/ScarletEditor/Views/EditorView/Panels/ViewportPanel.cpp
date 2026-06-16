@@ -120,6 +120,7 @@ void ViewportPanel::RenderViewportToolbar(SelectionManager& selectionManager)
     ImGui::SameLine(viewportSize.x * 0.5f - 75.0f);
     if (ImGui::ImageButton("Play", playIconId, ImVec2{ iconWidth, iconWidth }, ImVec2{ 0.0f, 1.0f }, ImVec2{ 1.0f, 0.0f }) && !mGameSimulating)
     {
+        EditorManager::Instance().SaveCurrentScene();
         mGameSimulating = true;
 
         Engine::Instance().GetMainWindow()->SetShowCursor(false);
@@ -244,8 +245,9 @@ void ViewportPanel::ViewportSelection(SelectionManager& selectionManager) const
 
     ImGuizmo::SetRect(imagePosition.x, imagePosition.y, imageDrawnSize.x, imageDrawnSize.y);
 
-    // If the manipulation is still occuring, early out as selection should not be altered mid transform.
-    if (selectionManager.ManipulatingSelected())
+    // If the game is simulating, then early out as there can be no selection. Do this first to prevent gizmo rendering.
+    // If the manipulation is still occuring, early out as selection should not be altered mid-transform.
+    if (mGameSimulating || selectionManager.ManipulatingSelected())
     {
         return;
     }
